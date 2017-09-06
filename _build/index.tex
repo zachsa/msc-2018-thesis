@@ -1,0 +1,51 @@
+% Preamble
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage[utf8]{inputenc}
+\usepackage{minted}
+\usepackage{etoolbox}
+\usepackage[margin=1in]{geometry}
+
+% Configuration
+\setminted{fontsize=\scriptsize,baselinestretch=0}
+
+% Bibliography
+
+% Title
+\title{nETL}
+\author{Zach Smith}
+\date{\today}
+ 
+ % Document
+\begin{document}
+
+% Title page
+\maketitle
+\tableofcontents
+\newpage
+
+% Test figures and tables
+\begin{figure}
+    \caption{Dummy figure}
+\end{figure}
+\begin{table}
+    \caption{Dummy table}
+\end{table}
+
+% Content
+\input{../abstract/index.tex}
+\input{../introduction/index.tex}
+\input{../temp/index.tex}
+\newpage
+
+% Appendix
+\begin{appendix}
+    \listoffigures
+    \listoftables
+\end{appendix}
+\newpage
+
+% Bibliogrpahy
+
+% Close docuemnt
+\end{document}
