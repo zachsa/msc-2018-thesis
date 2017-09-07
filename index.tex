@@ -1,15 +1,18 @@
-% Preamble
+% Document
 \documentclass{article}
 \usepackage{blindtext}
 \usepackage[utf8]{inputenc}
-\usepackage{minted}
 \usepackage{etoolbox}
 \usepackage[margin=1in]{geometry}
 
-% Configuration
+% Inline-code
+\usepackage[outputdir=./_build]{minted}
 \setminted{fontsize=\scriptsize,baselinestretch=0}
 
 % Bibliography
+\usepackage{natbib}
+\usepackage{bibentry}
+\nobibliography*
 
 % Title
 \title{nETL}
@@ -35,7 +38,6 @@
 % Content
 \input{../abstract/index.tex}
 \input{../introduction/index.tex}
-\input{../temp/index.tex}
 \newpage
 
 % Appendix
@@ -46,6 +48,8 @@
 \newpage
 
 % Bibliogrpahy
+\bibliographystyle{plain}
+\bibliography{../bibliography/msc_citations.bib}
 
 % Close docuemnt
 \end{document}

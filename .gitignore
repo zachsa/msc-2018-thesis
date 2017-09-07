@@ -1,3 +1,6 @@
+# added by Zach
+_build/
+
 # Ignore PDFs
 *.pdf
 
