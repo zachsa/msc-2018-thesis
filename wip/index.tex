@@ -6,10 +6,32 @@
 \begin{document}
 
 \section{Introduction}
+\paragraph
+Despite major disruptions to the University of Cape Town's teaching curriculum in 2016 xxx, the academic year was completed successfully with only minimal disruptions to the calendar schedule. Despite xxx hours of teaching time lost, xxx days of closing the university, course curriculums remained constant and exams tested a similar amount of material as had been previously tested.
 
-\section{And now for something completely different}
-Lorem ipsum yada yada,
-also see \cite{bower16}
+\paragraph
+One of the reasons the university could absorb such disruptions is due to their implementation of learning management software - their 'Vula' system, which is based on the 'Sukai' platform.
+
+\paragraph
+The trend of educational institutions has been to increasingly implement and rely on such software and UCT is no exception. Looking at a graph showing the uptake of such systems throughout globally acclaimed educational institutes shows just how important they have become xxx. A plethora of competing educational tools exist; Blackboard, Canvas, Sukai to name a few, all with a fairly comparable feature list xxx.
+
+\paragraph
+A key feature is ability to host and deliver course content via an online platform, taking advantage of functionality that such a platform can provide - in this case with reference to tracking of platform and content usage. With reference specifically to the Sakai platform, it is possible to follow which students accessed which resources and the timing of such events.
+
+\paragraph
+The striking at the University of Cape Town provides a unique opportunity to analyze this data as a comparison between classroom learning augmented by online tools vs primary reliance on online tools over an extended period by the same learners. Effectively a blind-control was inadvertently created that allows assessment of a single group of students in two isolated environments in terms of their resultant grades.
+
+\section{The data}
+\paragraph
+Many software packages exist to make analysis of such data trivial in terms of processing. Spreadsheet programs such as Microsoft Excel (or their online competition Google Sheets), databases such as Microsoft Access, MySQL are designed for this time of work.
+
+\paragraph
+But these tools fail when looking at scale of storage that Sakai's event data requires either in terms of ability (Microsoft Excel can work with a theoretical maximum of xxx lines, Access databases can be maximum 2GB), complexity or cost. Relational databases don't scale well horizontally speaking xxx, and this problem is going become more pronounced with time.
+
+This thesis looks at creating a cost-effective 'analysis-engine' capable of scaling to many times the amount of data that a single machine can hold in a way that is still effective to analyze (distributed computing) and not too mentally taxing to implement.
+
+specifically this project analyzed the viability of a software package called CouchDB, a NoSQL DBMS as a replacement for conventional RDMSs when analyzing data that has conventionally been housed RDBMSs (usually with an Oracle, Microsoft or SAP price tag associated with it).
+
 
 \bibliographystyle{plain}
 \bibliography{../bibliography/msc_citations.bib}
