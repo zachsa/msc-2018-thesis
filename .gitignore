@@ -1,9 +1,6 @@
 # added by Zach
 _build/
 
-# Ignore PDFs
-*.pdf
-
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

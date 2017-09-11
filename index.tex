@@ -1,9 +1,17 @@
-% Document
-\documentclass{article}
+% Global
+\documentclass[parskip=full,a4paper]{scrartcl}
 \usepackage{blindtext}
 \usepackage[utf8]{inputenc}
 \usepackage{etoolbox}
+
+% Graphics
+\usepackage{pdfpages}
+\usepackage{graphicx}
+
+% Layout
 \usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\setstretch{1.3}
 
 % Inline-code
 \usepackage[outputdir=./_build]{minted}
@@ -38,6 +46,14 @@
 % Content
 \input{../abstract/index.tex}
 \input{../introduction/index.tex}
+
+\begin{figure}[h]
+    \centering
+    % \includepdf[pages={1},scale=0.7,pagecommand=\chapter]{../resources/figures/netlUML.pdf}
+    \includegraphics[scale=0.4]{./resources/figures/netlUML.pdf}
+    \caption{Description of figure}
+\end{figure}
+
 \newpage
 
 % Appendix
