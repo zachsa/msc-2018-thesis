@@ -2,7 +2,7 @@
 \usepackage{natbib}
 \usepackage{bibentry}
 \usepackage[margin=1in]{geometry}
-
+\usepackage{float}
 \usepackage{graphicx}
 \usepackage{pdfpages}
 
@@ -34,16 +34,25 @@ This thesis looks at creating a cost-effective 'analysis-engine' capable of scal
 
 specifically this project analyzed the viability of a software package called CouchDB, a NoSQL DBMS as a replacement for conventional RDMSs when analyzing data that has conventionally been housed RDBMSs (usually with an Oracle, Microsoft or SAP price tag associated with it).
 
+% \newpage
 
 
-
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     % \includegraphics[scale=0.4]{../resources/netlUML.pdf}
     \includepdf[pages={1},scale=0.7,pagecommand=\chapter]{../resources/figures/netlUML.pdf}
-    \caption{Description of figure}
+    \caption[nETL]{nETL}
+    \label{nETL}
 \end{figure}
+\newpage
 
+Coming from a relational database environment there are a plethora of tools avaialable that facilitate transfer of CSV dato to a DBMS. These tools are available at a variety of different levels of extraction depending on a users technical skillset, time constraints and requirements. xxx: list some of these tools.
+
+In a SQL Server environment SSDT (formerly SSIS) is considered the de facto standard for extracting/transforming and loading data between different data sources. xxx: find a graph on the usage of SSDT/SSIS in companies.
+
+In fact it's likely that the availability of of SSDT/SSIS has influenced the uptake of SQL Server in operations that require dealing with large amount of data. It's fair to say that a barrier to using open source sofware such as CouchDB is the LACK of such software. Bespoke scripts are currently the only viable way of interfacing with CouchDB in a way that is comparable to SQL Server and SSDT. But with high-level languages such as node.js maturing, and the proliferation of small, focused libraries in these languages that abstract much of the unpleasant and gnarly aspects of bespoke scripting, bespoke data-scripting is nowhere near as difficult as it would be within the Microsoft environment (C\# of VB).
+
+Inline with the lower barrier of entry to bespoke data transformation tools, a component of this MSc is an exploration of a framework that brings the power of SSDT to and open source platforma, and specifically with moving large amounts of CSV data into CouchDB databases. Figure \ref{nETL} shows one possible architectural choice in building such a framework that has been prototyped in node.js for this MSc.
 
 
 \newpage
