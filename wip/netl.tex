@@ -50,9 +50,13 @@ Coming from a relational database environment there are a plethora of tools avai
 
 In a SQL Server environment SSDT (formerly SSIS) is considered the de facto standard for extracting/transforming and loading data between different data sources. xxx: find a graph on the usage of SSDT/SSIS in companies.
 
-In fact it's likely that the availability of of SSDT/SSIS has influenced the uptake of SQL Server in operations that require dealing with large amount of data. It's fair to say that a barrier to using open source sofware such as CouchDB is the LACK of such software. Bespoke scripts are currently the only viable way of interfacing with CouchDB in a way that is comparable to SQL Server and SSDT. But with high-level languages such as node.js maturing, and the proliferation of small, focused libraries in these languages that abstract much of the unpleasant and gnarly aspects of bespoke scripting, bespoke data-scripting is nowhere near as difficult as it would be within the Microsoft environment (C\# of VB).
+In fact it's likely that the availability of of SSDT/SSIS has influenced the uptake of SQL Server in operations that require dealing with large amount of data. It's fair to say that a barrier to using open source software such as CouchDB is the LACK of such software. Bespoke scripts are currently the only viable way of interfacing with CouchDB in a way that is comparable to SQL Server and SSDT. But with high-level languages such as node.js maturing, and the proliferation of small, focused libraries in these languages that abstract much of the unpleasant and gnarly aspects of bespoke scripting (xxx examples), bespoke data-scripting is nowhere near as difficult as it would be within the Microsoft environment (C\# or VB).
 
-Inline with the lower barrier of entry to bespoke data transformation tools, a component of this MSc is an exploration of a framework that brings the power of SSDT to and open source platforma, and specifically with moving large amounts of CSV data into CouchDB databases. Figure \ref{nETL} shows one possible architectural choice in building such a framework that has been prototyped in node.js for this MSc.
+In line with the requirement of transferring large amounts of CSV data from a CSV source to CouchDB, and taking into account the comparatively low entry barrier to bespoke data-transformation scripts, a component of this MSc is an exploration of a possible alternative to SSDT for an environment other than Microsoft's SQL Server. This MSc project actually has several requirements that fall within the ETL spectrum that such a framework could easily be adapted to handle in a generic way. The framework has been published as an npm library and is available at ..., with source code available at github somewhere xxx.
+
+Fig. \ref{nETL} shows a potential architecture for a configurable component-based ETL tool...
+
+such a framework that has been prototyped in node.js for this MSc.
 
 
 \newpage
