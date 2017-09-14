@@ -8,15 +8,18 @@
 \usepackage{pdfpages}
 \usepackage{graphicx}
 
+% Lists
+\usepackage{enumitem}
+\setlist{nosep} % or \setlist{noitemsep} to leave space around whole list
+
 % Layout
-% \usepackage{float}
 \usepackage[margin=1in]{geometry}
 \usepackage{setspace}
 \setstretch{1.3}
 
 % Inline-code
-\usepackage[outputdir=./_build]{minted}
-\setminted{fontsize=\scriptsize,baselinestretch=0}
+\usepackage[outputdir=../_build]{minted}
+\setminted{fontsize=\scriptsize,baselinestretch=1.1,linenos,xleftmargin=\parindent, breaklines}
 
 % Bibliography
 \usepackage{natbib}
@@ -27,6 +30,3 @@
 \title{nETL}
 \author{Zach Smith}
 \date{\today}
-
- % Document
-\begin{document}

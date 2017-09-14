@@ -1,24 +1,32 @@
 % Preamble
-\input{./begin_.tex}
+\input{./preamble.tex}
+
+% Document
+\begin{document}
 
 % Title page
 \maketitle
+\newpage
+
+%  TOC
 \tableofcontents
 \newpage
 
-% Test figures and tables
-\begin{figure}
-    \caption{Dummy figure}
-\end{figure}
-\begin{table}
-    \caption{Dummy table}
-\end{table}
-
 % Content
-\input{../abstract/index.tex}
-\input{../introduction/index.tex}
+\input{../content/introduction.tex}
 \input{../content/netl.tex}
 \newpage
 
-% End
-\input{./end_.tex}
+% Appendix
+\begin{appendix}
+    \listoffigures
+    \listoftables
+\end{appendix}
+\newpage
+
+% Bibliogrpahy
+\bibliographystyle{plain}
+\bibliography{../bibliography/msc_citations.bib}
+
+% Close docuemnt
+\end{document}
