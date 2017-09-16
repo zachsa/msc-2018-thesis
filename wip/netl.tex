@@ -1,4 +1,4 @@
-\input{../preamble.tex}
+\input{../preamble}
 \begin{document}
 
 
@@ -43,50 +43,50 @@ The framework itself is quite lightweight and comprises just the NETL, TaskManag
     \item Another reason for choosing JavaScript is that it is very much in line with the spirit of CouchDB and the web in general
 \end{enumerate}
 
-\subsection{Implementation}
+\subsection{Using the Framework}
 
 nETL is primarily a task-managing application, and as such, the TaskManager class is effectively the core of the application. It is intended that it can be instantiated as an instance (i.e. there can be many TaskManager instances hosted within a single running application). In JavaScript this is best implemented via a constructor:
 
 \begin{minted}{javascript}
-    /* File taskmanager.js */
-    function TaskManager(extractions, transformations, loads) {
-        this.tasks = {};
+/* File taskmanager.js */
+function TaskManager(extractions, transformations, loads) {
+    this.tasks = {};
 
-        // Hold references to extractions/transformation/loads of the main application process
-        this.extractions = extractions;
-        this.transformations = transformations;
-        this.loads = loads;
-    };
+    // Hold references to extractions/transformation/loads of the main application process
+    this.extractions = extractions;
+    this.transformations = transformations;
+    this.loads = loads;
+};
 
-    TaskManager.prototype.newTask = function(task) {
-        // Add task to this.tasks and execute the task
-    };
+TaskManager.prototype.newTask = function(task) {
+    // Add task to this.tasks and execute the task
+};
 
-    module.exports = TaskManager;
+module.exports = TaskManager;
 \end{minted}
 
 The application itself is intended to be singleton instance of \mintinline{javascript}{class NETL{}}, which provides an IO interface (either a console terminal or otherwise) to TaskManager instances, and modular extraction/transformation and load operations. Singleton's are typically implemented via the modular pattern in JavaScript, which is typically how libraries are delivered to users by package managers and invoked by \mintinline{javascript}{var library = require('library-name')();}. One possible way of implementing the NETL class in JavaScript (i.e the method that is used within this project's code base) is shown here:
 
 \begin{minted}{javascript}
-    /* File netl.js */
-    module.exports = function() {
-        // Private properties / methods
-        const _extractions = {};
-        const _transformations = {};
-        const _loads = {};        
-        const _taskManager = new TaskManager(_extractions, _transformations, _loads);
-        function _loadExtractionModule(extractionOperation){};
-        function _loadTransformationModule(transformOperation){};
-        function _loadLoadModule(loadOperation){};
+/* File netl.js */
+module.exports = function() {
+    // Private properties / methods
+    const _extractions = {};
+    const _transformations = {};
+    const _loads = {};        
+    const _taskManager = new TaskManager(_extractions, _transformations, _loads);
+    function _loadExtractionModule(extractionOperation){};
+    function _loadTransformationModule(transformOperation){};
+    function _loadLoadModule(loadOperation){};
 
-        // Make process API available
-        return {
-            taskManager: _taskManager,
-            loadExtractionModule: _loadExtractionModule,
-            loadTransformationModule: _loadTransformationModule,
-            loadLoadModule: _loadLoadModule
-        };
+    // Make process API available
+    return {
+        taskManager: _taskManager,
+        loadExtractionModule: _loadExtractionModule,
+        loadTransformationModule: _loadTransformationModule,
+        loadLoadModule: _loadLoadModule
     };
+};
 \end{minted}
 
 Packaged as a node.js module, the intention is that a user can simply import the \mintinline{javascript}{NETL} module and instantiate the \mintinline{javascript}{NETL} class as a singleton. Thereafter a user can add their own extraction / transformation / load modules via the singleton's API (the returned object). The format of these modules should conform to the interface as represented in the diagram. (Actually, JavaScript is not a suitable language for specifying interfaces since tooling that allows interface implementation in the language easy is lacking).
@@ -94,82 +94,186 @@ Packaged as a node.js module, the intention is that a user can simply import the
 As specified in Figure \ref{nETL}, modules should return an object with the properties 'name' and 'exe'. 'name' should be the naming identifier of the function, and 'exe' should return the starting function of the module. Adding modules to the framework makes them available to tasks as specified by configuration objects. These objects are implemented as a JSON, and are used as instructions to start Tasks. Effectively this allows users to specify custom data processing tasks as a configuration + module. The configuration is passed to the program on startup, and the tasks are run. A possible netl startup script with in line configuration and modules may look like this:
 
 \begin{minted}{javascript}
-    /* File <user entry point>.js */
+/* File <user entry point>.js */
 
-    // Import the nETL module
-    const NETL = require('./path/to/netl.js');
-    var netl = NETL();
+// Import the nETL module
+const NETL = require('./path/to/netl.js');
+var netl = NETL();
 
-    // Specify the extraction/transformation/load configuration
-    const config = [{
-        "ID": "TaskName",
-        "Extraction": {
-            "Name": "ExtractionType",
+// Specify the extraction/transformation/load configuration
+const config = [{
+    "ID": "TaskName",
+    "Extraction": {
+        "Name": "ExtractionType",
+        // ...
+        "afterTaskRunCBs": ["function(moduleConfig) {console.log('Run on task-end')}"]
+    },
+    "Transformations": [{
+            "Name": "TransType",
             // ...
             "afterTaskRunCBs": ["function(moduleConfig) {console.log('Run on task-end')}"]
         },
-        "Transformations": [{
-                "Name": "TransType",
-                // ...
-                "afterTaskRunCBs": ["function(moduleConfig) {console.log('Run on task-end')}"]
-            },
-            {
-                // ...
-            },
+        {
             // ...
-        ],
-        "Load": {
-            "Name": "LoadType",
-            // ...
-            "afterTaskRunCBs": ["function(moduleConfig) {console.log('Run on task-end')}"]
-        }
-    }];
+        },
+        // ...
+    ],
+    "Load": {
+        "Name": "LoadType",
+        // ...
+        "afterTaskRunCBs": ["function(moduleConfig) {console.log('Run on task-end')}"]
+    }
+}];
 
-    // Load your own bespoke extraction module
-    netl.loadExtractionModule((function() {
-        function exe(obj) {
-            // ...
-        };
-        return {
-            name: "ExtractionType",
-            exe: exe
-        };
-    })());
+// Load your own bespoke extraction module
+netl.loadExtractionModule((function() {
+    function exe(obj) {
+        // ...
+    };
+    return {
+        name: "ExtractionType",
+        exe: exe
+    };
+})());
 
-    // Load your own bespoke Transformation module
-    netl.loadTransformationModule((function() {
-        function exe(obj) {
-            // ...
-        };
-        return {
-            name: "TransType",
-            exe: exe
-        };
-    })());
+// Load your own bespoke Transformation module
+netl.loadTransformationModule((function() {
+    function exe(obj) {
+        // ...
+    };
+    return {
+        name: "TransType",
+        exe: exe
+    };
+})());
 
-    // Load your own bespoke Load module
-    netl.loadLoadModule((function() {
-        function exe(obj) {
-            // ...
-        };
-        return {
-            name: "LoadType",
-            exe: exe
-        };
-    })());
+// Load your own bespoke Load module
+netl.loadLoadModule((function() {
+    function exe(obj) {
+        // ...
+    };
+    return {
+        name: "LoadType",
+        exe: exe
+    };
+})());
 
-    // Run your task till completion
-    netl.taskManager.newTask(config);
+// Run your task till completion
+netl.taskManager.newTask(config);
 \end{minted}
 
-\subsection{Extractions from large sources}
-The framework above has been conceptualized primarily as a means of working with CSV data as exported from the Sukai platform. Specifically, this MSc has the dual requirements of:
+\subsection{Framework implementation}
 
-\begin{enumerate}
-    \item Extracting data from an 80GB CSV
-    \item Anonymising column(s) in the same 80GB CSV in a predictable way
-\end{enumerate}
+\subsubsection{Extraction Modules}
+The framework above has been conceptualized primarily as a means of working with CSV data as exported from the Sukai platform. Specifically, this MSc has the dual requirements of extracting data from an 80GB CSV and snonymising column(s) in this 80GB CSV in a predictable way. To this end, included in the nETL source code used to complete this thesis is a FLATFILE extraction module.
+
+Ethical clearance to use student data, although granted by the University of Cape Town still makes the condition that identities of the students be anonymized. Partly as a way of testing the nETL framework as mentioned above, I offered to provide a 'one-click' installation of the nETL application that provides an anonymizing pipeline for use by Professor Sonia Berman to prepare the student data for this project.
+
+Extracting data from a flatfile is only tricky if it's size is such that the memory footprint of file contents is greater than the memory made available to the process. For an 80GB CSV that is certainly the case. The only feasible means of extracting data from such a file is to utilize the concept of an 'iterator'. Effectively this involves specifying the size of a reading block via two pointers (a 'begin' and 'end' pointer) that then traverse the data structure of the file from start to finish. These pointers maintain a constant width apart and at each incrementation of the iteration retrieve the data between those pointers.
+
+Using an iterator, it is straightforward to process portions of a file at time, so long as only partial retrieval of a file's data can still be understood. Flatfile's work well for this with data structured as any number of 'line' entities that don't need to be read in the context of other marker's that may be found within the file.
+
+Almost all high-level languages provide numerous abstractions for reading flatfile's on a line-by-line basis. For example, in a few different languages file iterators can be generated in the following ways:
+
+\paragraph*{Python}
+\begin{minted}{python}
+with open('/path/to/file') as file:
+   for line in file:
+       # Process the line
+\end{minted}
+
+\paragraph*{Ruby}
+\begin{minted}{ruby}
+IO.foreach('/path/to/file') do |line|
+  # Process the line
+end
+\end{minted}
+
+\paragraph*{C\#}
+\begin{minted}{csharp}
+using (StreamReader streamReader = File.OpenText(/path/to/file))
+{
+    string line = String.Empty;
+    while ((line = streamReader.ReadLine()) != null)
+    {
+        // Process the line
+    }
+}
+\end{minted}
+
+JavaScript provides a similar API for reading files line-by-line to the languages mentioned above, and a user could write such a simple iterator module provided that the module adhere to the nETL module interface for extractions and implements a \mintinline{javascript}{getNext()} function that effectively allows for pausing such extraction. It's likely that there are numerous ways of achieving this with the standard ECMAScript 5 standard. But partly as a means of exploring more state-of-the art JavaScript features, and partly of a means of demonstrating these new features, the file extraction module as used in this thesis implements EcmaScript 6 generators.
+
+As described by \cite{mozillaGenerators}, JavaScript generators allow for quickly implementing arbitrary iterators, including iterators over generated iterators. Using open source code provided by \cite{bower16}, nETL makes use of a generator function to create a file iterator, and then a higher level generator to iterate over results of the line generator:
+
+\begin{minted}{javascript}
+var pointer = 0;
+var buffersize = 64KB; // As close to a disc read size as possible
+var filesize = FileLength;
+
+// Generate the filereader
+function* _readLines() {
+    while (pointer < filesize) {
+        let lineBuffer = [];
+        // 1. Create a dataBuffer (byte array) of the data between pointer and filesize
+        // 2. Find the start of a line
+        // 3. Iterator through dataBuffer until a newline marker is found
+            // Load each byte into lineBuffer
+        // 4. yield lineBuffer.toString
+    };
+};
+var lineReader = _readLines();
+
+// Simplified implimentation of getNext() public API
+function getNext() {
+    return lineReader.next();
+};
+
+// Simplified batch generator
+function getBatch* () {
+    let data = [];
+    for (0..batchSize) {
+        data.push(lineExtraction.getNext());
+    };
+    yield data;
+};
+
+// Then batches of lines can be extracted via the following code
+var batch = getBatch.next();
+\end{minted}
+
+compared to implementing an iterating-linereader in other languages, the JavaScript syntax in this case is more verbose. However this is largely because of the opinionated, asynchronous approach to IO operations. This approach makes the nETL framework easier to implement as a whole, however, since it allows many JavaScript tasks to run asynchronously. This would be harder to implement in languages such as Ruby/Python/C\#/etc and would probably involve some kind of thread management. This is not required with JavaScript.
+
+\subsubsection{Transformation Modules}
+
+\subsubsection{Load Modules}
+
+\subsubsection{ETL engine}
+Since extraction => transformation => load pipelines are defined via user-configuration, line data-structures can effectively be replaced by any data structure a user desires. Of course that user needs to make sure that the pipeline component (module) at any point in the pipeline can handle the data structure passed to it.
+
+In any case, once a batch of x lines (or any other kind of data structure) has been obtained, transforming and loading data is pretty easy. Pseudocode to implement the nETL framework task-engine could be written something along the lines of:
+
+\begin{minted}{javascript}
+// An IIFE is used effectively as an asynchronous implementation of a while loop
+(function doEtlTask(self) {
+    var payLoad = [];
+    var batch = getBatch.next();
+
+    // Apply transformations to elements of extracted batch
+    batch.forEach(function(datum){
+        SpecifiedTransformations.forEach(function(t) {
+            datum = self.transformations[t.Name].call(t, t).start(datum);
+        });
+        payLoad.push(datum);
+    });
+
+    // Load the batch
+    self.load.batch(payLoad, function(status, msg) {
+        doEtlTask(self); // Start ETL of next batch
+    });
+
+})(/* bind task configuration object to function execution context */);
+\end{minted}
 
 
-% Close docuemnt
-\end{document}
+
+\input{../endamble}

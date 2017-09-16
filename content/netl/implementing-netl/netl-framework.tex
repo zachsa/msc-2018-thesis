@@ -1,0 +1,44 @@
+\subsubsection{Implementation}
+nETL is primarily a task-managing application, and as such, the TaskManager class is effectively the core of the application. It is intended that it can be instantiated as an instance (i.e. there can be many TaskManager instances hosted within a single running application). In JavaScript this is best implemented via a constructor:
+
+\begin{minted}{javascript}
+/* File taskmanager.js */
+function TaskManager(extractions, transformations, loads) {
+    this.tasks = {};
+
+    // Hold references to extractions/transformation/loads of the main application process
+    this.extractions = extractions;
+    this.transformations = transformations;
+    this.loads = loads;
+};
+
+TaskManager.prototype.newTask = function(task) {
+    // Add task to this.tasks and execute the task
+};
+
+module.exports = TaskManager;
+\end{minted}
+
+The application itself is intended to be singleton instance of \mintinline{javascript}{class NETL{}}, which provides an IO interface (either a console terminal or otherwise) to TaskManager instances, and modular extraction/transformation and load operations. Singleton's are typically implemented via the modular pattern in JavaScript, which is typically how libraries are delivered to users by package managers and invoked by \mintinline{javascript}{var library = require('library-name')();}. One possible way of implementing the NETL class in JavaScript (i.e the method that is used within this project's code base) is shown here:
+
+\begin{minted}{javascript}
+/* File netl.js */
+module.exports = function() {
+    // Private properties / methods
+    const _extractions = {};
+    const _transformations = {};
+    const _loads = {};        
+    const _taskManager = new TaskManager(_extractions, _transformations, _loads);
+    function _loadExtractionModule(extractionOperation){};
+    function _loadTransformationModule(transformOperation){};
+    function _loadLoadModule(loadOperation){};
+
+    // Make process API available
+    return {
+        taskManager: _taskManager,
+        loadExtractionModule: _loadExtractionModule,
+        loadTransformationModule: _loadTransformationModule,
+        loadLoadModule: _loadLoadModule
+    };
+};
+\end{minted}
