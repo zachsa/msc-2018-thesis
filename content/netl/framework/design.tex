@@ -1,4 +1,29 @@
-\subsubsection{Implementation}
+\subsubsection{Desgin}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.4]{./resources/figures/netlUML}
+    \caption[nETL]{nETL}
+    \label{nETL}
+\end{figure}
+
+Figure \ref{nETL} shows a potential architecture for a configurable component-based ETL tool. The intention of the framework is that it works on the basis of a pipeline of tasks. These tasks can be divided into 3 steps; an extraction step, a transformation step and a loading step. xxx insert something about ETL variations and why I chose the ETL pipeline.
+
+\begin{enumerate}
+    \item Extract data from a source specified by a user into memory
+    \item Apply any number of transformations to the data in memory
+    \item Load the data from memory into a destination specified by a user
+\end{enumerate}
+
+The framework itself is quite lightweight and comprises just the NETL, TaskManager and general purpose 'Tools' classes. For the purposes of this thesis, the framework as described by Figure \ref{nETL} has been prototyped in node.js with the source code available at xxx (there is also an npm package available at xxx). JavaScript is a suitable language to prototype this application for a number of reasons:
+
+\begin{enumerate}
+    \item It has a very succinct API making it fast to write code in (i.e. it is a highly abstracted language similarly to Ruby or Python)
+    \item But unlike Ruby or Python (and other high level languages), it is opinionated in that it handles IO asynchronously by default
+    \item The JavaScript implementation of object-orientation allows for easy runtime manipulation of the object model
+    \item Another reason for choosing JavaScript is that it is very much in line with the spirit of CouchDB and the web in general
+\end{enumerate}
+
 nETL is primarily a task-managing application, and as such, the TaskManager class is effectively the core of the application. It is intended that it can be instantiated as an instance (i.e. there can be many TaskManager instances hosted within a single running application). In JavaScript this is best implemented via a constructor:
 
 \begin{minted}{javascript}

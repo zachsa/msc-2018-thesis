@@ -1,5 +1,5 @@
-\subsubsection{nETL engine}
-Since extraction => transformation => load pipelines are defined via user-configuration, line data-structures can effectively be replaced by any data structure a user desires. Of course that user needs to make sure that the pipeline component (module) at any point in the pipeline can handle the data structure passed to it.
+\subsubsection{Implementation}
+Since extraction \ensuremath{\rightarrow} transformation \ensuremath{\rightarrow} load pipelines are defined via user-configuration, line data-structures can effectively be replaced by any data structure a user desires. Of course that user needs to make sure that the pipeline component (module) at any point in the pipeline can handle the data structure passed to it.
 
 In any case, once a batch of x lines (or any other kind of data structure) has been obtained, transforming and loading data is pretty easy. Pseudocode to implement the nETL framework task-engine could be written something along the lines of:
 

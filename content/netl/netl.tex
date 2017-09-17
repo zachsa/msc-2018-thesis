@@ -7,13 +7,6 @@ This thesis looks at creating a cost-effective 'analysis-engine' capable of scal
 
 specifically this project analyzed the viability of a software package called CouchDB, a NoSQL DBMS as a replacement for conventional RDMSs when analyzing data that has conventionally been housed RDBMSs (usually with an Oracle, Microsoft or SAP price tag associated with it).
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[scale=0.4]{./resources/figures/netlUML.pdf}
-    \caption[nETL]{nETL}
-    \label{nETL}
-\end{figure}
-
 Coming from a relational database environment there are a plethora of tools avaialable that facilitate transfer of CSV dato to a DBMS. These tools are available at a variety of different levels of extraction depending on a users technical skillset, time constraints and requirements. xxx: list some of these tools.
 
 In a SQL Server environment SSDT (formerly SSIS) is considered the de facto standard for extracting/transforming and loading data between different data sources. xxx: find a graph on the usage of SSDT/SSIS in companies.
@@ -22,29 +15,12 @@ In fact it's likely that the availability of of SSDT/SSIS has influenced the upt
 
 In line with the requirement of transferring large amounts of CSV data from a CSV source to CouchDB, and taking into account the comparatively low entry barrier to bespoke data-transformation scripts, a component of this MSc is an exploration of a possible alternative to SSDT for an environment other than Microsoft's SQL Server. This MSc project actually has several requirements that fall within the ETL spectrum that such a framework could easily be adapted to handle in a generic way. The framework has been published as an npm library and is available at ..., with source code available at github somewhere xxx.
 
-Figure \ref{nETL} shows a potential architecture for a configurable component-based ETL tool. The intention of the framework is that it works on the basis of a pipeline of tasks. These tasks can be divided into 3 steps; an extraction step, a transformation step and a loading step. xxx insert something about ETL variations and why I chose the ETL pipeline.
+\subsection{Framework}
+\input{content/netl/framework/design}
+\input{content/netl/framework/implementation}
 
-\begin{enumerate}
-    \item Extract data from a source specified by a user into memory
-    \item Apply any number of transformations to the data in memory
-    \item Load the data from memory into a destination specified by a user
-\end{enumerate}
-
-The framework itself is quite lightweight and comprises just the NETL, TaskManager and general purpose 'Tools' classes. For the purposes of this thesis, the framework as described by Figure \ref{nETL} has been prototyped in node.js with the source code available at xxx (there is also an npm package available at xxx). JavaScript is a suitable language to prototype this application for a number of reasons:
-
-\begin{enumerate}
-    \item It has a very succinct API making it fast to write code in (i.e. it is a highly abstracted language similarly to Ruby or Python)
-    \item But unlike Ruby or Python (and other high level languages), it is opinionated in that it handles IO asynchronously by default
-    \item The JavaScript implementation of object-orientation allows for easy runtime manipulation of the object model
-    \item Another reason for choosing JavaScript is that it is very much in line with the spirit of CouchDB and the web in general
-\end{enumerate}
-
-\subsection{Using nETL}
-\input{netl/using-netl/netl-module}
-\input{netl/using-netl/extraction-modules}
-\input{netl/using-netl/transformation-modules}
-\input{netl/using-netl/load-modules}
-
-\subsection{Framework implementation}
-\input{netl/implementing-netl/netl-framework}
-\input{netl/implementing-netl/netl-engine}
+\subsection{Usage}
+\input{content/netl/usage/netl-module}
+\input{content/netl/usage/extraction-modules}
+\input{content/netl/usage/transformation-modules}
+\input{content/netl/usage/load-modules}

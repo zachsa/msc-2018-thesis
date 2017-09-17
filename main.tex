@@ -1,8 +1,13 @@
+% Preamble
 % Global
-\documentclass[parskip=full,a4paper]{scrartcl}
+\documentclass[
+    parskip=full,
+    a4paper
+]{scrartcl}
 \usepackage{blindtext}
 \usepackage[utf8]{inputenc}
 \usepackage{etoolbox}
+\usepackage{import}
 
 % Graphics
 \usepackage{pdfpages}
@@ -61,3 +66,33 @@
 \title{nETL}
 \author{Zach Smith}
 \date{\today}
+
+% Document
+\begin{document}
+
+% Title page
+\maketitle
+\newpage
+
+%  TOC
+\tableofcontents
+\newpage
+
+% Content
+\input{content/introduction}
+\input{content/netl/netl}
+\newpage
+
+% Appendix
+\begin{appendix}
+    \listoffigures
+    \listoftables
+\end{appendix}
+\newpage
+
+% Bibliogrpahy
+\bibliographystyle{plain}
+\bibliography{bibliography/msc_citations}
+
+% Close docuemnt
+\end{document}
