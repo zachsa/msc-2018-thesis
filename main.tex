@@ -9,6 +9,15 @@
 \usepackage{etoolbox}
 \usepackage{import}
 
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
 % Graphics
 \usepackage{pdfpages}
 \usepackage{graphicx}
@@ -33,6 +42,7 @@
 \usepackage[outputdir=./_build]{minted}
 \definecolor{dhscodebg}{rgb}{0.01,0.199,0.1}
 \setminted{
+    breaksymbolleft=,
     fontsize=\scriptsize,
     baselinestretch=1.1,
     % bgcolor=dhscodebg,
