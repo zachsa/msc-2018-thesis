@@ -118,7 +118,9 @@ In otherwords, installing CouchDB on Ubuntu 16.04 is not very difficult. Due to 
 }
 \end{minted}
 
-And then creating a clustered database from scratch with the following command: \mintinline{ruby}{ruby init.rb}, or perhaps just double clicking on an executable in the same folder as the JSON configuraion file.
+And then creating a clustered database from scratch with the following command: \mintinline{ruby}{ruby init.rb}, or perhaps just double clicking on an executable in the same folder as the JSON configuration file. As virtual cloud server providers mature and add functionality, setting up clusters becomes even easier. The simple rCluster script presented in this MSc could very easily be extended to script the actual server registration as well.
+
+For this project registering the CX20 instances required logging into the Hetzer.de website and manually ordering the 6 servers that this project utilizes. But the API available at \url{https://robot.your-server.de/doc/webservice/en.html#preface} allows for automation of the process of ordering and provisioning servers. It would not be difficult to extend the rCluster script to allow for automated server ordering. In which case, the script could easily be adjusted to setup thousands of servers at a time. i.e. CouchDB MapReduce queries could easily be dispersed among thousands of computer nodes, as could massive amounts of data. In terms of usability, and following on from the metaphor of Microsoft Excel, it would be of about equivalent difficulty to use a CouchDB cluster of 10 000 + nodes to process a dataset of several TB as it would be to do a similar analysis of a smaller amount of data on Microsoft Excel.
 
 TODO: couchapp with MapReduce queries
 
