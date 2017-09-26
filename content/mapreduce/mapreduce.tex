@@ -1,0 +1,22 @@
+% \bibliography{../../bibliography/msc_citations}
+
+\section{MapReduce}
+This should be a general overview of how Map Reduce actually works and why it was worth thinking about.
+
+\subsection{What is MapReduce?}
+As discussed by \cite{mining2011}, data-centered applications that make use of a large amounts of data have spurred the development of distributed computing using commodity hardware instead of super-computers. <xxx google big table, amazon hive>. Distributed file systems have subsequently been developed as a response to computing on dispersed clusters of commodity hardware that enables, amongst other things, distributed data-processing. \cite{mining2011} refers to the combination of clustered commodity hardware, a distributed file system, and the wide variety of software aimed to be executed on this new platform as the 'New Software Stack'.
+
+Intrinsic to this 'New Software Stack' is the idea of MapReduce \cite{mining2011}; a logical framework for approaching data analysis in a distributed way. With initial implementations of MapReduce aimed at lower level data handling within the file system, it has become clear that it is useful across the entirety of software abstraction levels; including implementations of the SQL specification, the extent of which this is possible being dependent on specific MapReduce implementations. \cite{mining2011} show a variety of different ways that data can be queried in a SQLesque way.
+
+MapReduce is actually quite an old idea <xxx> that first rose to prominence as the framework implemented to rank web pages implemented by Google, graph analysis and other such clean data sources <xxx>. But in fact, MapReduce may be just as useful as a means of 'normalizing' irregular data within a standard relational context (the subject of this project) due to the versatility of the different components within the MapReduce specification.
+
+
+\subsection{Data manipulation with MapReduce}
+This section should compare standard SQL operations to how they are implemented in MapReduce, with the conclusion that everything is possible that a standard SQL database does, via MapReduce
+
+- Discuss how the book shows it is possible to implement different families of algorithms using MapReduce
+- Name a couple of them, and then contrast MapReduce algorithm analysis in terms of time and space complexity
+- communication cost model
+- complexity theory
+
+The point of me choosing to use MapReduce is that the Map functions are split across many of nodes. And that this makes it easy to calculate dispersedly. So I should get some citations of why this is more difficult and more expensive than doing the same on a relational database. Perhaps this could be as simple as having to maintain a file system that is dispersed across multiple physical computing devices - requiring special hardware.
