@@ -22,9 +22,9 @@ With these benefits in mind, this project explores the usage of CouchDB as a per
     \item An approach for easily designing CouchDB MapReduce indexes, implementing them and running them
 \end{enumerate}
 
-CouchDB is open-source software with free binary distributions for a Windows, Max, and Linux environment. With the intent of clustering many server instances, each with it's own instance of the CouchDB software, only Linux is feasable since it is released as free software (GPL license). Combined with affordable, virtual, managed servers such as those offered by Digital Ocean, AWS, hetzer, Linode to name a few (including several South Africa-based companies), clustered computing is very much within the reach of everyday consumers. Setting up several Ubuntu Xenial/CouchDB 2.1 instances is no more complicated than running a few commands on a linux terminal. While there is still some technical understanding required in terms of security, it would be fairly straightforward to package 'setup' scripts for non-technical users giving users the potential to utilize CouchDB clusters in their own right.
+CouchDB is open-source software with free binary distributions for a Windows, Max, and Linux environment. With the intent of clustering many server instances, each with it's own instance of the CouchDB software, only Linux is feasible since it is released as free software (GPL license). Combined with affordable, virtual, managed servers such as those offered by Digital Ocean, AWS, Hetzer, Linode to name a few (including several South Africa-based companies), clustered computing is very much within the reach of everyday consumers. Setting up several Ubuntu Xenial/CouchDB 2.1 instances is no more complicated than running a few commands on a Linux terminal. While there is still some technical understanding required in terms of security, it would be fairly straightforward to package 'setup' scripts for non-technical users giving users the potential to utilize CouchDB clusters in their own right.
 
-For the purposes of this MSc, several instances of Hezner's CX20 virtual cloud servers were used. xxx
+For the purposes of this MSc, several instances of Hetzner's CX20 virtual cloud servers were used. xxx
 
 A complete list of the commands required for a basic installation of an Ubuntu Xenial server supporting a CouchDB 2.1 installation is as follows:
 
@@ -89,7 +89,7 @@ curl -X POST -H \"Content-Type: application/json\" http://<username>:<password>@
 
 xxx add sources for commands
 
-In otherwords, installing CouchDB on Ubuntu 16.04 is not very difficult. Due to the testing requirements of this project, a Ruby script was created to automate this process and can be found at \url{https://github.com/zachsa/rcluster}. For a user, the process of installing a clustered CouchDB database now becomes a matter of adjusting a configuration object, which could be a file called 'config.json' and look like this:
+In other words, installing CouchDB on Ubuntu 16.04 is not very difficult. Due to the testing requirements of this project, a Ruby script was created to automate this process and can be found at \url{https://github.com/zachsa/rcluster}. For a user, the process of installing a clustered CouchDB database now becomes a matter of adjusting a configuration object, which could be a file called 'config.json' and look like this:
 
 \begin{minted}{json}
 {
