@@ -27,7 +27,22 @@ CouchDB's MapReduce pipeline works something along the lines of
 
 \begin{verbatim}
 Map Functions executed in parallel, with [key, value] output collected by CouchDB's main Erlang process
-=> 
+=> Grouping
+=> Reduce (+/- Rereduce)
 \end{verbatim}
 
-CouchDB's MapReduce implementation is coded within this engine, and since
+The limitations of this pipeline are:
+
+\begin{enumerate}
+    \item You can only run the pipeline once. Additional grouping after a reduction is not possible
+    \item Handling the rereduce argument makes writing custom reduce functions challenging
+\end{enumerate}
+
+For the two reasons mentioned above, although MapReduce CAN be used to implement SQL-like joins, CouchDB's implementation can't be. Instead it is necessary to utilize a 3rd party function to convert grouped [key, value, value, value, value, etc] output from MapFunctions (with group=true) into 'joined' documents. This is easily achievable via two mechanisms:
+
+\begin{enumerate}
+    \item Using CouchDB 'list' functions
+    \item Using a 3rd party tool external to the CouchDB application itself
+\end{enumerate}
+
+todo: mentions couch lists enumerator functionality
