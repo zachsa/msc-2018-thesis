@@ -1,0 +1,33 @@
+\section{Student Data}
+Events file has 44420509 lines.
+
+\section{Calculation with CouchDB}
+As a means of testing feasibility of building indexes across large amounts of documents in CouchDB, I installed the database locally on a Windows 10 personal PC. It took a little over an hour to parse 44 million CSV rows into the database, with nETL using a maximum of around 450MB of system memory and negligible CPU/Disk capacity.
+
+There is no way of calculating indexing times of CouchDB views, so I created a simple index for benchmark purposes:
+
+\begin{minted}{javascript}
+function(doc){
+    if (doc.type_) {
+        emit(doc.type_, 1);
+    };
+};
+\end{minted}
+
+And found that it took a little over 3 hours to build the index on my machine. The view as written above will have to 'touch' every document in the database, allowing a comparative qualitative estimate for the amount of time other indexes will be built. In other words, since an index is already touching every document in the database, the time complexity is O(n) in terms of the document scan and this would hold true regardless of the logic of the index creation itself. So indexes that process a similar number of documents would take a similar amount of time to be created with:
+
+\begin{enumerate}
+    \item An allowance for how long it would take to do a linear scan of each document for the 'type\_' property (so documents with more properties would increase index-build time)
+    \item An allowance for how many steps the 'emit' function call requires; each of which would require linear scans of document objects and other calculations. i.e. longer documents == longer index-build times.
+\end{enumerate}
+
+In terms of the actual indexing itself, CouchDB includes in its installation a query engine identified by 'couchjs.exe'. The actual MapReduce implementation within CouchDB is strictly tied to the Erlang core and could not be altered without major changes to the source code. Opinionated implementation of MapReduce within the CouchDB database stack, makes it's use-case limited compared to other systems that have become synonymous with the 'big-data' stack - including Hadoop, Google xxx, Microsoft xxx, Amazon xxx stacks.
+
+CouchDB's MapReduce pipeline works something along the lines of
+
+\begin{verbatim}
+Map Functions executed in parallel, with [key, value] output collected by CouchDB's main Erlang process
+=> 
+\end{verbatim}
+
+CouchDB's MapReduce implementation is coded within this engine, and since
