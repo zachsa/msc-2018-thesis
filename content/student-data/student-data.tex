@@ -1,3 +1,5 @@
+% \bibliography{../../bibliography/msc_citations}
+
 \section{Student Data}
 Events file has 44420509 lines.
 
@@ -46,3 +48,55 @@ For the two reasons mentioned above, although MapReduce CAN be used to implement
 \end{enumerate}
 
 todo: mentions couch lists enumerator functionality
+
+
+\section{Sakai Event data}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.4]{./resources/figures/sakaiEventModel}
+    \caption[Sakai]{Model of Sakai browser events as modeled in the RDBMS}
+    \label{Sakai}
+\end{figure}
+
+Sakai is open source software, meaning that it is fairly straightforward finding information on how it's data-layer is modeled. In this case, browser events are registered as xxx. The University of Cape Town processes the raw event data to model events as represented in \ref{Sakai}. This greatly cuts down on the amount of data that a user needs to process and summarizes all a user's browser interaction on the Sakai site as 'types' of events. These include just 6 categories:
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        Event ID & Event Description \\ \hline
+        1        & Administration    \\
+        2        & Assessment        \\
+        3        & Communication     \\
+        4        & Content           \\
+        5        & Presence          \\
+        6        & System            \\ \hline
+    \end{tabular}
+    \caption[Sakai Event Types]{All user interaction on the Sakai browser frontend can be categorized as a part of one of these events}
+    \label{SakaiEventTypes}
+\end{table}
+
+\section{3 Way join}
+
+Looking at only events of type 'presence', with reference to the Sakai data model as shown in \ref{Sakai}, it is clear that a natural join (i.e. a join across common columns) is required. Such a join; \textit{R(a,b)} joined with \textit{S(b,c)} joined with \textit{T(c,d)} (where \textit{R}, \textit{S} and \textit{T} are relations and \textit{a}, \textit{b}, \textit{c}, \textit{d} are attributes) could be expressed via the following SQL (SQL Server syntax):
+
+\begin{minted}{sql}
+SELECT
+[R].[a],
+[T].[d]
+FROM [R]
+LEFT JOIN [S] on [S].[b] = [R].[b]
+LEFT JOIN [T] ON [T].[c] = [S].[c]
+\end{minted}
+
+As mentioned by \cite{mining2011}, within a MapReduce context such a join can be achieved via:
+\begin{enumerate}
+    \item A Map function: iterating through all tuples \textit{(commonField, fieldList)} of all relations and producing a key-value pair of the form \textit{(commonField, (Relation, fieldList))}
+    \item An implicit group function: group all Map output as a list of tuples per common key of the form \textit{(id, ((R,A), (S, C), (T,D), etc))}
+    \item A Reduce function to produce the desirable attributes across the joined tuples \textit{(A,D)} where attribute \textit{C} is of a particular value
+\end{enumerate}
+
+As discussed above, a multi-way join is impossible within CouchDB's implementation of MapReduce. As mentioned by \cite{chandar2010} and others xxx multi-way joins need multiple map phases, which is not a possibility using the CouchDB software. CouchDB's implementation of MapReduce is opinionated in that it expects xxx and xxx and doesn't allow for xxx.
+
+TODO: Ask about multiway joins on the Slack channel.
