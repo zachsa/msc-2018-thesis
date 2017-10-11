@@ -7,8 +7,6 @@
 \usepackage{blindtext}
 \usepackage[utf8]{inputenc}
 \usepackage{etoolbox}
-\usepackage{import}
-\usepackage{standalone}
 
 \usepackage{hyperref}
 \hypersetup{
@@ -25,6 +23,22 @@
 \usepackage{xcolor}
 \usepackage[many]{tcolorbox}
 \usepackage{etoolbox}
+
+% Diagrams
+\usepackage{tikz-er2}
+\usetikzlibrary{positioning}
+\usetikzlibrary{shadows}
+
+\tikzstyle{every entity} = [top color=white, bottom color=blue!30,
+draw=blue!50!black!100, drop shadow]
+\tikzstyle{every weak entity} = [drop shadow={shadow xshift=.7ex,
+        shadow yshift=-.7ex}]
+\tikzstyle{every attribute} = [top color=white, bottom color=yellow!20,
+draw=yellow, node distance=1cm, drop shadow]
+\tikzstyle{every relationship} = [top color=white, bottom color=red!20,
+draw=red!50!black!100, drop shadow]
+\tikzstyle{every isa} = [top color=white, bottom color=green!20,
+draw=green!50!black!100, drop shadow]
 
 % Lists
 \usepackage{enumitem}

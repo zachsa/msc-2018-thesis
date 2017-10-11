@@ -1,7 +1,38 @@
-\section{Introduction}
-Despite major disruptions to the University of Cape Town's teaching curriculum in 2016 xxx, the academic year was completed successfully with only minimal disruptions to the calendar schedule. Despite xxx hours of teaching time lost, xxx days of closing the university, course curriculum remained constant and exams tested a similar amount of material as had been previously tested.
+% \bibliography{../bibliography/msc_citations}
 
-One of the reasons the university could absorb such disruptions is due to their implementation of learning management software - their 'Vula' system, which is based on the 'Sukai' platform.
+\section{Introduction}
+Despite major disruptions to the University of Cape Town's teaching curriculum in 2016 xxx, the academic year was completed successfully with only minimal disruptions to the calendar schedule. Despite xxx hours of teaching time lost, xxx days of closing the university, course curriculum remained constant and exams tested a similar amount of material as had been previously tested xxx.
+
+Grades (todo: compare grades between different years) also appear to have been largely unaffected/affected xxx. And the point of this thesis is to attempt to put these differences/similarities between different year's grades within context of 'learning management software'. The University of Cape Town (UCT) implements the 'Sukai' platform that makes such an analysis possible. As part of this project, data has kindly been provided by Professor Sonia Berman and xxx from three different data sources to make this possible, with student IDs anonymized consistently across all three data sources.
+
+\begin{enumerate}
+    \item Demographic data of students entering the university
+    \item Course result data for every student
+    \item Vula usage data in terms of individual student's 'presence' on the Sakai platform
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \scalebox{.87}{
+        \begin{tikzpicture}[node distance=1.5cm, every edge/.style={link}]
+            \node[entity] (d) {DemographicData};
+            \node[entity] (g) [below left=2cm of d] {GradeData} edge (d);
+            \node[entity] (e) [below right=2cm of d] {SakaiEvent} edge (d) edge (g);
+            \node[entity] (eD) [below=1.5cm of e] {EventDesc} edge (e);
+            \node[entity] (eT) [below=1.5cm of eD] {EventType} edge (eD);
+        \end{tikzpicture}
+    }
+    \caption[DataModel]{Model of data exports provided for this project}
+    \label{DataModel}
+\end{figure}
+
+Within the tried and tested relational database model, such a schema is straightforward to query and is well understood. But with greater amounts of data becoming normal on a day to day basis it is worth testing such a relationship via a distributed processing model. As mentioned by \cite{mining2011} the MapReduce framework allows for such processing, and work from a 2010 MSc thesis from the University of Edinburgh \cite{chandar2010} Shows that MapReduce as a tool is viable for implementing JOINS in the traditional SQLesque sense. Specifically, \cite{chandar2010} mentions that MapReduce joins can be subdivided into two categories (\textit{Two-Way} and \textit{Multi-Way} joins), and he provides examples of algorithms for implementing each type.
+
+With regards to the data provided for analysis in this project described in \ref{DataModel}, considering the data-pipeline there is room for decisions on modeling data in CouchDB. However, in the interest of exploration of the CouchDB software, entities have been left as close to the data export as possible since it is my intention to use MapReduce not only as a means of querying, but also as a tool for entity transformation as part of the ETL process. For this reason, a \textit{Multi-Way} is required with reference to \ref{DataModel}. Specifically, the join of \textit{DemographicData}, \textit{GradeData} and \textit{SakaiEvent} data requires a subjoin of \textit{SakaiEvent}, \textit{EventDesc}, \textit{EventType} to allow for querying events based on type. For this reason, possible algorithms for implementing \textit{Multi-Way} joins as mentioned by \cite{chandar2010} are examined.
+
+\subsection{Multi-Way JOINS in MapReduce}
+
+\section{Other introduction?}
 
 The trend of educational institutions has been to increasingly implement and rely on such software and UCT is no exception. Looking at a graph showing the uptake of such systems throughout globally acclaimed educational institutes shows just how important they have become xxx. A plethora of competing educational tools exist; Blackboard, Canvas, Sukai to name a few, all with a fairly comparable feature list xxx.
 
@@ -43,4 +74,4 @@ Tools such as MS Office are fast reaching their capacity, and will afford contro
 This MSc thesis explores a potentially different different metaphor-stack compared to the one that is currently in wide spread use, and how a user may use such metaphors in the future. This is tested via an analysis of student grades from the University of Cape Town in 2016 - a year drastically effected by student striking.
 
 \section{Student Grades}
-discuss the data that I have and what I hope to do with it
+

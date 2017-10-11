@@ -100,3 +100,7 @@ As mentioned by \cite{mining2011}, within a MapReduce context such a join can be
 As discussed above, a multi-way join is impossible within CouchDB's implementation of MapReduce. As mentioned by \cite{chandar2010} and others xxx multi-way joins need multiple map phases, which is not a possibility using the CouchDB software. CouchDB's implementation of MapReduce is opinionated in that it expects xxx and xxx and doesn't allow for xxx.
 
 TODO: Ask about multiway joins on the Slack channel.
+
+CouchDB's MapReduce implementation allows for a single Map - Group - Reduce pipeline, which is limiting in comparison to frameworks such as xxx, xxx, etc. This means that CouchDB's ability to join is limited by what the common keys of the entities are; only a single 'common' key is allowed since to join in Couch's MapReduce that key needs to be emitted for every document included in the join.
+
+The query above needs to run the join of \textit{R(a,b)} with \textit{S(b,c)} prior to joining the result with \textit{T(c,d)} since a common property - \textit{c} needs to be created for the relation \textit{R} before tuples for \textit{R} and \textit{T} can be grouped by a common key (\textit{c}).
