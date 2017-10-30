@@ -1,0 +1,11 @@
+% \bibliography{../bibliography/msc_citations}
+
+\subsection{Motivation \& Aim}
+Compared to RDMSs such as Sql Server, Oracle, MySQL, and many others, CouchDB offers the advantages of scheme-less data-modeling, an HTTP interface and easy-to-setup clustering. These features make for a variety of use-cases that makes research into using CouchDB worthwhile. And because the software is completely open-source, it is free to use.
+
+The clustering features added when IBM's Cloudant software was merged for the 2.0 release allow CouchDB databases to handle a theoretical unlimited amount of data, with indexes calculated in a truly dispersed way (indexes are calculated partially and in parallel across any number of nodes). Replicated shards also allow for node-failure, meaning that (theoretically) CouchDB allows for unlimited storage on clusters of cheap virtual servers.
+
+CouchDB's native HTTP (RESTful) API combined with JSON storage makes the database 'web'-like, meaning that interactions with the data-layer (from a server) are reminiscent of interacting with web 2.0 applications. This is very easy, and since browser requests are over HTTP(S), it is possible to interact with the database directly with a browser. Combined with CouchDB's handling of file data (attachments), and a couple other features (show functions, list functions, URL rewrites and a vHost engine to name a few) CouchDB can double as a webserver that serves HTML. The CouchDB community has traditionally referred to serving HTML as "CouchApps". These tools allow for designing bespoke database-management tools very quickly and were definitely a CouchDB draw-card for many as seen in this open email exchange \cite{googleCon2017}. This same exchange shows (unfortunately) that the "CouchApp" feature of CouchDB is unlikely to survive future releases due to lack of interest in contributing to this feature.
+
+todo: schemaless json
+view index flattens json

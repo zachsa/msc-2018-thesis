@@ -1,0 +1,126 @@
+% Preamble
+% Global
+\documentclass[
+    parskip=full,
+    a4paper
+]{scrartcl}
+\usepackage{blindtext}
+\usepackage[utf8]{inputenc}
+\usepackage{etoolbox}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+% Graphics
+\usepackage{pdfpages}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[many]{tcolorbox}
+\usepackage{etoolbox}
+
+% Lists
+\usepackage{enumitem}
+\setlist{nosep} % or \setlist{noitemsep} to leave space around whole list
+
+% Layout
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\setstretch{1.3}
+% \setlength{\parindent}{0em}
+% \setlength{\parskip}{1em}
+
+% Inline-code
+\usepackage[outputdir=./_build]{minted}
+\definecolor{dhscodebg}{rgb}{0.01,0.199,0.1}
+\setminted{
+    breaksymbolleft=,
+    fontsize=\scriptsize,
+    baselinestretch=1.1,
+    % bgcolor=dhscodebg,
+    % rulecolor=\color{gray!40},
+    % framesep=\fboxsep,
+    % frame=single,
+    % framesep=10pt
+    % framerule=2pt,
+    xleftmargin=2.5em,
+    linenos,
+    breaklines,
+    tabsize=4
+}
+\usemintedstyle{tango}
+\BeforeBeginEnvironment{minted}
+{\begin{tcolorbox}[
+            breakable,
+            boxrule=0.2pt,
+            colback=gray!40,
+            % toprule=1pt,
+            % rule=1pt,
+            arc=0pt
+        ]}\AfterEndEnvironment{minted}{\end{tcolorbox}}
+
+% Bibliography
+\usepackage{natbib}
+\usepackage{bibentry}
+\nobibliography*
+
+% Title
+\title{Analysing relational datasets with CouchDB}
+\author{Zach Smith}
+\date{\today}
+
+% Document
+\begin{document}
+
+% Title page
+\maketitle
+\newpage
+
+%  TOC
+\tableofcontents
+\newpage
+
+% Content
+\section{Introduction}
+\input{introduction/mapreduce}
+\input{introduction/motivation_aim}
+
+
+\subsection{Related Work}
+
+\section{CouchDB}
+
+\section{nETL}
+\input{netl/overview}
+\input{netl/framework-design}
+\input{netl/framework-implementation}
+\input{netl/usage}
+
+\section{Evaluation \& Results}
+
+\section{Discussion}
+
+\section{Conclusion}
+
+\newpage
+
+% Appendix
+\begin{appendix}
+    \listoffigures
+    \listoftables
+\end{appendix}
+\newpage
+
+% Bibliogrpahy
+\bibliographystyle{plain}
+\bibliography{bibliography/msc_citations}
+
+% Close docuemnt
+\end{document}

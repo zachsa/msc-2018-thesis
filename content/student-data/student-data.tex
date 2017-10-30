@@ -77,9 +77,9 @@ Sakai is open source software, meaning that it is fairly straightforward finding
     \label{SakaiEventTypes}
 \end{table}
 
-\section{3 Way join}
+For the purposes of this project, only events of type 'presence' will be considered. These are thought to be representative of a students usage of Sakai on the basis that, in most cases, a student would login to the platform with the intention of transacting in a 'learning' sense.
 
-Looking at only events of type 'presence', with reference to the Sakai data model as shown in \ref{Sakai}, it is clear that a natural join (i.e. a join across common columns) is required. Such a join; \textit{R(a,b)} joined with \textit{S(b,c)} joined with \textit{T(c,d)} (where \textit{R}, \textit{S} and \textit{T} are relations and \textit{a}, \textit{b}, \textit{c}, \textit{d} are attributes) could be expressed via the following SQL (SQL Server syntax):
+Retrieving events of type 'presence', a natural join (i.e. a join across common columns) is required. Such a join; \textit{R(a,b)} joined with \textit{S(b,c)} joined with \textit{T(c,d)} (where \textit{R}, \textit{S} and \textit{T} are relations and \textit{a}, \textit{b}, \textit{c}, \textit{d} are attributes) could be expressed via the following SQL (SQL Server syntax):
 
 \begin{minted}{sql}
 SELECT
@@ -104,3 +104,7 @@ TODO: Ask about multiway joins on the Slack channel.
 CouchDB's MapReduce implementation allows for a single Map - Group - Reduce pipeline, which is limiting in comparison to frameworks such as xxx, xxx, etc. This means that CouchDB's ability to join is limited by what the common keys of the entities are; only a single 'common' key is allowed since to join in Couch's MapReduce that key needs to be emitted for every document included in the join.
 
 The query above needs to run the join of \textit{R(a,b)} with \textit{S(b,c)} prior to joining the result with \textit{T(c,d)} since a common property - \textit{c} needs to be created for the relation \textit{R} before tuples for \textit{R} and \textit{T} can be grouped by a common key (\textit{c}).
+
+
+\subsection{Data Analysis}
+s
