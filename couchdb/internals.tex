@@ -1,0 +1,21 @@
+% \bibliography{../bibliography/msc_citations}
+
+\subsection{CouchDB's MapReduce implementation}
+"CouchDB: The Definitive Guide" summarizes the database as appearing to be "a B-tree manager with an HTTP interface" \cite{couchguide}, due to the nature of how the database handles both its data and its indexes. CouchDB's MapReduce API actually allows for defining indexes rather than queries; a user is given direct access to the raw indexes, unlike other DBMSs such as SQL Server where indexes are kept behind the scenes and used instead to facilitate result fetching.
+
+More accurately, \textit{map} results are stored as B+ indexes within CouchDB and \textit{reduce} results are stored as internal nodes on this B+ tree \ref{appendix:rnewson}. CouchDB's \textit{reduce} implementation is optimized to \textit{rereduce} when processing large numbers of documents dictated by the structure of the B+tree. As mentioned on the original (and no longer maintained) CouchDB Wiki, \textit{map} output is sent the \textit{Reducer} in batches delimited by B+tree boundaries \cite{couchwiki}. Since grouping is done after this step by the \textit{Reducer}, there is no guarantee that all values relating to a specific key (as produced by the \textit{map} function) will be processed by the same \textit{reduce} function. CouchDB user-defined \textit{reduce} functions had to implement a confusing contract instead. A \textit{reduce} function should handle the case when \mintinline{javascript}{rereduce = fals;} and when \mintinline{javascript}{rereduce = true;} - see \ref{couchmapreduce}. It is possible that the same logic can be used for either case, as in the CouchDB built in \mintinline{javascript}{_sum} function, but largely the two cases require separate logic.
+
+Because of the nature of the \textit{reduce} function contract, joins that are possible via algorithms described by \cite{chandar2010} are simply not possible. A SQL query of the form: \textit{R(a,b)} joined with \textit{S(b,c)} joined with \textit{T(c,d)} (where \textit{R}, \textit{S} and \textit{T} are relations and \textit{a}, \textit{b}, \textit{c}, \textit{d} are attributes) and expressed by the code (SQL Server syntax):
+
+\begin{minted}{sql}
+SELECT
+[R].[a],
+[T].[d]
+FROM [R]
+LEFT JOIN [S] on [S].[b] = [R].[b]
+LEFT JOIN [T] ON [T].[c] = [S].[c]
+\end{minted}
+
+cannot be achieved without prior processing of all or some of the relations, or in the spirit of CouchDB, via multiple queries. If two or more entities were to be joined on a common field then it is theoretically possible to group these values in the reduce function and retrieve a 'joined' dataset that way, but CouchDB looks for this and warns users that this is NOT an appropriate use of MapReduce. CouchDB's optimization of it's B+tree storage structures means that the database complains when \textit{reduce} function output doesn't shrink compared to the input. There is a configurable setting in CouchDB \mintinline{javascript}{reduce_limit=false} that allows a user to override the default setting, but as mentioned in this project, such a configuration produced no results within a reasonable time frame. As one of the owners of CouchDB mentions, such a function would defeat the purpose of structuring the view results as an index and result in performance in terms of space and time of O(n^2) or worse \ref{appendix:jan_slack}.
+
+Instead it is fair to say that using CouchDB, the full scope of data querying as typically done on RDBMS systems is entirely possible, when such queries are re-imagined to work within the framework of MapReduce. Although other implementations of MapReduce (for example as mentioned by \cite{chandar2010}) do allow for relational operations such as \textit{union} of sets, it is likely that there are more performant ways of analyzing the same data in ways that favor the MapReduce framework (and cannot be achieved using a RDBMS).

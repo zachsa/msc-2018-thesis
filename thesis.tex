@@ -72,7 +72,7 @@
 \nobibliography*
 
 % Title
-\title{Analysing relational datasets with CouchDB}
+\title{Analysing relational datasets with CouchDB's MapReduce implementation}
 \author{Zach Smith}
 \date{\today}
 
@@ -91,11 +91,11 @@
 \section{Introduction}
 \input{introduction/mapreduce}
 \input{introduction/motivation_aim}
-
-
-\subsection{Related Work}
+\input{introduction/related_work}
 
 \section{CouchDB}
+\input{couchdb/internals}
+\input{couchdb/querying_couch}
 
 \section{nETL}
 \input{netl/overview}
@@ -104,7 +104,6 @@
 \input{netl/usage}
 
 \section{Evaluation \& Results}
-
 \section{Discussion}
 
 \section{Conclusion}
@@ -113,6 +112,8 @@
 
 % Appendix
 \begin{appendix}
+    \input{appendix/rnewson_slack}
+    \input{appendix/jan_slack}
     \listoffigures
     \listoftables
 \end{appendix}

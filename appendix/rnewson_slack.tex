@@ -1,0 +1,41 @@
+\section{Slack conversation 1}
+\label{appendix:rnewson}
+
+zach [12:13 PM]
+Hi. What would cause CouchDB rereduce=true param when running a reduce task?
+
+rnewson (IRC) APP [12:25 PM]
+couchdb stores the result of the reduce function on internal b+tree nodes of the view index. rereduce is true when we're higher up in the tree and need to know the reduction of a group of previous reductions.
+
+[12:25]
+so it happens when you have more than a handful of documents and your reduce function will only work correctly if you do the right thing for rereduce false and true cases.
+
+[12:26]
+when rereduce is true, the keys param is null and the values array is the output of previous calls to your reduce function.
+
+zach [12:30 PM]
+thank you. that means that a reduce function needs to work with an input of either the map output or it's reduce output? Is there a term for this kind of function? I feel like there should be...
+
+rnewson (IRC) APP [12:31 PM]
+yes, the contract for a reduce function is that it must work for both types of input, and the third parameter tells you which you're doing.
+
+[12:31]
+there are implementations where the logic is the same for both types, of course.
+
+[12:32]
+"return sum(values);" for example
+
+zach [12:48 PM]
+Thanks again! I'm not super familiar with the b-trees, but my understanding is that if you are higher up on such a tree, that the key you are looking for exists lower down? Would it be correct to say that rereduce is a means of appending to a reduce functions output that already exists? If the entire index was calculated from scratch then, could you assume that rereduce will always be false since grouped output of the map function means that a reduce function will NOT reprocess the same keys?
+
+rnewson (IRC) APP [12:51 PM]
+no, you cannot assume that
+
+    [12:51]
+rereduce param will be set to false and true for any database above 10 documents or so
+
+    [12:51]
+write your reduce function accordingly, that's the contract
+
+zach [12:54 PM]
+thank you
