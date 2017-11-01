@@ -1,1 +1,39 @@
 \subsection{The Student Data Entity Model}
+
+\subsubsection*{Sakai Events}
+
+
+\subsubsection*{Course Grades}
+
+Grade results may have the following format:
+
+\begin{table}[]
+    \centering
+    \caption{My caption}
+    \label{my-label}
+    \begin{tabular}{lll}
+        Symbol & Meaning                  & Handling Logic  \\ \hline
+        49A    & Absent for supplementary & Grade used      \\
+        49S    & Supplementary pending    & Grade used      \\
+        50C    & ?                        & Grade used      \\
+        78     & Grade                    & Grade used      \\
+        AB     & Absent (fail)            & 40\% Grade used \\
+        ATT    & ?                        & N/A             \\
+        DE     & Deferred                 & N/A             \\
+        DPR    & Duly performed refused   & 20\% Grade used \\
+        F      & Fail                     & 40\% Grade used \\
+        GIP    & Thesis only              & N/A             \\
+        INC    & Incomplete (fail)        & 20\% Grade used \\
+        LOA    & Leave of absence         & N/A             \\
+        OS     & Oustanding               & N/A             \\
+        OSS    & Oustanding               & N/A             \\
+        PA     & Pass (thesis)            & N/A             \\
+        SAT    & Thesis only              & N/A             \\
+        UF     & Unclassified Fail        & 30\% Grade used \\
+        UNS    & Thesis only              & N/A             \\
+        UP     & Unclassified pass        & 50\% Grade used \\ \hline
+    \end{tabular}
+\end{table}
+
+
+
