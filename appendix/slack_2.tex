@@ -1,0 +1,116 @@
+\section{Slack conversation 2}
+\label{appendix:slack2}
+zach [3:53 PM]
+at the risk of sounding like a repetitive novice... what is wrong with indexes that get bigger and bigger? Is it best to avoid them because a) there is almost always a better way of doing something? or b) they have some other effect on the CouchDB process (other than whatever overhead is required to use a larger-than-requried index)
+
+rnewson (IRC) APP [3:57 PM]
+'bigger and bigger'?
+
+jan [4:03 PM]
+@zach not sure what you mean, indexes are expected to grow with more documents
+
+zach [4:22 PM]
+writing a reduce function I sometimes get a warning that reduce output is not shrinking fast enough - in this case i can either rewrite my reduce function or turn off the setting. As you mentioned previously @jan, option 1 (rewriting) is definitely the way to go. But what is the reason for this? Is it because a reduce function that doesn't shrink output requires continuous balancing of the B+ tree which means poor performance? (i don't have a background in data structures). what are the theoretical problems of in a reduce function like this: function(keys, values, rereduce){return values (with code to do the same in the rereduce)} if there was an unlimited amount of hardrive space available.
+
+[4:23]
+I know this is a 'relational' approach.. and that there are better options. but I'm still interested in why
+
+jan [4:49 PM]
+that reduce function will copy all values from the leaves of the b-tree into the root node, and all intermediate nodes get their share of leaves copied in as well. You’re effectively stacking a reverse tree on top of the actual tree, approaching $ O(n^2) $ or worse performance and disk use.
+
+zach [4:51 PM]
+ah. thank you
+
+jan [4:55 PM]
+I.e. it subverts everything an index is meant to do
+
+rnewson (IRC) APP [5:12 PM]
+I'm curious to know what the reduce function is
+
+jan (IRC) APP [5:13 PM]
+" a reduce function like this: function(keys, values, rereduce){return values (with code to do the same in the rereduce)}"
+
+afinne [5:33 PM]
+zach, just to double check: you are aware that a reduce function is not mandatory?
+
+zach [5:42 PM]
+Hi @afinne - yes. why do you ask? (I don't think I was able to group without the reduce function)
+
+Wohali (IRC) APP [5:43 PM]
+just use a built-in reduce like \_sum
+
+[5:43]
+if all you want is grouping
+
+zach [5:43 PM]
+if I say group=true and reduce = false I get an error
+
+rnewson (IRC) APP [5:44 PM]
+yes, you need a reduce if you want to group.
+
+[5:44]
+though 'return null' is sufficient
+
+zach [5:45 PM]
+would that guarantee all values returned for a particular key?
+
+[5:48]
+I re-wrote the reduce function to aggregate. though I must have done something wrong since 5 hours later it's still calculating
+
+...
+
+[5:49]
+and the database is only about 3.5GB
+
+rnewson (IRC) APP [5:49 PM]
+well, you'll @fabsolute least get compound rounding errors from the divide
+
+    [5:49]
+but the whole thing looks wrong tbh
+
+    [5:49]
+what does the map look like? what does a doc look like?
+
+[5:51]
+hm, I bet you could get the built-in's to do this for you
+
+    [5:51]
+if you emitted an array as your value in map, then \_sum will sum each item, etc
+
+    [5:52]
+for an average, you should calculate both values and then divide @fabsolute the client, you can't do it as you go
+
+    [5:52]
+and a note of caution, if any of your values happen not to be numbers, you'll end up doing string concatenation and blowing things up that way
+
+    [5:53]
+so I suggest typeof(number) checks
+
+zach [5:53 PM]
+thanks. the map function looks like this: (url)
+
+...
+
+zach [6:03 PM]
+Thanks for pointing out the rounding and average points @rnewson. I think I understand how I could use the \_sum, but I don't know how I would include the average
+
+rnewson (IRC) APP [6:04 PM]
+you couldn't, but you could include the numbers you need to calculate the average from the result of the \_view request
+
+    [6:05]
+that is, don't bother calculating r.gAvgS1 or r.gAvgS2 in the view
+
+    [6:05]
+just calculate it from the other two fields from the view response
+
+zach [6:07 PM]
+oh. i guess i could just sum the grades percent and divide by total grades at the end.
+
+rnewson (IRC) APP [6:07 PM]
+aye
+
+    [6:08]
+the built-in \_stats endpoint would give you the sum and count of the values, which you could then use to get mean average
+
+    [6:08]
+afk
