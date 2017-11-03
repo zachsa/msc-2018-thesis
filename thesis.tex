@@ -29,7 +29,8 @@
 \setlist{nosep} % or \setlist{noitemsep} to leave space around whole list
 
 % Layout
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=1.25in]{geometry}
+% \hoffset .25in
 \usepackage{setspace}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
@@ -42,7 +43,7 @@
 \definecolor{dhscodebg}{rgb}{0.01,0.199,0.1}
 \setminted{
     breaksymbolleft=,
-    fontsize=\scriptsize,
+    fontsize=\footnotesize,
     baselinestretch=1.1,
     % bgcolor=dhscodebg,
     % rulecolor=\color{gray!40},
@@ -72,7 +73,7 @@
 \nobibliography*
 
 % Title
-\title{Analysing relational datasets with CouchDB's MapReduce implementation}
+\title{Assessing CouchDB suitability for JOINing datasets} % Or. "Joinging datasets in CouchDB"
 \author{Zach Smith}
 \date{\today}
 
@@ -81,6 +82,10 @@
 
 % Title page
 \maketitle
+\thispagestyle{empty}
+
+% Abstract
+\input{1-abstract/1-abstract}
 \newpage
 
 %  TOC
@@ -89,39 +94,40 @@
 
 % Content
 \section{Introduction}
-\input{introduction/mapreduce}
-\input{introduction/motivation_aim}
-\input{introduction/related_work}
+\input{2-introduction/1-mapreduce}
+\input{2-introduction/2-motivation_aim}
+\input{2-introduction/3-related_work}
 
 \section{CouchDB}
-\input{couchdb/internals}
-\input{couchdb/querying_couch}
+\input{3-couchdb/1-overview}
+\input{3-couchdb/2-api}
 
 \section{nETL}
-\input{netl/overview}
-\input{netl/framework-design}
-\input{netl/framework-implementation}
-\input{netl/usage}
+\input{4-netl/1-requirements}
+\input{4-netl/2-design}
+\input{4-netl/3-configuration}
 
 \section{Evaluation \& Results}
-\input{evaluation/data_model}
-\input{evaluation/cluster_setup}
-\input{evaluation/methodology}
-\input{evaluation/results}
+\input{5-evaluation/1-setup}
+\input{5-evaluation/2-data}
+\input{5-evaluation/3-methods}
 
 \section{Discussion}
-\input{discussion/discussion}
-\input{discussion/future_work}
+\input{6-discussion/1-results}
+\input{6-discussion/2-future_work}
 
 \section{Conclusion}
+\input{7-conclusion/1-conclusion}
 
 \newpage
 
 % Appendix
 \begin{appendix}
-    \input{appendix/slack_1}
-    \input{appendix/slack_2}
-    \input{appendix/slack_3}
+    \section{Appendix}
+    \input{8-appendix/slack_1}
+    \input{8-appendix/slack_2}
+    \input{8-appendix/slack_3}
+    \input{8-appendix/slack_4}
     \listoffigures
     \listoftables
 \end{appendix}
