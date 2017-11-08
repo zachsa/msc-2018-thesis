@@ -133,3 +133,44 @@ The course-grade entity export as used in this project is relatively simple - a 
     UP     & Unclassified pass        & 50\% Grade used \\ \hline
   \end{tabular}
 \end{table}
+
+\subsection{Demographic data}
+Similarly to the events and grades exports received for analysis, this entity is represented by a flat CSV. Unlike other entities, demographics structure varies greatly from year-to-year. fields of interest are shown in table \ref{Demographics Columns}. The NBT (national benchmark test) scores are of most interest since they theoretically represent a normalized assessment of a student's capabilities. Grade 12 results by contrast may vary depending on the exam authority used.
+
+\begin{table}[]
+  \centering
+  \caption{Demographics Columns}
+  \label{Demographics Columns}
+  \begin{tabular}{l}
+    Field Name             \\ \hline
+    anonIDnew              \\
+    Population Group       \\
+    Sex                    \\
+    Citizenship Residency  \\
+    SA School              \\
+    Eng Grd12 Fin Rslt     \\
+    Math Grd12 Fin Rslt    \\
+    Mth Lit Grd12 Fin Rslt \\
+    Adv Mth Grd12 Fin Rslt \\
+    Phy Sci Grd12 Fin Rslt \\
+    NBT AL Score           \\
+    NBT QL Score           \\
+    NBT Math Score         \\
+    RegAcadYear            \\ \hline
+  \end{tabular}
+\end{table}
+
+\subsection{Analysis outline}
+The data domain allows for several interesting aggregations that could provide insight on how the Sakai platform is used by different student populations. Potential data aggregations in this regard include:
+
+\begin{enumerate}
+  \item Comparison between grades achieved and Sakai usage per semester
+  \item Comparison between Sakai usage across different population groups per semester
+  \item Correlating different demographics' usage of Sakai with achieved grade per semester
+  \item Correlating Sakai usage with gender
+  \item Correlating Sakai usage with particular courses, per gender and population group
+\end{enumerate}
+
+Although this project doesn't have the necessary clearance to publish these aggregations, the steps to achieve these aggregations is outlined and could be reproduced if necessary. The reason for not achieving ethical clearance in this regard is due to the likelihood of such results unfairly supporting existing stereotypes without the aggregation logic being nuanced enough to take in external factors such as environment, existing discrimination, type-casting, etc. Such results could still be useful, however, and especially in terms of Sakai usage vs population group, could quantify the discrepancy between tech-based information access of different demographics.
+
+In any case, data analysis is not the focus of this project; instead the process of combining these datasets into a single, manageable dataset is more important.

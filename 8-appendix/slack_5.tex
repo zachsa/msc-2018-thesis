@@ -32,3 +32,51 @@ if n > 1, would that result in an index being calculated more than once/
 
 [11:51]
 ?
+
+Wohali (IRC) APP [11:52 AM]
+i'm too tired to answer that right now
+
+    [11:52]
+maybe someone else can help you
+
+    [11:52]
+i have been up for 24 hours.
+
+zach [11:54 AM]
+i imagine that increasing nodes would result in decreasing index creation time since map output is calculated per node. and I would imagine that data copies don't get their own indexes. thanks :slightly_smiling_face:. have a good sleep
+
+Wohali (IRC) APP [11:57 AM]
+map output is calculated per shard, per copy
+
+    [11:57]
+on every node
+
+    [11:57]
+8 shards on a node = 8 couchjs processes
+
+zach [11:58 AM]
+so if n=3, then three copies of each view are calculated?
+
+[11:59]
+is that to increase availability of index retrievals?
+
+[12:01]
+I think Jan mentioned that it was a single couchjs process per reduce function, but many couchjs processes per map function. i saw this on my windows pc - n = 1 with 8 shards, there are at first many more than 8 couchjs processes running, and then only 8 processes running
+
+Antonio [1:26 PM]
+joined #general.
+
+rnewson (IRC) APP [3:50 PM]
+'but many couchjs processes per map function' - nope.
+
+[3:50]
+each view shard is built separately exactly as a view used to build in couchdb < 2.0.
+
+[3:50]
+that is, sequentially in _changes order until current.
+
+zach [3:57 PM]
+oh. sorry i misunderstood.
+
+[3:57]
+thank you

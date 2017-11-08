@@ -238,6 +238,83 @@ function(doc) {
 _sum // Built-in function
 \end{minted}
 
+\subsubsection*{Expanding the Map function}
+In the interest of further pushing CouchDB's querying capabilities, a second index was configured to add the \textit{demographic} entity to the joined aggregation and the map function above was expanded to deal with the additional entity:
+
+\begin{minted}{javascript}
+/**
+ * outputs: key:[<list of 10 numbers>]
+ * @param {Object} doc CouchDB document passed to Map function
+ */
+function(doc) {
+    var output = [
+        0, // eCountS1
+        0, // eCountS2
+
+        0, // gCountS1
+        0, // gCountS2
+        0, // gSumAvgS1
+        0, // gSumAvgS2
+
+        0, // dCount
+        0, // nbtAL
+        0, // nbtQL
+        0 // nbtMath
+    ];
+
+    // Checks number
+    function processScore(score) {
+        var r = parseFloat(score);
+        return (!r || isNaN(r)) ? 0 : r;
+    };
+
+    // Create output
+    switch (doc.type_) {
+        case 'courseGrade':
+            // ...
+            emit(doc.anonIDnew, output);
+            break;
+
+        case 'vulaEvent':
+            // ...
+            emit(doc.uct_id, output);
+            break;
+
+        case 'demographic':
+            output[6] = 1; // count
+            var nbtAL = processScore(doc["NBT AL Score"]);
+            var nbtQL = processScore(doc["NBT QL Score"]);
+            var nbtMath = processScore(doc["NBT Math Score"]);
+            output[7] = nbtAL;
+            output[8] = nbtQL;
+            output[8] = nbtMath;
+            emit(doc.anonIDnew, output);
+            break;
+
+        default:
+            break;
+    };
+};
+\end{minted}
+
+Because within the demographic data a particular student ID only appears once, it's possible to take into account non-numerical values within the aggregation. For example, and taking into account that the map output needs to be a list of \textit{numbers}, "sex" can be mapped as \textit{Female:1}, \textit{Male:2}, \textit{etc:..} with one index in the map output list reserved for description of sex. Population groups could be mapped in a similar way. However, CouchDB's MapReduce implementation does limit the extent to which such data could be queried. A query that can be fairly easily expressed in \textit{SQL}:
+
+\begin{minted}{sql}
+SELECT
+    D.StudentID,
+    G.CourseID,
+    COUNT(E.Event),
+    AVG(G.Grades)
+FROM Demographics D
+LEFT JOIN Grades G ON G.StudentID = D.StudentID
+LEFT JOIN Events E ON E.StudentID = D.StudentID
+GROUP BY
+    D.StudentID,
+    G.CourseID
+\end{minted}
+
+cannot be achieved as easily in couchDB since it would not be possible to emit the course ID itself in Map function list output and summing some kind of mapping to a course ID makes no sense. Instead it is necessary to work in a roundabout way, where the map function would either output a much longer list (corresponding to the total number of course grades). In theory CouchDB should be able to handle different output formats of the map function in which case this query would be fine. In practice, however (as has been discussed above), using anything other than built-in reduce functions cripples CouchDB's index building facility and so isn't a good or usable solution.
+
 \subsection{Index retrieval}
 Due to the nature of B+tree indexes in CouchDB retrieving view data is very quick - this is the benefit of CouchDB's MapReduce implementation over non-indexed output such as Hadoop. The view data is formatted as a JSON array of \textit{[key,value]} pairs. To use the view data outside of viewing it in a browser, a translation step is required since CouchDB doesn't offer tool to export or save output. For the purposes of this project output is required in the \textit{CSV} format so as to facilitate further data analysis using stats programs, Excel, saving the output in a data warehouse, etc.
 
