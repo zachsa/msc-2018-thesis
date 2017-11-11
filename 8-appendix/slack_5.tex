@@ -1,7 +1,7 @@
 \subsection{Slack conversation 5}
 \label{appendix:slack5}
 zach [11:46 AM]
-when I look at data/shards/... I see that my database is split amongst 8 shards on my single node setup. How does Couch distribute documents to each shard (i'm using the default _id generator). When in clustered mode, can I assume that data gets distributed amongst shards evently?
+when I look at data/shards/... I see that my database is split amongst 8 shards on my single node setup. How does Couch distribute documents to each shard (i'm using the default \_id generator). When in clustered mode, can I assume that data gets distributed amongst shards evently?
 
 Wohali (IRC) APP [11:48 AM]
 it's based on a hash of the document
@@ -28,7 +28,7 @@ if I configure n=1, q=8
 this is to see if increasing number of nodes in a cluster reduces index time... should it?
 
 [11:51]
-if n > 1, would that result in an index being calculated more than once/
+if n \textgreater 1, would that result in an index being calculated more than once/
 
 [11:51]
 ?
@@ -43,7 +43,7 @@ maybe someone else can help you
 i have been up for 24 hours.
 
 zach [11:54 AM]
-i imagine that increasing nodes would result in decreasing index creation time since map output is calculated per node. and I would imagine that data copies don't get their own indexes. thanks :slightly_smiling_face:. have a good sleep
+i imagine that increasing nodes would result in decreasing index creation time since map output is calculated per node. and I would imagine that data copies don't get their own indexes. thanks :slightly\_smiling\_face:. have a good sleep
 
 Wohali (IRC) APP [11:57 AM]
 map output is calculated per shard, per copy
@@ -64,16 +64,16 @@ is that to increase availability of index retrievals?
 I think Jan mentioned that it was a single couchjs process per reduce function, but many couchjs processes per map function. i saw this on my windows pc - n = 1 with 8 shards, there are at first many more than 8 couchjs processes running, and then only 8 processes running
 
 Antonio [1:26 PM]
-joined #general.
+joined \#general.
 
 rnewson (IRC) APP [3:50 PM]
 'but many couchjs processes per map function' - nope.
 
 [3:50]
-each view shard is built separately exactly as a view used to build in couchdb < 2.0.
+each view shard is built separately exactly as a view used to build in couchdb \textless 2.0.
 
 [3:50]
-that is, sequentially in _changes order until current.
+that is, sequentially in \_changes order until current.
 
 zach [3:57 PM]
 oh. sorry i misunderstood.

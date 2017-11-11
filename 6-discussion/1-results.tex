@@ -9,14 +9,17 @@ Although analysis of the student data is not the focus of this project, it's wor
     \centering
     \caption{nETL task runtimes}
     \label{netl-runtimes}
-    \begin{tabular}{llllll}
-                                                   &        & Runtime & Max CPU usage & Max memory usage & Lines Processed \\ \hline
-        \multicolumn{1}{c}{\multirow{2}{*}{Run 1}} & Events & 1       & 1             & 1                & 1               \\
-        \multicolumn{1}{c}{}                       & Grades & 1       & 1             & 1                & 1               \\
-        \multirow{2}{*}{Run 2}                     & Events & 1       & 1             & 1                & 1               \\
-                                                   & Grades & 1       & 1             & 1                & 1               \\
-        \multirow{2}{*}{Run 3}                     & Events & 1       & 1             & 1                & 1               \\
-                                                   & Grades & 1       & 1             & 1                & 1               \\ \hline
+    \begin{tabular}{cllll}
+        \multicolumn{1}{l}{Run} & Task         & Runtime (sec) & Max memory usage (mb)* & Lines Processed (loaded)** \\ \hline
+        \multirow{3}{*}{1}      & Events       & 4253          & \textless 200          & 44420508 (13184082)        \\
+                                & Grades       & 73.9          & \textless 200          & 180893 (106301)            \\
+                                & Demographics & 2             & \textless 200          & 12219 (9874)               \\
+        \multirow{3}{*}{2}      & Events       & 7125          & \textless 200          & 44420508 (13184082)        \\
+                                & Grades       & 107.5         & \textless 200          & 180893 (106301)            \\
+                                & Demographics & 2             & \textless 200          & 12219 (9874)               \\
+        \multirow{3}{*}{3}      & Events       & 4992          & \textless 200          & 44420508 (13184082)        \\
+                                & Grades       & 85.6          & \textless 200          & 180893 (106301)            \\
+                                & Demographics & 2.3           & \textless 200          & 12219 (9874)               \\ \cline{2-5}
     \end{tabular}
 \end{table}
 

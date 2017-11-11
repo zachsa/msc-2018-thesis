@@ -135,7 +135,7 @@ The course-grade entity export as used in this project is relatively simple - a 
 \end{table}
 
 \subsection{Demographic data}
-Similarly to the events and grades exports received for analysis, this entity is represented by a flat CSV. Unlike other entities, demographics structure varies greatly from year-to-year. fields of interest are shown in table \ref{Demographics Columns}. The NBT (national benchmark test) scores are of most interest since they theoretically represent a normalized assessment of a student's capabilities. Grade 12 results by contrast may vary depending on the exam authority used.
+Similarly to the events and grades exports received for analysis, this entity is represented by a flat CSV. Unlike other entities, demographics structure varies greatly from year-to-year. Fields of interest are shown in table \ref{Demographics Columns}. Both the NBT (national benchmark test) scores and the Grade 12 grades will be considered. Theoretically the NBT scores represent a normalized assessment of a student's capabilities, whereas grade 12 results by contrast may vary depending on the exam authority used and the quality of the school attended and resulting in a lower 'literacy'. There is no clear consensus over which score is more representative of general general university 'preparedness'. Although the NBT grade scores are more consistent across different years of intakes, making them easier to use. Because incoming students take literacy tests only on their first registration, demographic data from 2014/2015/2016 has been used (corresponding to undergraduate years). However, different years have different schema's, so the data is pre-treated to be normalized as according to the attributes in the 2016 data.
 
 \begin{table}[]
   \centering

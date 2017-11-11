@@ -99,9 +99,9 @@
 
 % Content
 \section{Introduction}
-\input{2-introduction/1-mapreduce}
-\input{2-introduction/2-no_sql}
-\input{2-introduction/3-motivation_aim}
+\input{2-introduction/0-introduction}
+\input{2-introduction/1-motivation-aim}
+\input{2-introduction/2-related-work}
 
 \section{CouchDB}
 \input{3-couchdb/1-overview}
@@ -119,12 +119,16 @@
 
 \section{Discussion}
 \input{6-discussion/1-results}
-\input{6-discussion/2-future_work}
 
 \section{Conclusion}
-\input{7-conclusion/1-conclusion}
-
+\input{7-conclusion/0-conclusion}
+\input{7-conclusion/1-future_work}
+\input{7-conclusion/2-acknowledgments}
 \newpage
+
+% Bibliogrpahy
+\bibliographystyle{plain}
+\bibliography{bibliography/msc_citations}
 
 % Appendix
 \begin{appendix}
@@ -133,14 +137,11 @@
     \input{8-appendix/slack_2}
     \input{8-appendix/slack_3}
     \input{8-appendix/slack_4}
+    \input{8-appendix/slack_5}
     \listoffigures
     \listoftables
 \end{appendix}
 \newpage
-
-% Bibliogrpahy
-\bibliographystyle{plain}
-\bibliography{bibliography/msc_citations}
 
 % Close docuemnt
 \end{document}
