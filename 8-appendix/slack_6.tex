@@ -1,0 +1,10 @@
+\subsection{Slack conversation 6}
+\label{appendix:slack6}
+zach [1:52 PM]
+Hi - is there anyway to simulate a SQL 'Window' function in CouchDB? i.e. could I do something like `rank() over(partition by someClassification order by someNumber desc)`. Since I can't guarantee that in my reduce function I will have all the values for a particular key, I'm assuming 'no'?
+
+[1:53]
+I can do this in the list function, i know that
+
+jan [2:45 PM]
+or outside of CouchDB with the reduce result. Would avoid list funs

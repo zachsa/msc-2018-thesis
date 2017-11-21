@@ -1,0 +1,97 @@
+\subsection{Design Document functions for Iteration 1}
+\label{appendix:ddoc-i1}
+\begin{minted}{javascript}
+/**
+ * Map function argument for CouchDB view calculation.
+ * Output key should be an array: [<year>, <studentID>]
+ * Output value should be an array: [<CSC1015F result>, <Gr12 Eng result>]
+ * @param {Object} doc 
+ */
+function(doc) {
+    var disallowedCourseGrades = ['ATT', 'DE', 'GIP', 'LOA', 'OS', 'OSS', 'PA', 'SAT', 'UNS', ''];
+    var fuDictionary = {
+        "A*": 90,
+        "A": 80,
+        "B": 70,
+        "C": 60,
+        "D": 55,
+        "E": 50
+    };
+    var key = [doc.RegAcadYear, doc.anonIDnew];
+    var value = [0, 0];
+    if (doc.type_ === 'courseGrade') {
+        var p = doc.Percent || '';
+        // If p not a number, try convert
+        if (typeof p !== 'number') {
+            if (typeof p !== 'string') return;
+            var newP = p.toUpperCase().trim();
+            if (disallowedCourseGrades.indexOf(p) >= 0) return;
+            switch (newP) {
+                case 'AB':
+                    p = 40;
+                    break;
+                case 'F':
+                    p = 40;
+                    break;
+                case 'DPR':
+                    p = 20;
+                    break;
+                case 'INC':
+                    p = 20;
+                    break;
+                case 'UF':
+                    p = 30;
+                    break;
+                case 'UP':
+                    p = 50;
+                    break;
+                default:
+                    p = parseFloat(p.substring(0, p.length - 1));
+                    if (isNaN(p)) return;
+                    break;
+            };
+        };
+        value[0] = p;
+        emit(key, value);
+
+    } else if (doc.type_ === 'demographic') {
+        var g = doc["Eng Grd12 Fin Rslt"] || "";
+        var retG;
+        if (isNaN(parseInt(g))) {
+            // Its a symbol
+            if (typeof g !== 'string') return;
+            retG = fuDictionary[g.toUpperCase().trim()] || 0;
+        } else {
+            // It's a number
+            retG = parseInt(g);
+        };
+        value[1] = retG;
+        emit(key, value);
+    };
+};
+
+/**
+ * Reduce function
+ */
+_stats
+
+/**
+ * List function
+ */
+function(head, req) {
+    provides('csv', function() {
+        var headers = "Year,StudentAnonID,CS1015F %,Gr12 Eng %";
+        send(headers);
+        while (row = getRow()) {
+            var key = row.key;
+            var value = row.value;
+            var yr = key[0];
+            var id = key[1];
+            var courseGrade = value[0].max;
+            var engGrade = value[1].max;
+            var line = "\\n" + yr + "," + id + "," + courseGrade + "," + engGrade;
+            send(line);
+        };
+    });
+};
+\end{minted}

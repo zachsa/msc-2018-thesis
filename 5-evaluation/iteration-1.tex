@@ -1,0 +1,40 @@
+I took an iterative approach to joining entities, with each iteration introducing additional complexity to the join requirements and introducing additional data-load. With an iterative approach I was able to identify key performance considerations when working with the tech stack described within this thesis. Looking at two entities: \textit{Grades} and \textit{Demographics} with the aim of correlating student benchmarks with the results of a specific course \textit{CSC1015F}. Student results from the \textit{CSC1015F} were iteratively joined with an increasing number of the available benchmarks to measure the indexing time of creating the joined datasets.
+
+In preparation of this assessment \textit{nETL} was configured to process all the cohort demographic data from 2016,2015,2014 and course grade data from 2016, 2015, 2014. This includes 2 CSVs (available on request) that formed the basis for all iterative analyses. The CSVs are listed here:
+
+\begin{enumerate}
+    \item \textit{FU-CombinedGrades-2016Reg.csv}
+    \item \textit{CombinedGrades.csv}
+\end{enumerate}
+
+\subsection{iteration 1: \textit{CSC1015F} result vs English Gr12 result}
+Filtering was applied to the demographic data to load only students who had taken \textit{CSC1015F}. Because \textit{nETL}'s filter module allows for specifying attributes to filter on with a corresponding list of values to accept, and NOT (without additional coding) filter on indirect associations such as \textit{student IDs that appear in the set ...}, a list of students was manually compiled to apply the filter on comprising 1879 unique students who registered for \textit{CSC1015F} in 2016, 2015, and 2015 (36 students registered for this course in separate years). Grades were filtered to only load results from the \textit{CSC1015F} course. White-listing of attributes was then applied to create docs of the following form:
+
+\begin{minted}{javascript}
+// Demographics JSON documents
+{"type_": "demographic", "anonIDnew": <number>, "Eng Grd12 Fin Rslt"; <grade (uncleaned)>, "RegAcadYear": <year>}
+
+// Grade JSON documents
+{"type_": "courseGrade", "RegAcadYear": <year>, "anonIDnew": <number>, "Percent": <grade (uncleaned)>}
+\end{minted}
+
+The \textit{nETL} configuration comprised two tasks run asynchronously to produce the above entities. The \textit{nETL} configuration is shown in \ref{appendix:config-i1}, with execution results of the \textit{nETL} shown in \ref{i1-results} alongside the database document summary (produced by the MapReduce index shown in \ref{appendix:dbInfo}).
+
+\begin{table}[]
+    \centering
+    \caption{\textit{nETL} runtime results for I1 analysis}
+    \label{i1-results}
+    \begin{tabular}{lcc}
+                                      & FU documents                      & Grade documents \\ \hline
+        CSV lines extracted           & 12219                             & 513872          \\
+        CSV lines loaded              & 1380                              & 1891            \\
+        \textit{nETL} task time (sec) & 2.4                               & 31.9            \\
+        CouchDB footprint             & \multicolumn{2}{c}{\textless 1MB}                   \\
+        Year 2016 doc-count           & 524                               & 738             \\
+        Year 2015 doc-count           & 460                               & 618             \\
+        Year 2014 doc-count           & 396                               & 738             \\
+        View calculation time (sec)   & \multicolumn{2}{c}{\textless 5}                     \\
+    \end{tabular}
+\end{table}
+
+The MapReduce join in the context of this analysis should be performed on key tuples of <year, studentId>, with a result output of <\textit{CSC1015F} \%, Gr12Eng \%>. The design document to achieve this format is shown in \ref{appendix:ddoc-i1}. The Map function includes logic to translate grade symbols to percentages; since the reduce phase (the built-in \_stats function in this case) requires that value-output of the Map function be an array of numbers. Results are shown in the graphs in Fig TODO.
