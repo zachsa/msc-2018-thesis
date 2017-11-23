@@ -12,10 +12,20 @@ Filtering was applied to the demographic data to load only students who had take
 
 \begin{minted}{javascript}
 // Demographics JSON documents
-{"type_": "demographic", "anonIDnew": <number>, "Eng Grd12 Fin Rslt"; <grade (uncleaned)>, "RegAcadYear": <year>}
+{
+    "type_": "demographic",
+    "anonIDnew": <number>,
+    "Gr12 Eng": <grade (uncleaned)>,
+    "RegAcadYear": <year>
+}
 
 // Grade JSON documents
-{"type_": "courseGrade", "RegAcadYear": <year>, "anonIDnew": <number>, "Percent": <grade (uncleaned)>}
+{
+    "type_": "courseGrade",
+    "RegAcadYear": <year>,
+    "anonIDnew": <number>,
+    "Percent": <grade (uncleaned)>
+}
 \end{minted}
 
 The \textit{nETL} configuration comprised two tasks run asynchronously to produce the above entities. The \textit{nETL} configuration is shown in \ref{appendix:config-i1}, with execution results of the \textit{nETL} shown in \ref{i1-results} alongside the database document summary (produced by the MapReduce index shown in \ref{appendix:dbInfo}).
@@ -25,16 +35,89 @@ The \textit{nETL} configuration comprised two tasks run asynchronously to produc
     \caption{\textit{nETL} runtime results for I1 analysis}
     \label{i1-results}
     \begin{tabular}{lcc}
-                                      & FU documents                      & Grade documents \\ \hline
-        CSV lines extracted           & 12219                             & 513872          \\
-        CSV lines loaded              & 1380                              & 1891            \\
-        \textit{nETL} task time (sec) & 2.4                               & 31.9            \\
-        CouchDB footprint             & \multicolumn{2}{c}{\textless 1MB}                   \\
-        Year 2016 doc-count           & 524                               & 738             \\
-        Year 2015 doc-count           & 460                               & 618             \\
-        Year 2014 doc-count           & 396                               & 738             \\
-        View calculation time (sec)   & \multicolumn{2}{c}{\textless 5}                     \\
+                                      & FU documents                    & Grade documents \\ \hline
+        CSV lines extracted           & 12219                           & 513872          \\
+        CSV lines loaded              & 1380                            & 1891            \\
+        \textit{nETL} task time (sec) & 2.4                             & 31.9            \\
+        CouchDB footprint             & \multicolumn{2}{c}{0.8MB}                         \\
+        Year 2016 doc-count           & 524                             & 738             \\
+        Year 2015 doc-count           & 460                             & 618             \\
+        Year 2014 doc-count           & 396                             & 535             \\
+        View calculation time (sec)   & \multicolumn{2}{c}{\textless 5}                   \\
     \end{tabular}
 \end{table}
 
 The MapReduce join in the context of this analysis should be performed on key tuples of <year, studentId>, with a result output of <\textit{CSC1015F} \%, Gr12Eng \%>. The design document to achieve this format is shown in \ref{appendix:ddoc-i1}. The Map function includes logic to translate grade symbols to percentages; since the reduce phase (the built-in \_stats function in this case) requires that value-output of the Map function be an array of numbers. Results are shown in the graphs in Fig TODO.
+
+\subsection{iteration 2: \textit{CSC1015F} result vs all (8) demographic markers}
+Similar to \textit{Iteration 1}, filtering was applied to the demographic data to load only students who had taken \textit{CSC1015F} by manually selecting student IDs and configuring the filter to allow rows of only those student IDs into the database. Grade-rows from the \textit{CSC1015F} course and white-listing of attributes was then applied to create documents with the desirable attributes only. This iteration used all the markers from the demographic information:
+
+\begin{enumerate}
+    \item Gr12 Eng \%
+    \item Gr12 Sci \%
+    \item Gr12 Mth \%
+    \item Gr12 Mth Lit \%
+    \item Gr12 Mth Adv \%
+    \item NBT AL \%
+    \item NBT QL \%
+    \item NBT Mth \%
+\end{enumerate}
+
+\begin{minted}{javascript}
+// Demographics JSON documents
+{
+    "type_": "demographic",
+    "anonIDnew": <number>,
+    "Gr12 Eng": <grade (uncleaned)>,
+    "Gr12 Sci": <grade (uncleaned)>,
+    "Gr12 Mth": <grade (uncleaned)>,
+    "Gr12 Mth Lit": <grade (uncleaned)>,
+    "Gr12 Mth Adv": <grade (uncleaned)>,
+    "NBT AL": <grade (uncleaned)>,
+    "NBT QL": <grade (uncleaned)>,
+    "NBT Mth": <grade (uncleaned)>,
+    "RegAcadYear": <year>
+}
+
+// Grade JSON documents
+{
+    "type_": "courseGrade",
+    "RegAcadYear": <year>,
+    "anonIDnew": <number>,
+    "Percent": <grade (uncleaned)>
+}
+\end{minted}
+
+Similarly to Iteration 1, \textit{nETL} was configured to run two tasks asynchronously with the configuration shown in \ref{appendix:config-i2}. Execution results are shown in \ref{i2-results}.
+
+\begin{table}[]
+    \centering
+    \caption{\textit{nETL} runtime results for I2 analysis. As expected the database footprint increased slightly along with inclusion of 7 additional columns from the demographics CSV. Runtime of the \textit{nETL} task increased slightly - but that is not meaningful on a single run.}
+    \label{i2-results}
+    \begin{tabular}{lcc}
+                             & FU documents              & Grade documents \\ \hline
+        CSV lines extracted  & 12219                     & 513872          \\
+        CSV lines loaded     & 1380                      & 1891            \\
+        nETL task time (sec) & 2.4                       & 33.8            \\
+        CouchDB footprint    & \multicolumn{2}{c}{0.9MB}                   \\
+        Year 2016 doc-count  & 524                       & 738             \\
+        Year 2015 doc-count  & 460                       & 618             \\
+        Year 2014 doc-count  & 396                       & 535             \\
+    \end{tabular}
+\end{table}
+
+
+\subsection{iteration 3: Introducing additional courses}
+The above examples achieve the join of the demographic data and the grade data through joining on keys as output by the map task. CoucuDB allows for configuring the level at which keys are grouped when using \textit{compound-keys}. The above iterations showed key groupings in the form \textit{<year, student ID>}. With an \textit{exact} level of grouping (the default), demographic and grade data is joined on the \textit{<year, student ID>} combination and the output is grouped on that as well. With a grouping of level 1 it's possible to join the two entities on just \textit{year}, and then group on that as well.
+
+Such a grouping is only possible when all entities can output keys on which grouping can occur - i.e. both the demographic and grade data include \textit{year} and \textit{student number} fields, and so by emitting \textit{<year, student ID>} tuples from each entity allows the CouchDB MapReduce engine to group on matching tuples. The demographic entity doesn't include course information, however, so it is impossible to (natively) emit tuples of \textit{<year, student ID, course ID>} on which the entities can be grouped.
+
+Using built-in reduce functions (\_sum or \_stats), where the values-output of the map function must be numbers, there are 3 different ways incorporating courses into the join as discussed in iteration 1 and iteration 2. These are:
+
+\begin{enumerate}
+    \item
+\end{enumerate}
+
+
+NOTE:
+for the demographic, i would need to emit the same document for several keys. this would be something like an outer join
