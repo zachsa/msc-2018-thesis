@@ -1,3 +1,28 @@
+\subsection{left join}
+Using compound keys to implement a join, which requires emitting the same value for multiple keys for some entities
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 I took an iterative approach to joining entities, with each iteration introducing additional complexity to the join requirements and introducing additional data-load. With an iterative approach I was able to identify key performance considerations when working with the tech stack described within this thesis. Looking at two entities: \textit{Grades} and \textit{Demographics} with the aim of correlating student benchmarks with the results of a specific course \textit{CSC1015F}. Student results from the \textit{CSC1015F} were iteratively joined with an increasing number of the available benchmarks to measure the indexing time of creating the joined datasets. In all cases computing time was conducted on the same PC, with indexing time retrieved from the logs, both for the \textit{nETL} application and the \textit{CouchDB} application. Logs were read using the useful \textit{grep} tool available via the Ubuntu 16.04.x shell.
 
 CouchDB indexing time was calculated via retrieving the latest logs for a particular indexing job using GREP (add ref), and the getting the difference between the smallest and largest dates. This is because shards finish at different times and so I want the start of the first shard and the end of the last shard in terms of indexing.
@@ -8,6 +33,8 @@ In preparation of this assessment \textit{nETL} was configured to process all th
     \item \textit{FU-CombinedGrades-2016Reg.csv}
     \item \textit{CombinedGrades.csv}
 \end{enumerate}
+
+
 
 \subsection{iteration 1: \textit{CSC1015F} result vs English Gr12 result}
 Filtering was applied to the demographic data to load only students who had taken \textit{CSC1015F}. Because \textit{nETL}'s filter module allows for specifying attributes to filter on with a corresponding list of values to accept, and NOT (without additional coding) filter on indirect associations such as \textit{student IDs that appear in the set ...}, a list of students was manually compiled to apply the filter on comprising 1879 unique students who registered for \textit{CSC1015F} in 2016, 2015, and 2015 (36 students registered for this course in separate years). Grades were filtered to only load results from the \textit{CSC1015F} course. White-listing of attributes was then applied to create docs of the following form:
@@ -157,3 +184,4 @@ The 3rd option in this case is tested as the most feasible. It requires the leas
 \end{table}
 
 \subsection{iteration 4: Introducing the Events entity}
+A quick analysis of the events dataset shows that for the 40 courses as queried in Iteration 2, there are 8 848 001 presence events for the students enrolled in these courses (events can't be joined on students)
