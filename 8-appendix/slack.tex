@@ -1,0 +1,346 @@
+\subsection{Slack conversations}
+\label{appendix:slack}
+
+\subsubsection{October 25 2017}
+zach [12:13 PM]
+Hi. What would cause CouchDB rereduce=true param when running a reduce task?
+
+rnewson (IRC) APP [12:25 PM]
+couchdb stores the result of the reduce function on internal b+tree nodes of the view index. rereduce is true when we're higher up in the tree and need to know the reduction of a group of previous reductions.
+
+[12:25]
+so it happens when you have more than a handful of documents and your reduce function will only work correctly if you do the right thing for rereduce false and true cases.
+
+[12:26]
+when rereduce is true, the keys param is null and the values array is the output of previous calls to your reduce function.
+
+zach [12:30 PM]
+thank you. that means that a reduce function needs to work with an input of either the map output or it's reduce output? Is there a term for this kind of function? I feel like there should be...
+
+rnewson (IRC) APP [12:31 PM]
+yes, the contract for a reduce function is that it must work for both types of input, and the third parameter tells you which you're doing.
+
+[12:31]
+there are implementations where the logic is the same for both types, of course.
+
+[12:32]
+"return sum(values);" for example
+
+zach [12:48 PM]
+Thanks again! I'm not super familiar with the b-trees, but my understanding is that if you are higher up on such a tree, that the key you are looking for exists lower down? Would it be correct to say that rereduce is a means of appending to a reduce functions output that already exists? If the entire index was calculated from scratch then, could you assume that rereduce will always be false since grouped output of the map function means that a reduce function will NOT reprocess the same keys?
+
+rnewson (IRC) APP [12:51 PM]
+no, you cannot assume that
+
+    [12:51]
+rereduce param will be set to false and true for any database above 10 documents or so
+
+    [12:51]
+write your reduce function accordingly, that's the contract
+
+zach [12:54 PM]
+thank you
+
+\subsubsection{October 31 2017}
+zach [3:53 PM]
+at the risk of sounding like a repetitive novice... what is wrong with indexes that get bigger and bigger? Is it best to avoid them because a) there is almost always a better way of doing something? or b) they have some other effect on the CouchDB process (other than whatever overhead is required to use a larger-than-requried index)
+
+rnewson (IRC) APP [3:57 PM]
+'bigger and bigger'?
+
+jan [4:03 PM]
+@zach not sure what you mean, indexes are expected to grow with more documents
+
+zach [4:22 PM]
+writing a reduce function I sometimes get a warning that reduce output is not shrinking fast enough - in this case i can either rewrite my reduce function or turn off the setting. As you mentioned previously @jan, option 1 (rewriting) is definitely the way to go. But what is the reason for this? Is it because a reduce function that doesn't shrink output requires continuous balancing of the B+ tree which means poor performance? (i don't have a background in data structures). what are the theoretical problems of in a reduce function like this: function(keys, values, rereduce){return values (with code to do the same in the rereduce)} if there was an unlimited amount of hardrive space available.
+
+[4:23]
+I know this is a 'relational' approach.. and that there are better options. but I'm still interested in why
+
+jan [4:49 PM]
+that reduce function will copy all values from the leaves of the b-tree into the root node, and all intermediate nodes get their share of leaves copied in as well. You’re effectively stacking a reverse tree on top of the actual tree, approaching $ O(n^2) $ or worse performance and disk use.
+
+zach [4:51 PM]
+ah. thank you
+
+jan [4:55 PM]
+I.e. it subverts everything an index is meant to do
+
+rnewson (IRC) APP [5:12 PM]
+I'm curious to know what the reduce function is
+
+jan (IRC) APP [5:13 PM]
+" a reduce function like this: function(keys, values, rereduce){return values (with code to do the same in the rereduce)}"
+
+afinne [5:33 PM]
+zach, just to double check: you are aware that a reduce function is not mandatory?
+
+zach [5:42 PM]
+Hi @afinne - yes. why do you ask? (I don't think I was able to group without the reduce function)
+
+Wohali (IRC) APP [5:43 PM]
+just use a built-in reduce like \_sum
+
+[5:43]
+if all you want is grouping
+
+zach [5:43 PM]
+if I say group=true and reduce = false I get an error
+
+rnewson (IRC) APP [5:44 PM]
+yes, you need a reduce if you want to group.
+
+[5:44]
+though 'return null' is sufficient
+
+zach [5:45 PM]
+would that guarantee all values returned for a particular key?
+
+[5:48]
+I re-wrote the reduce function to aggregate. though I must have done something wrong since 5 hours later it's still calculating
+
+...
+
+[5:49]
+and the database is only about 3.5GB
+
+rnewson (IRC) APP [5:49 PM]
+well, you'll @fabsolute least get compound rounding errors from the divide
+
+    [5:49]
+but the whole thing looks wrong tbh
+
+    [5:49]
+what does the map look like? what does a doc look like?
+
+[5:51]
+hm, I bet you could get the built-in's to do this for you
+
+    [5:51]
+if you emitted an array as your value in map, then \_sum will sum each item, etc
+
+    [5:52]
+for an average, you should calculate both values and then divide @fabsolute the client, you can't do it as you go
+
+    [5:52]
+and a note of caution, if any of your values happen not to be numbers, you'll end up doing string concatenation and blowing things up that way
+
+    [5:53]
+so I suggest typeof(number) checks
+
+zach [5:53 PM]
+thanks. the map function looks like this: (url)
+
+...
+
+zach [6:03 PM]
+Thanks for pointing out the rounding and average points @rnewson. I think I understand how I could use the \_sum, but I don't know how I would include the average
+
+rnewson (IRC) APP [6:04 PM]
+you couldn't, but you could include the numbers you need to calculate the average from the result of the \_view request
+
+    [6:05]
+that is, don't bother calculating r.gAvgS1 or r.gAvgS2 in the view
+
+    [6:05]
+just calculate it from the other two fields from the view response
+
+zach [6:07 PM]
+oh. i guess i could just sum the grades percent and divide by total grades at the end.
+
+rnewson (IRC) APP [6:07 PM]
+aye
+
+    [6:08]
+the built-in \_stats endpoint would give you the sum and count of the values, which you could then use to get mean average
+
+    [6:08]
+afk
+
+\subsubsection{November 1 2017}
+zach [12:25 PM]
+Question @rnewson - thanks for those pointers yesterday. it took just over an hour to finish indexing the MapReduce view using the \_sum reduce function. In an unrelated note, I remember reading somewhere that the default reduce functions run much more efficiently than custom reduce function? why is this? i also recall someone mentioning (I think it was on this channel) that the reduction phase is done by the main erlang process. Does this mean that reduction is not done in parallel? i.e. the map functions are computed using instances of couchjs, but the reduce function is done via a single process?
+
+zach [12:48 PM]
+ah. i see why there is a performance difference here: http://docs.couchdb.org/en/2.1.0/maintenance/performance.html\#builtin-reduce-functions. I'd still be interested to know if the reduce function is done by many 'reducers'
+
+jan [12:55 PM]
+per view build, it is sequential, optimising for write IO / on a sharded system, view builds are per-shard
+
+zach [1:10 PM]
+is it correct to say that for a particular view: per shard, map indexes are calculated in parallel (multiple couchjs processes), followed by a single instance of the reduce function (a single process)? i.e. a database running as a single node with 8 shards would have at most 8 reduce functions running? So theoretically speaking increasing shards would decrease the time taking to build MapReduce indexes?
+
+[1:11]
+I now understand what I see 8 instances of the couchjs process in Windows task manager
+
+jan [1:11 PM]
+the reduce, especially built-in reduce is not likely to be factor in view build times.
+
+[1:11]
+oh
+
+    [1:11]
+windows
+
+    [1:11]
+windows has extra slowness added to it
+
+zach [1:12 PM]
+why is that?
+
+jan [1:13 PM]
+Windows isn’t very good at unix-style inter process communication
+
+zach [1:14 PM]
+so there is an overhead every time a map process is spawned and returned...
+
+jan [1:15 PM]
+it’s less the spwning, and more the i/o
+
+\subsubsection{November 2 2017}
+zach [10:57 AM]
+will list functions be included in future versions of CouchDB? I saw a thread that they are considered as part of CouchApps and may not. I kinda love them
+
+jan [11:02 AM]
+@zach we have no plans to remove them, but they may fall by the wayside. Nobody has worked on that in 5+ years, and it’s not something we recommend anyone using
+
+\subsubsection{November 7 2017}
+zach [11:46 AM]
+when I look at data/shards/... I see that my database is split amongst 8 shards on my single node setup. How does Couch distribute documents to each shard (i'm using the default \_id generator). When in clustered mode, can I assume that data gets distributed amongst shards evently?
+
+Wohali (IRC) APP [11:48 AM]
+it's based on a hash of the document
+
+[11:49]
+which should be random enough to ensure equal distribution
+
+zach [11:49 AM]
+Thank you
+
+Wohali (IRC) APP [11:49 AM]
+in clustered mode, in a 3 node cluster, every node gets a copy of your document
+
+[11:49]
+so all 8 shards are stored on all 3 nodes (total 24 shards)
+
+zach [11:49 AM]
+that's if n=3 though?
+
+[11:49]
+if I configure n=1, q=8
+
+    [11:50]
+this is to see if increasing number of nodes in a cluster reduces index time... should it?
+
+[11:51]
+if n \textgreater 1, would that result in an index being calculated more than once/
+
+[11:51]
+?
+
+Wohali (IRC) APP [11:52 AM]
+i'm too tired to answer that right now
+
+    [11:52]
+maybe someone else can help you
+
+    [11:52]
+i have been up for 24 hours.
+
+zach [11:54 AM]
+i imagine that increasing nodes would result in decreasing index creation time since map output is calculated per node. and I would imagine that data copies don't get their own indexes. thanks :slightly\_smiling\_face:. have a good sleep
+
+Wohali (IRC) APP [11:57 AM]
+map output is calculated per shard, per copy
+
+    [11:57]
+on every node
+
+    [11:57]
+8 shards on a node = 8 couchjs processes
+
+zach [11:58 AM]
+so if n=3, then three copies of each view are calculated?
+
+[11:59]
+is that to increase availability of index retrievals?
+
+[12:01]
+I think Jan mentioned that it was a single couchjs process per reduce function, but many couchjs processes per map function. i saw this on my windows pc - n = 1 with 8 shards, there are at first many more than 8 couchjs processes running, and then only 8 processes running
+
+Antonio [1:26 PM]
+joined \#general.
+
+rnewson (IRC) APP [3:50 PM]
+'but many couchjs processes per map function' - nope.
+
+[3:50]
+each view shard is built separately exactly as a view used to build in couchdb \textless 2.0.
+
+[3:50]
+that is, sequentially in \_changes order until current.
+
+zach [3:57 PM]
+oh. sorry i misunderstood.
+
+[3:57]
+thank you
+
+\subsubsection{November 20 2017}
+zach [1:52 PM]
+Hi - is there anyway to simulate a SQL 'Window' function in CouchDB? i.e. could I do something like `rank() over(partition by someClassification order by someNumber desc)`. Since I can't guarantee that in my reduce function I will have all the values for a particular key, I'm assuming 'no'?
+
+[1:53]
+I can do this in the list function, i know that
+
+jan [2:45 PM]
+or outside of CouchDB with the reduce result. Would avoid list funs
+
+\subsubsection{November 24 2017}
+zach [11:40 AM]
+Hi. In a Map query, I created a variable `key` that I would then adjust and emit several times: `function(doc) {var key = [it1, it2, it3]; var arr = ["a", "b", "c", etc]; arr.forEach(function(val) {key[1] = val; emit(key, ...)})}`. but i found that the `forEach` loop didn't work as expected. It seemed that the variable `key` was in a global scope that was shared by separate instances of the map function -i.e. all the keys emitted were the last string in `arr`. Is this supposed to be the case? (edited)
+
+jan [11:45 AM]
+@zach can you share the full map fun code in a pastie service somewhere? (don’t paste here pls)
+
+rnewson (IRC) APP [11:49 AM]
+ah, I can believe that
+
+    [11:49]
+emit(key,value) simply builds an array that we return @fabsolute the end
+
+    [11:49]
+so if you're modifying a variable that you emitted, it won't work as you expect
+
+    [11:50]
+though of course in your case you're also making 'key' have a scope outside of the forEach anyway
+
+zach [11:52 AM]
+the full map function is available here: https://gist.githubusercontent.com/zachsa/52fa64fd0cc85de7b0f7fb7601aaba53/raw/ec800a79e12920f22d2d6da5d87ee020ccd44379/map%2520function
+
+[11:53]
+thank @rnewson - at the end of the map function?
+
+rnewson (IRC) APP [11:53 AM]
+after the end of the map function
+
+    [11:54]
+there's an array declared before we call your map function, any calls to emit() add items to it.
+
+[11:54]
+_if_ your function returns successfully, that array is then marshalled back to couchdb erlang side
+
+    [11:54]
+this is why an error in your map function causes none of your emits to appear in the view.
+
+[11:54]
+but also why you're seeing this effect
+
+zach [11:58 AM]
+oh ok. so per an execution of a map function, if i emit the variable 'key' several times it's just a reference to a single object - and the same for value in the case of the function (though I don't change the value variable after I emit). Thanks!
+
+rnewson (IRC) APP [11:58 AM]
+https://github.com/apache/couchdb/blob/master/share/server/views.js
+
+[11:59]
+https://github.com/apache/couchdb/blob/master/share/server/views.js#L85-L87

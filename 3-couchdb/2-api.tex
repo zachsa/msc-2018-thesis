@@ -1,42 +1,11 @@
 \subsection{CouchDB Server API}
-CouchDB allows a user to specify several different types of functions that are executed on the server-side Erlang application. These functions need to be specified on a 'Design' document, which is simply a normal JSON document with an \_id of "\_design/documentName". A full list of the server API for executing functions is:
+CouchDB allows a user to specify several different types of functions that are executed on the server-side Erlang application. These functions need to be specified on a 'Design' document, which is simply a normal JSON document with an attribute "\_id" having a value of "\_design/documentName". A full list of the server API can be seen in the sample design document in \ref{appendix:designDoc}. There are 6 types of functions that a user can specify and are executed by the CouchDB application on the server: \textit{views}, \textit{shows}, \textit{lists}, \textit{updates}, \textit{filters}, and \textit{validation} checks. Via this API much of the functionality that you typically find in an RDBMS can be implemented in couchDB (albeit in a roundabout way). For example a SQL trigger could be implemented via a CouchDB \textit{update}, a SQL query could be implemented as a \textit{list} function and a \textit{view} index, etc. While the full range of data-interactions available on an RDBMS are available via CouchDB, however, to work with such a different DBMS requires a vastly different mindset and tool-set (using CouchDB requires a strong coding ability and an understanding of underlying programming concepts such as algorithms and data structures).
 
-\begin{enumerate}
-    \item Views
-    \item Show Functions
-    \item List Functions
-    \item Update Functions
-    \item Filter Functions
-    \item Validate Document Update Functions
-\end{enumerate}
+\subsection{Views}
+Views comprise two components - a \textit{Map}-function component and a \textit{Reduce}-function component, the contracts of which are shown in \ref{appendix:designDoc}.
 
-\subsubsection{Views}
-Views comprise two components - a \textit{Map}-function component and a \textit{Reduce}-function component.
+\subsubsection*{The \textit{\_stats} function}
+Considering the performance cost of custom reduce functions in CouchDB, which is difficult to quantify and is worthy of an analysis in and of itself, only the built-in reduce function \textit{\_stats} is used in this project. This function requires that Map function output be a list of numbers
 
-\begin{minted}{javascript} 
-/**
- * Map function
- * @param  {Object} doc Each document in the database is passed in turn to the function
- * @return {null} Nothing is returned - key:value pairs are emitted (multiple pairs can be emitted per document)
- */
-function(doc) {
-    emit(someKey, someValue);
-};
-
-/**
- * Reduce function
- * @param  {Object[]} [keys] A list of [key, docId] pairs - key as from the map function, and key from the original doc
- * @param  {Object[]} values Output from the map function, or from the reduce function
- * @param  {Boolean} [rereduce] Indicates whether values are output from the map (rereduce = false) or reduce (rereduce = true) function
- * @return {[type]}
- */
-function(keys, values, rereduce) {
-    return // ...someValue
-};
-\end{minted}
-
-todo: discuss the query code re built-in reduce functions.
-
-
-\subsubsection{List functions}
-List functions fall under the category of \textit{CouchApps} and, as mentioned previously, are likely to be excluded from future releases. These functions iterate a view output to an HTTP(S) client, allowing a final phase of transformation - i.e. a data format switch from JSON documents to CSV format. Since \textit{list functions} form part of the HTTP API, these functions effectively allow for "insta-APIs" available to the world. \textit{List} functions take the name of a \textit{MapReduce} view as an argument and iterate through the results, passing those results to a user over HTTP(S). As with all of CouchDB interactions, list functions are invoked via HTTP and allow for an API of retrieving data from CouchDB views. As mentioned in \ref{appendix:slack6}, list functions are deprecated and should be replaced by code external to the CouchDB application. \textit{nETL} could be easily configured to replace list functions with a small amount of coding.
+\subsection{List functions}
+List functions fall under the category of \textit{CouchApps} and, as mentioned previously, are likely to be excluded from future releases. These functions iterate a view output to an HTTP(S) client, allowing a final phase of transformation - i.e. a data format switch from JSON documents to CSV format. Since \textit{list functions} form part of the HTTP API, these functions effectively allow for "insta-APIs" available to the world. \textit{List} functions take the name of a \textit{MapReduce} view as an argument and iterate through the results, passing those results to a user over HTTP(S). As with all of CouchDB interactions, list functions are invoked via HTTP and allow for an API of retrieving data from CouchDB views. As mentioned in \ref{appendix:slack}, list functions are deprecated and should be replaced by code external to the CouchDB application. \textit{nETL} could be easily configured to replace list functions with a small amount of coding.

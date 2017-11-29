@@ -1,0 +1,59 @@
+\subsection{CouchDB}
+
+\subsubsection{Setup script}
+\label{appendix:couch-setup}
+\begin{minted}{sh}
+# Set hostname of server
+hostname <hostname>; rm /etc/hostname; touch /etc/hostname; echo <hostname> >> /etc/hostname; chmod 466 /etc/hostname;
+
+## Install basic tooling 
+# GCC collection (GNU make and GNU compiler tools)
+apt-get update
+apt-get install build-essential -y
+
+# Update openssl to 1.0.2l
+cd /usr/src
+wget https://www.openssl.org/source/openssl-1.0.2l.tar.gz
+tar -zxf openssl-1.0.2l.tar.gz
+cd openssl-1.0.2l
+./config
+make
+make test
+make install
+mv /usr/bin/openssl /root/
+ln -s /usr/local/ssl/bin/openssl /usr/bin/openssl
+
+# Python
+apt-get update
+apt-get install python -y
+
+# libcurl
+apt-get update
+apt-get install libcurl4-openssl-dev -y
+
+# ICU
+apt-get update
+apt-get install libicu-dev -y
+
+# Pre-seed debconf to answer CouchDB installation wizard automatically
+debconf-set-selections <<< 'couchdb couchdb/bindaddress string 0.0.0.0'
+debconf-set-selections <<< 'couchdb couchdb/cookie string monster'
+debconf-set-selections <<< 'couchdb couchdb/mode string clustered'
+debconf-set-selections <<< 'couchdb couchdb/nodename string couchdb@<hostname>'
+debconf-set-selections <<< 'couchdb couchdb/adminpass password <password>'
+debconf-set-selections <<< 'couchdb couchdb/adminpass_again password <password>'
+
+# register CouchDB package with the server package manager and install
+echo 'deb https://apache.bintray.com/couchdb-deb xenial main' | sudo tee -a /etc/apt/sources.list
+curl -L https://couchdb.apache.org/repo/bintray-pubkey.asc | sudo apt-key add -
+apt-get update
+apt-get install couchdb -y
+
+# And then once those commands have been run to setup all the CouchDB nodes, the CouchDB cluster can be configured using a few commands on any one node (temporarily referred to as the CoOrdinatingNodeHost)
+# Run these two lines to add a node to the CouchDB cluster
+curl -X POST -H \"Content-Type: application/json\" http://<username>:<password>@<CoOrdinatingNodeHost>:<port>/_cluster_setup -d '{\"action\": \"enable_cluster\", \"bind_address\":\"CoOrdinatingNodeHost\", \"username\": \"<username>\", \"password\":\"<password>\", \"port\": <port>, \"node_count\": \"<intented node count>\", \"remote_node\": \"<remote hostname>\", \"remote_current_user\": \"<username>\", \"remote_current_password\": \"<password>\" }'
+curl -X POST -H \"Content-Type: application/json\" http://<username>:<password>@<CoOrdinatingNodeHost>:<port>/_cluster_setup -d '{\"action\": \"add_node\", \"host\":\"<remote hostname>\", \"port\": \"<port>\", \"username\": \"<username>\", \"password\":\"<password>\"}'
+
+# Finalize the cluster setup
+curl -X POST -H \"Content-Type: application/json\" http://<username>:<password>@<CoOrdinatingNodeHost>:<port>/_cluster_setup -d '{\"action\": \"finish_cluster\"}'
+\end{minted}

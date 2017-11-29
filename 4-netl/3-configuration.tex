@@ -11,35 +11,4 @@
     \item \textit{netl-load-couchdb}
 \end{enumerate}
 
-As shown in \ref{nETL}, these modules must adhere to a contracts stipulated by \textit{nETL}'s module-loading interface. Modules are loaded into \textit{nETL}'s memory via the following code:
-
-\begin{minted}{javascript}
-// Load the module into memory
-memoryObject[userModule.name] = userModule.exe;
-
-// Invoke the module's closure
-var loadedModule = memoryObject[userModule.Name].call(userModule);
-
-// Genrate batch from extraction module
-var batch = loadedModule.getNext()
-
-// Do transformations on batch
-batch = loadedModule.transform(batch);
-
-// Load transformed batch
-load.batch(batch).then(function(msg) {}).catch(function(msg) {});
-
-// An example userModule (an extraction module)
-userModule = (function() {
-    function exe(configurationObj) {
-        function getNext() { /* ... */};
-        return {
-            getNext: getNext
-        };
-    };
-    return {
-        name: "MODULE_NAME",
-        exe: exe
-    };
-})();
-\end{minted}
+As shown in \ref{nETL}, these modules must adhere to a contracts stipulated by \textit{nETL}'s module-loading interface. See \ref{appendix:netl-loading} for an example of a script that loads a module into the initiated \textit{nETL} application.
