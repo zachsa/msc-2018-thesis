@@ -5,4 +5,4 @@ Since virtual servers are relatively inexpensive in comparison to dedicated serv
 
 Since CouchDB 2.0 onwards is designed primarily with clustering in mind, by default databases are created with several (8) shards. A database with multiple shards per a single node is considered to be \textit{oversharded}, which is in itself fine. For the purposes of this project the default of 8 shards (\textit{q=8} in Couch-speak) is used across all servers (since the maximum number of nodes tested on is 6).
 
-A summary of the setup script is showin in \ref{appendix:couch-setup}.
+A summary of the setup script is showin in \ref{appendix:couch-setup}; this script was used to create a linux cluster for testing. Most of the work was done on a Windows machine, however, where such an elaborate install procedure is not required; there is binary available specifically for Windows.
