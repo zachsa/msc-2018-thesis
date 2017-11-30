@@ -1,8 +1,4 @@
-
-
-I took an iterative approach to joining entities so as to correlate a join using CouchDB with a SQL statement in a clear and concise way.
-
-
+\subsection{left join}
 Using compound keys to implement a join, which requires emitting the same value for multiple keys for some entities
 
 
@@ -12,22 +8,7 @@ Using compound keys to implement a join, which requires emitting the same value 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-, with each iteration introducing additional complexity to the join requirements and introducing additional data-load. With an iterative approach I was able to identify key performance considerations when working with the tech stack described within this thesis. Looking at two entities: \textit{Grades} and \textit{Demographics} with the aim of correlating student benchmarks with the results of a specific course \textit{CSC1015F}. Student results from the \textit{CSC1015F} were iteratively joined with an increasing number of the available benchmarks to measure the indexing time of creating the joined datasets. In all cases computing time was conducted on the same PC, with indexing time retrieved from the logs, both for the \textit{nETL} application and the \textit{CouchDB} application. Logs were read using the useful \textit{grep} tool available via the Ubuntu 16.04.x shell.
+I took an iterative approach to joining entities, with each iteration introducing additional complexity to the join requirements and introducing additional data-load. With an iterative approach I was able to identify key performance considerations when working with the tech stack described within this thesis. Looking at two entities: \textit{Grades} and \textit{Demographics} with the aim of correlating student benchmarks with the results of a specific course \textit{CSC1015F}. Student results from the \textit{CSC1015F} were iteratively joined with an increasing number of the available benchmarks to measure the indexing time of creating the joined datasets. In all cases computing time was conducted on the same PC, with indexing time retrieved from the logs, both for the \textit{nETL} application and the \textit{CouchDB} application. Logs were read using the useful \textit{grep} tool available via the Ubuntu 16.04.x shell.
 
 CouchDB indexing time was calculated via retrieving the latest logs for a particular indexing job using GREP (add ref), and the getting the difference between the smallest and largest dates. This is because shards finish at different times and so I want the start of the first shard and the end of the last shard in terms of indexing.
 
