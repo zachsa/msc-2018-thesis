@@ -1,0 +1,131 @@
+\subsection{Data}
+\label{appendix:data}
+\subsubsection{Sakai Events}
+\label{appendix:sakai-events}
+\begin{table}[]
+    \centering
+    \caption{Sakai event data}
+    \label{event-data-csv}
+    \begin{tabular}{llll}
+        Field name     & Field type & Notes                   & Include in scrape \\ \hline
+        event\_date    & date       &                         & \cmark            \\
+        event\_id      & int        & Filtered: only 281 used & \cmark            \\
+        uct\_id (anon) & int        &                         & \cmark            \\
+        site\_key      & int        &                         & \cmark            \\
+        ref            & string     &                         & \xmark            \\ \hline
+    \end{tabular}
+\end{table}
+
+An example of an event row as a JSON document
+\begin{minted}{json}
+{
+  "_id": "000e569ee321b915bae59fe62e0051e3",
+  "_rev": "1-7112afce121087818c33ebfd0fd7fed7",
+  "event_date": "2016-04-17T14:04:20.000Z",
+  "event_id": 281,
+  "uct_id": 3018438,
+  "site_key": 2297,
+  "type_": "vulaEvent"
+}
+\end{minted}
+
+\subsubsection{Grade data}
+\label{appendix:grade-data}
+\begin{table}[]
+    \centering
+    \caption{Grade data}
+    \label{grade-data-csv}
+    \begin{tabular}{lll}
+        Field name       & Field type & Include in scrape \\
+        DownloadedDate   & date       & \xmark            \\
+        RegAcadYear      & int        & \cmark            \\
+        RegTerm          & int        & \xmark            \\
+        anonIDnew        & int        & \cmark            \\
+        RegProgram       & string     & \xmark            \\
+        RegCareer        & string     & \xmark            \\
+        Degree           & string     & \xmark            \\
+        DegreeDescr      & string     & \xmark            \\
+        Subject          & string     & \xmark            \\
+        Catalog.         & string     & \xmark            \\
+        Course           & string     & \cmark            \\
+        CourseSuffix     & string     & \xmark            \\
+        Session          & string     & \xmark            \\
+        Percent          & string     & \cmark            \\
+        Symbol           & string     & \xmark            \\
+        UnitsTaken       & int        & \xmark            \\
+        CourseID         & int        & \xmark            \\
+        CourseDescr      & string     & \xmark            \\
+        CourseCareer     & string     & \xmark            \\
+        Faculty          & string     & \xmark            \\
+        Dept             & string     & \xmark            \\
+        MaximumCrseUnits & int        & \xmark            \\
+        CourseCount      & int        & \xmark            \\
+        CourseLevel      & int        & \xmark            \\
+        CESM             & int        & \xmark            \\
+        Sub-CESM         & int        & \xmark            \\
+    \end{tabular}
+\end{table}
+
+An example of a course grade as a JSON document:
+
+\begin{minted}{json}
+{
+  "_id": "7530f4eed7e6bc3ef0d99a53be8ba9a2",
+  "_rev": "8-232d0cf39728d41b4c5935f12469209d",
+  "RegAcadYear": 2016,
+  "RegTerm": 1161,
+  "anonIDnew": 1,
+  "RegCareer": "UGRD",
+  "Degree": "QHB002",
+  "Course": "PHI1010S",
+  "CourseSuffix": "S",
+  "Percent": "55",
+  "CourseID": 109157,
+  "Dept": "PHI",
+  "type_": "courseGrade"
+}
+\end{minted}
+
+\subsubsection{Demographic data}
+\label{appendix:demographic-data}
+\begin{table}[]
+    \centering
+    \caption{Demographic data}
+    \label{demographic-data-csv}
+    \begin{tabular}{llll}
+        Field name             & Field type & Notes                           & Include in scrape \\ \hline
+        anonIDnew              & int        &                                 & \cmark            \\
+        Career                 & string     & filtered: only UGRAD used       & \xmark            \\
+        Citizenship Residency  & string     & filtered: only SA citizens used & \xmark            \\
+        SA School              & string     &                                 & \xmark            \\
+        Eng Grd12 Fin Rslt     & string     &                                 & \cmark            \\
+        Math Grd12 Fin Rslt    & string     &                                 & \cmark            \\
+        Mth Lit Grd12 Fin Rslt & string     &                                 & \cmark            \\
+        Adv Mth Grd12 Fin Rslt & string     &                                 & \cmark            \\
+        Phy Sci Grd12 Fin Rslt & string     &                                 & \cmark            \\
+        NBT AL Score           & string     &                                 & \cmark            \\
+        NBT QL Score           & string     &                                 & \cmark            \\
+        NBT Math Score         & string     &                                 & \cmark            \\
+        RegAcadYear            & int        &                                 & \cmark            \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{minted}{json}
+{
+  "_id": "6587aa5b36bba2a70aeba96d06f05d2b",
+  "_rev": "1-8c7d395e046e452442907e3388c74b41",
+  "anonIDnew": 3103212,
+  "Eng Grd12 Fin Rslt": 58,
+  "Math Grd12 Fin Rslt": 73,
+  "Mth Lit Grd12 Fin Rslt": "",
+  "Adv Mth Grd12 Fin Rslt": "",
+  "Phy Sci Grd12 Fin Rslt": 67,
+  "NBT AL Score": 53,
+  "NBT QL Score": 43,
+  "NBT Math Score": 60,
+  "RegAcadYear": 2016,
+  "type_": "demographic"
+}
+\end{minted}
+
+

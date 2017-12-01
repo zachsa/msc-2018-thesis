@@ -1,3 +1,99 @@
+\subsection{\textit{nETL}}
+\label{netl-trans-fitler}
+\begin{minted}{javascript}
+'use strict';
+/**
+ * Configuration looks like this:
+ * filterOn: {"key1"; [<list of allowed values>], "key2": [...], ...}
+ * filtering can either be done on objects or arrays since
+ * arrays 'keys' are treated as indexes
+ *
+ * Configuration example:
+ * {
+ *     "Name": "FILTER",
+ *     "filterOn": {
+ *         "field1": [<list of allowed values>],
+ *         "field2": [<list of allowed values>],
+ *         etc...
+ *     },
+ *     "afterTaskRunCBs": []
+ * }
+ */
+function FILTER() {
+    const t = this;
+    const filterOn = t.filterOn;
+    function transform(batch) {
+        const transformedBatch = [];
+        batch.forEach(function(datum) {
+            var includeThisObj = true;
+            Object.keys(filterOn).forEach(function(key) {
+                if (filterOn[key].indexOf(datum[key]) < 0) {
+                    includeThisObj = false;
+                }
+            });
+            if (includeThisObj) transformedBatch.push(datum);
+        });
+        return transformedBatch;
+    };
+    return {
+        transform: transform
+    };
+};
+module.exports = {
+    name: 'FILTER',
+    exe: FILTER
+};
+\end{minted}
+
+
+\label{netl-trans-create-object-field}
+\begin{minted}{javascript}
+'use strict';
+/**
+ * Configuration example:
+ * {
+ *     "Name": "CREATE_OBJ_FIELD",
+ *     "newAttributes": [
+ *         ["type_", "<someValue>"]
+ *     ],
+ *     "afterTaskRunCBs": []
+ * },
+ */
+function CREATE_OBJ_FIELD() {
+    const t = this;
+    function transform(batch) {
+        const transformedBatch = JSON.parse(JSON.stringify(batch));
+        transformedBatch.forEach(function(datum) {
+            if (datum.length == 0) return;
+            t.newAttributes.forEach(function(attr) {
+                // Throw error if key already exists
+                if (datum.hasOwnProperty(attr[0])) {
+                    throw new Error("New property not allowed!");
+                }
+                datum[attr[0]] = attr[1]
+            });
+        });
+        return transformedBatch;
+    };
+    return {
+        transform: transform
+    };
+};
+module.exports = {
+    name: 'CREATE_OBJ_FIELD',
+    exe: CREATE_OBJ_FIELD
+};
+\end{minted}
+
+
+
+
+
+
+
+
+
+
 \subsection{SQL Queries}
 \label{appendix:sql}
 
