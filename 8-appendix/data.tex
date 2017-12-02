@@ -4,16 +4,20 @@
 \label{appendix:sakai-events}
 \begin{table}[]
   \centering
-  \caption{Sakai event data}
   \label{event-data-csv}
-  \begin{tabular}{llll}
-    Field name     & Field type & Notes                   & Include in scrape \\ \hline
+  \begin{tabular}{|$l|^l|^l|^c|}
+    \hline
+    \rowstyle{\bfseries}
+    Field name     & Field type & Notes                   & Include in scrape \\
+    \hline
     event\_date    & date       &                         & \cmark            \\
     event\_id      & int        & Filtered: only 281 used & \cmark            \\
     uct\_id (anon) & int        &                         & \cmark            \\
     site\_key      & int        &                         & \cmark            \\
-    ref            & string     &                         & \xmark            \\ \hline
+    ref            & string     &                         & \xmark            \\
+    \hline
   \end{tabular}
+  \caption{Sakai event data}
 \end{table}
 
 An example of an event row as a JSON document
@@ -33,10 +37,12 @@ An example of an event row as a JSON document
 \label{appendix:grade-data}
 \begin{table}[]
   \centering
-  \caption{Grade data}
   \label{grade-data-csv}
-  \begin{tabular}{lll}
+  \begin{tabular}{|$l|^l|^c|}
+    \hline
+    \rowstyle{\bfseries}
     Field name       & Field type & Include in scrape \\
+    \hline
     DownloadedDate   & date       & \xmark            \\
     RegAcadYear      & int        & \cmark            \\
     RegTerm          & int        & \xmark            \\
@@ -63,7 +69,9 @@ An example of an event row as a JSON document
     CourseLevel      & int        & \xmark            \\
     CESM             & int        & \xmark            \\
     Sub-CESM         & int        & \xmark            \\
+    \hline
   \end{tabular}
+  \caption{Grade data}
 \end{table}
 
 An example of a course grade as a JSON document:
@@ -89,10 +97,12 @@ An example of a course grade as a JSON document:
 % TODO: Add a description of each field
 \begin{table}[]
   \centering
-  \caption{List of white-listed columns for the Course Grade entity: only these fields are used in the analysis.}
   \label{Grades Columns}
-  \begin{tabular}{ll}
-    Column Name  & Description                 \\ \hline
+  \begin{tabular}{|$l|^l|}
+    \rowstyle{\bfseries}
+    \hline
+    Column Name  & Description                 \\
+    \hline
     RegAcadYear  & Year of course registration \\
     RegTerm      & Registration year ID        \\
     anonIDnew    & Student identification      \\
@@ -103,17 +113,21 @@ An example of a course grade as a JSON document:
     Percent      & Grade achieved              \\
     CourseID     & Numerical ID                \\
     Dept         & Department                  \\
-    CourseCount  & Course credit information   \\ \hline
+    CourseCount  & Course credit information   \\
+    \hline
   \end{tabular}
+  \caption{List of white-listed columns for the Course Grade entity: only these fields are used in the analysis.}
 \end{table}
 
 % TODO: discuss the possible values for RegCareer and why only UGRD was used in the study
 \begin{table}[]
   \centering
-  \caption{RegCareer value list in terms of filtering}
   \label{RegCareerFilter}
-  \begin{tabular}{ll}
-    RegCareer & Included \\ \hline
+  \begin{tabular}{|$l|^l|}
+    \hline
+    \rowstyle{\bfseries}
+    RegCareer & Included \\
+    \hline
     MAST      & FALSE    \\
     PDEV      & FALSE    \\
     BUSN      & FALSE    \\
@@ -125,17 +139,21 @@ An example of a course grade as a JSON document:
     NDGP      & FALSE    \\
     PDOC      & FALSE    \\
     MEDS      & FALSE    \\
-    NDGU      & FALSE    \\ \hline
+    NDGU      & FALSE    \\
+    \hline
   \end{tabular}
+  \caption{RegCareer value list in terms of filtering}
 \end{table}
 
 % TODO: discuss which course suffixes were used and why
 \begin{table}[]
   \centering
-  \caption{CourseSuffixFilter}
   \label{CourseSuffixFilter}
-  \begin{tabular}{lll}
-    Suffix & Include & Treatment \\ \hline
+  \begin{tabular}{|$l|^l|^l|}
+    \hline
+    \rowstyle{\bfseries}
+    Suffix & Include & Treatment \\
+    \hline
     D      & FALSE   & /         \\
     F      & TRUE    & S1        \\
     H      & TRUE    & S1 \& S2  \\
@@ -148,17 +166,21 @@ An example of a course grade as a JSON document:
     S      & TRUE    & S2        \\
     W      & TRUE    & S1 \& S2  \\
     X      & FALSE   & /         \\
-    Z      & FALSE   & /         \\ \hline
+    Z      & FALSE   & /         \\
+    \hline
   \end{tabular}
+  \caption{CourseSuffixFilter}
 \end{table}
 
 % TODO Discuss this table
 \begin{table}[]
   \centering
-  \caption{Grade results need to be treated as numbers for the purpose of this analysis, this table shows all different value types and the appropriate treatment for each}
   \label{PercentTreatment}
-  \begin{tabular}{lll}
-    Symbol & Meaning                  & Handling Logic  \\ \hline
+  \begin{tabular}{|$l|^l|^l|}
+    \hline
+    \rowstyle{\bfseries}
+    Symbol & Meaning                  & Handling Logic  \\
+    \hline
     49A    & Absent for supplementary & Grade used      \\
     49S    & Supplementary pending    & Grade used      \\
     50C    & ?                        & Grade used      \\
@@ -177,18 +199,24 @@ An example of a course grade as a JSON document:
     SAT    & Thesis only              & N/A             \\
     UF     & Unclassified Fail        & 30\% Grade used \\
     UNS    & Thesis only              & N/A             \\
-    UP     & Unclassified pass        & 50\% Grade used \\ \hline
+    UP     & Unclassified pass        & 50\% Grade used \\
+    \hline
   \end{tabular}
+  \caption{Grade results need to be treated as numbers for the purpose of this analysis, this table shows all different value types and the appropriate treatment for each}
 \end{table}
 
 \subsubsection{Demographic data}
 \label{appendix:demographic-data}
+
+
 \begin{table}[]
   \centering
-  \caption{This table shows a variety of test scores used to benchmark incoming students to UCT. Included are certain Matric subject results (Eng, Math, Sci) as well as national benchmark test (NBT) scores}
   \label{demographic-data-csv}
-  \begin{tabular}{llll}
-    Field name             & Field type & Notes                           & Include in scrape \\ \hline
+  \begin{tabular}{|$l|^l|^l|^c|}
+    \hline
+    \rowstyle{\bfseries}
+    Field name             & Field type & Notes                           & Include in scrape \\
+    \hline
     anonIDnew              & int        &                                 & \cmark            \\
     Career                 & string     & filtered: only UGRAD used       & \xmark            \\
     Citizenship Residency  & string     & filtered: only SA citizens used & \xmark            \\
@@ -201,9 +229,12 @@ An example of a course grade as a JSON document:
     NBT AL Score           & string     &                                 & \cmark            \\
     NBT QL Score           & string     &                                 & \cmark            \\
     NBT Math Score         & string     &                                 & \cmark            \\
-    RegAcadYear            & int        &                                 & \cmark            \\ \hline
+    RegAcadYear            & int        &                                 & \cmark            \\
+    \hline
   \end{tabular}
+  \caption{This table shows a variety of test scores used to benchmark incoming students to UCT. Included are certain Matric subject results (Eng, Math, Sci) as well as national benchmark test (NBT) scores}
 \end{table}
+
 
 \begin{minted}{json}
 {
@@ -222,5 +253,3 @@ An example of a course grade as a JSON document:
   "type_": "demographic"
 }
 \end{minted}
-
-

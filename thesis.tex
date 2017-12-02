@@ -34,8 +34,14 @@
 \usepackage{enumitem}
 \setlist{nosep} % or \setlist{noitemsep} to leave space around whole list
 
-% Tables
+% Tables & figures
 \usepackage{multirow}
+\usepackage{array}
+\newcolumntype{$}{>{\global\let\currentrowstyle\relax}}
+\newcolumntype{^}{>{\currentrowstyle}}
+\newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
+  #1\ignorespaces
+}
 
 % Layout
 \usepackage[margin=1.25in]{geometry}
