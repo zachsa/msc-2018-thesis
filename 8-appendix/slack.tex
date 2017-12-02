@@ -328,7 +328,7 @@ after the end of the map function
 there's an array declared before we call your map function, any calls to emit() add items to it.
 
 [11:54]
-_if_ your function returns successfully, that array is then marshalled back to couchdb erlang side
+\_if\_ your function returns successfully, that array is then marshalled back to couchdb erlang side
 
     [11:54]
 this is why an error in your map function causes none of your emits to appear in the view.
@@ -341,6 +341,3 @@ oh ok. so per an execution of a map function, if i emit the variable 'key' sever
 
 rnewson (IRC) APP [11:58 AM]
 https://github.com/apache/couchdb/blob/master/share/server/views.js
-
-[11:59]
-https://github.com/apache/couchdb/blob/master/share/server/views.js#L85-L87
