@@ -24,9 +24,8 @@
 \usepackage[many]{tcolorbox}
 \usepackage{etoolbox}
 
-% Chars https://tex.stackexchange.com/questions/42619/x-mark-to-match-checkmark
-\usepackage{amssymb}% http://ctan.org/pkg/amssymb
-\usepackage{pifont}% http://ctan.org/pkg/pifont
+\usepackage{amssymb}
+\usepackage{pifont}
 \newcommand{\cmark}{\ding{51}}%
 \newcommand{\xmark}{\ding{55}}%
 
@@ -37,11 +36,16 @@
 % Tables & figures
 \usepackage{multirow}
 \usepackage{array}
-\newcolumntype{$}{>{\global\let\currentrowstyle\relax}}
-\newcolumntype{^}{>{\currentrowstyle}}
-\newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
-  #1\ignorespaces
-}
+\usepackage[font=scriptsize,skip=0pt]{caption}
+\usepackage{mdframed}
+\captionsetup[figure]{labelformat=empty}
+\captionsetup[figure]{labelfont=bf,textfont=normalfont,singlelinecheck=off,justification=justified}
+\usepackage{dcolumn}
+\usepackage{booktabs}
+\newcolumntype{d}[1]{D..{#1}}
+% Two handy shortcut macros:
+\newcommand\mC[1]{\multicolumn{2}{c}{#1}} 
+\newcommand\mc[1]{\multicolumn{1}{c}{#1}}
 
 % Layout
 \usepackage[margin=1.25in]{geometry}
@@ -52,13 +56,14 @@
 \setstretch{1.3}
 % \setlength{\parindent}{0em}
 % \setlength{\parskip}{1em}
+\usepackage{tabularx}
 
 % Inline-code
 \usepackage[outputdir=./_build]{minted}
 \definecolor{dhscodebg}{rgb}{0.01,0.199,0.1}
 \setminted{
     breaksymbolleft=,
-    fontsize=\footnotesize,
+    fontsize=\scriptsize,
     baselinestretch=1.1,
     % bgcolor=dhscodebg,
     % rulecolor=\color{gray!40},
@@ -76,7 +81,7 @@
 {\begin{tcolorbox}[
             breakable,
             boxrule=0.2pt,
-            colback=gray!40,
+            % colback=gray!40,
             % toprule=1pt,
             % rule=1pt,
             arc=0pt
