@@ -39,13 +39,14 @@
 \usepackage[font=scriptsize,skip=0pt]{caption}
 \usepackage{mdframed}
 \captionsetup[figure]{labelformat=empty}
+\captionsetup[table]{labelformat=empty}
 \captionsetup[figure]{labelfont=bf,textfont=normalfont,singlelinecheck=off,justification=justified}
-\usepackage{dcolumn}
 \usepackage{booktabs}
-\newcolumntype{d}[1]{D..{#1}}
-% Two handy shortcut macros:
-\newcommand\mC[1]{\multicolumn{2}{c}{#1}} 
-\newcommand\mc[1]{\multicolumn{1}{c}{#1}}
+\usepackage{tabularx}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcommand*{\mC}[2]{\multicolumn{1}{#1}{#2}}
+\usepackage{subcaption}
+\usepackage{threeparttable}
 
 % Layout
 \usepackage[margin=1.25in]{geometry}
