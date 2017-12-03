@@ -47,6 +47,21 @@
 \newcommand*{\mC}[2]{\multicolumn{1}{#1}{#2}}
 \usepackage{subcaption}
 \usepackage{threeparttable}
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\@verbatim}
+  {\verbatim@font}
+  {\verbatim@font\tiny}
+  {}{}
+\makeatother
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
+\usepackage{listings}
+
+\lstset{
+  basicstyle=\tiny,
+  breaklines=true
+  }
 
 % Layout
 \usepackage[margin=1.25in]{geometry}
