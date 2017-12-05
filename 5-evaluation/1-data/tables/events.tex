@@ -1,0 +1,24 @@
+\begin{table}[h]
+    \begin{threeparttable}
+        \textbf{Table \ref{tbl-sakai-events}}\par\medskip\par\medskip
+        \caption[Sakai event data]{A description of the Sakai event data as received in CSV format, and how these fields were treated in the ETL and analysis process}
+        \label{tbl-sakai-events}
+        \begin{tabularx}{\textwidth}{>{\hsize=0.5\hsize}Y>{\hsize=0.8\hsize}X>{\hsize=0.8\hsize}X>{\hsize=1.9\hsize}X}
+            \toprule
+            \mC{c}{Include\tnote{\textsuperscript{1}}  } & \mC{c}{Field Name} & \mC{c}{Data type} & \mC{c}{Description}                                  \\
+            \midrule
+            \cmark                                       & event\_date        & date              & yyyy-mm-dd hh:mm:ss                                  \\
+            \cmark                                       & event\_id          & number            & Number\tnote{\textsuperscript{2}}                    \\
+            \cmark                                       & uct\_id            & number            & Anonymized student number\tnote{\textsuperscript{3}} \\
+            \cmark                                       & site\_key          & number            & Foreign key reference to course site                 \\
+            \xmark                                       & ref                & string            & Detail of event                                      \\
+            \bottomrule
+        \end{tabularx}
+        \scriptsize
+        \begin{tablenotes}
+            \item[\textsuperscript{1}]Attributes were included via a white-listing process.
+            \item[\textsuperscript{2}]This column represents a foreign key, pointing to a table of event types. filtering on this column cut down applicable rows from 44.4 million rows to just over 13.5 million rows.
+            \item[\textsuperscript{3}]Anonymization of the event data was performed by Stephen Marquard.
+        \end{tablenotes}
+    \end{threeparttable}
+\end{table}

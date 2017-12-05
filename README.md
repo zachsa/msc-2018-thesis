@@ -1,12 +1,8 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### Good links ###
 
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* Tables: % https://tex.stackexchange.com/questions/192656/alignment-in-tabularx-environment
 
 ### How do I get set up? ###
 

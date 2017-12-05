@@ -1,3 +1,120 @@
+\subsection{Configuration for iteration 1}
+\label{appendix:config-i1}
+\begin{minted}{json}
+[{
+    "ID": "Student Demographics for CSC1015F (2014/15/66)",
+    "Extraction": {
+        "Name": "FLATFILE",
+        "path": "C:/MSc/Data/Demographics/FU-CombinedGrades-2016Reg.csv",
+        "skipHeaderRows": 1,
+        "bufferSize": 65536,
+        "batchSize": 10000,
+        "startFrom": 0,
+        "afterTaskRunCBs": []
+    },
+    "Transformations": [{
+            "Name": "TEXT_LINE_TO_OBJ",
+            "attributeNames": "anonIDnew,Career,Citizenship Residency,SA School,Eng Grd12 Fin Rslt,Math Grd12 Fin Rslt,Mth Lit Grd12 Fin Rslt,Adv Mth Grd12 Fin Rslt,Phy Sci Grd12 Fin Rslt,NBT AL Score,NBT QL Score,NBT Math Score,RegAcadYear",
+            "delimiter": ",",
+            "textQualifier": "\"",
+            "escapeChar": "\\",
+            "afterTaskRunCBs": []
+        },
+        {
+            "Name": "FILTER",
+            "filterOn": {
+                "Career": ["UGRD", "First Year", "Second Year", "Third Year"],
+                "Citizenship Residency": ["SA Citizen", "Permanent Resident", "C", "P"],
+                "anonIDnew": [2368486, 2448646, "... list of 1879 unique student numbers"]
+            },
+            "afterTaskRunCBs": []
+        },
+        {
+            "Name": "CASE_CHANGE",
+            "upper": true,
+            "attributes": ["SA School"],
+            "afterTaskRunCBs": []
+        },
+        {
+            "Name": "CREATE_OBJ_FIELD",
+            "newAttributes": [
+                ["type_", "demographic"]
+            ],
+            "afterTaskRunCBs": []
+        },
+        {
+            "Name": "WHITELIST",
+            "allowedAttributes": [
+                "type_", "anonIDnew", "Eng Grd12 Fin Rslt", "RegAcadYear"
+            ],
+            "afterTaskRunCBs": []
+        }
+    ],
+    "Load": {
+        "Name": "COUCHDB",
+        "username": "admin",
+        "password": "password",
+        "server": "localhost",
+        "port": 5984,
+        "ssl": false,
+        "database": "msc_i1",
+        "afterTaskRunCBs": []
+    }
+}, {
+    "ID": "Student Grades for CSC1015F  (2016)",
+    "Extraction": {
+        "Name": "FLATFILE",
+        "path": "C:/MSc/Data/Grades/2016-results-anonIDnew.csv",
+        "skipHeaderRows": 1,
+        "bufferSize": 65536,
+        "batchSize": 10000,
+        "startFrom": 0,
+        "afterTaskRunCBs": []
+    },
+    "Transformations": [{
+            "Name": "TEXT_LINE_TO_OBJ",
+            "attributeNames": "DownloadedDate,RegAcadYear,RegTerm,anonIDnew,RegProgram,RegCareer,Degree,DegreeDescr,Subject,Catalog.,Course,CourseSuffix,Session,Percent,Symbol,UnitsTaken,CourseID,CourseDescr,CourseCareer,Faculty,Dept,MaximumCrseUnits,CourseCount,CourseLevel,CESM,Sub-CESM",
+            "delimiter": ",",
+            "textQualifier": "\"",
+            "escapeChar": "\\",
+            "afterTaskRunCBs": []
+        },
+        {
+            "Name": "FILTER",
+            "filterOn": {
+                "RegCareer": ["UGRD"],
+                "Course": ["CSC1015F"]
+            },
+            "afterTaskRunCBs": []
+        },
+        {
+            "Name": "CREATE_OBJ_FIELD",
+            "newAttributes": [
+                ["type_", "courseGrade"]
+            ],
+            "afterTaskRunCBs": []
+        },
+        {
+            "Name": "WHITELIST",
+            "allowedAttributes": [
+                "type_", "RegAcadYear", "anonIDnew", "Percent"
+            ],
+            "afterTaskRunCBs": []
+        }
+    ],
+    "Load": {
+        "Name": "COUCHDB",
+        "username": "admin",
+        "password": "password",
+        "server": "localhost",
+        "port": 5984,
+        "ssl": false,
+        "database": "msc_i1",
+        "afterTaskRunCBs": []
+    }
+}]
+\end{minted}
+
 \subsection{Configuration for iteration 2}
 \label{appendix:config-i2}
 \begin{minted}{json}

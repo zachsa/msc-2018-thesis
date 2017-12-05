@@ -1,0 +1,35 @@
+
+
+\begin{table}[h]
+    \begin{threeparttable}
+        \textbf{Table \ref{tbl-fu}}\par\medskip\par\medskip
+        \caption[FU data]{A description of the FU demographic data as received in CSV format, and how these fields were treated in the ETL and analysis process}
+        \label{tbl-fu}
+        \begin{tabularx}{\textwidth}{>{\hsize=0.4\hsize}Y>{\hsize=1\hsize}X>{\hsize=0.7\hsize}X>{\hsize=1.9\hsize}X}
+            \toprule
+            \mC{c}{Include\tnote{\textsuperscript{1}}  } & \mC{c}{Field Name}     & \mC{c}{Data type} & \mC{c}{Description}                                  \\
+            \midrule
+            \cmark                                       & anonIDnew              & number            & Anonymized student number\tnote{\textsuperscript{2}} \\
+            \xmark                                       & Career                 & string            & Academic level\tnote{\textsuperscript{3}}            \\
+            \xmark                                       & Citizenship Residency  & string            & Student citizenship \tnote{\textsuperscript{4}}      \\
+            \xmark                                       & SA School              & string            & School name (if in RSA)                              \\
+            \cmark                                       & Eng Grd12 Fin Rslt     & string            & Grade 12 English result                              \\
+            \cmark                                       & Math Grd12 Fin Rslt    & string            & Grade 12 Math result                                 \\
+            \cmark                                       & Mth Lit Grd12 Fin Rslt & string            & Grade 12 Math Literacy result                        \\
+            \cmark                                       & Adv Mth Grd12 Fin Rslt & string            & Grade 12 Advanced Math result                        \\
+            \cmark                                       & Phy Sci Grd12 Fin Rslt & string            & Grade 12 Science result                              \\
+            \cmark                                       & NBT AL Score           & string            & National benchmark test (NBT)                        \\
+            \cmark                                       & NBT QL Score           & string            & NBT                                                  \\
+            \cmark                                       & NBT Math Score         & string            & NBT                                                  \\
+            \cmark                                       & RegAcadYear            & number            & First registration at UCT                            \\
+            \bottomrule
+        \end{tabularx}
+        \scriptsize
+        \begin{tablenotes}
+            \item[\textsuperscript{1}]Attributes were included via a white-listing process.
+            \item[\textsuperscript{3}]Anonymization was performed by Associate Professor Sonia Berman.
+            \item[\textsuperscript{3}]Filtered for values of  "UGRD", "First Year", "Second Year" and "Third Year".
+            \item[\textsuperscript{4}]Filtered for values of "F", "S", "H", and "W".
+        \end{tablenotes}
+    \end{threeparttable}
+\end{table}

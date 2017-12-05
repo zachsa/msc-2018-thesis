@@ -1,0 +1,89 @@
+\subsection{CouchDB}
+
+\subsubsection{\textit{MapReduce} functions}
+\label{couchdb-mapreduce-contracts}
+\begin{minted}{javascript}
+/**
+ * Map function
+ * @param  {Object} doc Each document in the database is passed in turn to the function
+ * @return {null} Nothing is returned - key:value pairs are emitted (multiple pairs can be emitted per document)
+ */
+function(doc) {
+    emit(someKey, someValue);
+};
+
+/**
+ * Reduce function (javascript implementation of the _sum function shown)
+ * @param  {Object[]} [keys] A list of [key, docId] pairs - key as from the map function, and key from the original doc
+ * @param  {Object[]} values Output from the map function, or from the reduce function
+ * @param  {Boolean} [rereduce] Indicates whether values are output from the map (rereduce = false) or reduce (rereduce = true) function
+ * @return {[type]}
+ */
+function(keys, values, rereduce) {
+    if (rereduce) {
+        return values.reduce(function(a,b) {
+            return a + b;
+        }, 0);
+    } else {
+        return values.length;
+    };
+};
+\end{minted}
+
+\subsubsection{Sample Design Document}
+\label{couchdb-design-doc-sample}
+\begin{minted}{json}
+{
+    "_id": "_design/sample",
+    "_rev": "xxxxx",
+    "language": "javascript",
+    "views": {
+        "view1": {
+            "map": "function(doc) { ... }",
+            "reduce": "function(keys, values, rereduce) { ... }"
+        },
+        "view2": {
+            "map": "function(doc) { ... }",
+            "reduce": "_stats"            
+        }
+    },
+    "shows": {
+        "show1": "function(doc, req) { ... }",
+        "show2": "function(doc, req) { ... }"
+    },
+    "lists": {
+        "listFunc1": "function(head, req) { ... };",
+        "listFunc2": "function(head, req) { ... };"
+    },
+    "updates": {
+        "update1": "function(doc, req) { ... }",
+        "update2": "function(doc, req) { ... }"
+    },
+    "filters": {
+        "filter1": "function(doc, req) { ... }",
+        "filter2": "function(doc, req) { ... }"
+    },
+    "validate_doc_update": "function(newDoc, oldDoc, userCtx, secObj) { ... }"
+}
+
+\end{minted}
+
+\subsubsection{Design Doc}
+\label{appendix:couchdb-design-doc}
+Included are all the MapReduce views used in this project in the design document below, although separate design documents were used for each view during analysis. In general, design documents should only include a single view each, since changing any one view would force all the views in a design document to be recalculated from scratch regardless if other views in the same design document had been updated. This creates a needless performance overhead. Storing JavaScript code in JSON documents requires that newline markers are escaped, along with double quotes, as has been done in the example below.
+\begin{minted}{json}
+{
+    "_id": "_design/sample",
+    "_rev": "xxxxx",
+    "language": "javascript",
+    "views": {
+        "viewfunctions": {
+            "map": "function(doc) {\n    var disallowedCourseGrades = ['ATT', 'DE', 'GIP', 'LOA', 'OS', 'OSS', 'PA', 'SAT', 'UNS', ''];\n    var fuDictionary = {\n        \"A*\": 90,\n        \"A\": 80,\n        \"B\": 70,\n        \"C\": 60,\n        \"D\": 55,\n        \"E\": 50\n    };\n    var key = [doc.RegAcadYear, doc.anonIDnew];\n    var value = [0, 0];\n    if (doc.type_ === 'courseGrade') {\n        var p = doc.Percent || '';\n        // If p not a number, try convert\n        if (typeof p !== 'number') {\n            if (typeof p !== 'string') return;\n            var newP = p.toUpperCase().trim();\n            if (disallowedCourseGrades.indexOf(p) >= 0) return;\n            switch (newP) {\n                case 'AB':\n                    p = 40;\n                    break;\n                case 'F':\n                    p = 40;\n                    break;\n                case 'DPR':\n                    p = 20;\n                    break;\n                case 'INC':\n                    p = 20;\n                    break;\n                case 'UF':\n                    p = 30;\n                    break;\n                case 'UP':\n                    p = 50;\n                    break;\n                default:\n                    p = parseFloat(p.substring(0, p.length - 1));\n                    if (isNaN(p)) return;\n                    break;\n            };\n        };\n        value[0] = p;\n        emit(key, value);\n\n    } else if (doc.type_ === 'demographic') {\n        var g = doc[\"Eng Grd12 Fin Rslt\"] || \"\";\n        var retG;\n        if (isNaN(parseInt(g))) {\n            // Its a symbol\n            if (typeof g !== 'string') return;\n            retG = fuDictionary[g.toUpperCase().trim()] || 0;\n        } else {\n            // It's a number\n            retG = parseInt(g);\n        };\n        value[1] = retG;\n        emit(key, value);\n    };\n};",
+            "reduce": "_stats"
+        }
+    },
+    "lists": {
+        "listfunction": "function(head, req) {\n    provides('csv', function() {\n        var headers = \"Year,StudentAnonID,CS1015F %,Gr12 Eng %\";\n        send(headers);\n        while (row = getRow()) {\n            var key = row.key;\n            var value = row.value;\n            var yr = key[0];\n            var id = key[1];\n            var courseGrade = value[0].max;\n            var engGrade = value[1].max;\n            var line = \"\\n\" + yr + \",\" + id + \",\" + courseGrade + \",\" + engGrade;\n            send(line);\n        };\n    });\n};"
+    }
+}
+\end{minted}

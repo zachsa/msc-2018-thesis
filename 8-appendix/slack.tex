@@ -1,7 +1,7 @@
 \subsection{Slack conversations}
-\label{appendix:slack}
 
-\subsubsection{October 25 2017}
+\subsubsection*{October 25 2017}
+\label{slack-25-oct}
 zach [12:13 PM]
 Hi. What would cause CouchDB rereduce=true param when running a reduce task?
 
@@ -42,6 +42,7 @@ zach [12:54 PM]
 thank you
 
 \subsubsection{October 31 2017}
+\label{slack-31-oct}
 zach [3:53 PM]
 at the risk of sounding like a repetitive novice... what is wrong with indexes that get bigger and bigger? Is it best to avoid them because a) there is almost always a better way of doing something? or b) they have some other effect on the CouchDB process (other than whatever overhead is required to use a larger-than-requried index)
 
@@ -158,6 +159,7 @@ the built-in \_stats endpoint would give you the sum and count of the values, wh
 afk
 
 \subsubsection{November 1 2017}
+\label{slack-1-nov}
 zach [12:25 PM]
 Question @rnewson - thanks for those pointers yesterday. it took just over an hour to finish indexing the MapReduce view using the \_sum reduce function. In an unrelated note, I remember reading somewhere that the default reduce functions run much more efficiently than custom reduce function? why is this? i also recall someone mentioning (I think it was on this channel) that the reduction phase is done by the main erlang process. Does this mean that reduction is not done in parallel? i.e. the map functions are computed using instances of couchjs, but the reduce function is done via a single process?
 
@@ -198,6 +200,7 @@ jan [1:15 PM]
 it’s less the spwning, and more the i/o
 
 \subsubsection{November 2 2017}
+\label{slack-2-nov}
 zach [10:57 AM]
 will list functions be included in future versions of CouchDB? I saw a thread that they are considered as part of CouchApps and may not. I kinda love them
 
@@ -205,6 +208,7 @@ jan [11:02 AM]
 @zach we have no plans to remove them, but they may fall by the wayside. Nobody has worked on that in 5+ years, and it’s not something we recommend anyone using
 
 \subsubsection{November 7 2017}
+\label{slack-7-nov}
 zach [11:46 AM]
 when I look at data/shards/... I see that my database is split amongst 8 shards on my single node setup. How does Couch distribute documents to each shard (i'm using the default \_id generator). When in clustered mode, can I assume that data gets distributed amongst shards evently?
 
@@ -287,6 +291,7 @@ oh. sorry i misunderstood.
 thank you
 
 \subsubsection{November 20 2017}
+\label{slack-20-nov}
 zach [1:52 PM]
 Hi - is there anyway to simulate a SQL 'Window' function in CouchDB? i.e. could I do something like `rank() over(partition by someClassification order by someNumber desc)`. Since I can't guarantee that in my reduce function I will have all the values for a particular key, I'm assuming 'no'?
 
@@ -297,6 +302,7 @@ jan [2:45 PM]
 or outside of CouchDB with the reduce result. Would avoid list funs
 
 \subsubsection{November 24 2017}
+\label{slack-24-nov}
 zach [11:40 AM]
 Hi. In a Map query, I created a variable `key` that I would then adjust and emit several times: `function(doc) {var key = [it1, it2, it3]; var arr = ["a", "b", "c", etc]; arr.forEach(function(val) {key[1] = val; emit(key, ...)})}`. but i found that the `forEach` loop didn't work as expected. It seemed that the variable `key` was in a global scope that was shared by separate instances of the map function -i.e. all the keys emitted were the last string in `arr`. Is this supposed to be the case? (edited)
 

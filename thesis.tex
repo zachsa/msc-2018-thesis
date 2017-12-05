@@ -36,11 +36,7 @@
 % Tables & figures
 \usepackage{multirow}
 \usepackage{array}
-\usepackage[font=scriptsize,skip=0pt]{caption}
 \usepackage{mdframed}
-\captionsetup[figure]{labelformat=empty}
-\captionsetup[table]{labelformat=empty}
-\captionsetup[figure]{labelfont=bf,textfont=normalfont,singlelinecheck=off,justification=justified}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
@@ -54,7 +50,13 @@
   {\verbatim@font\tiny}
   {}{}
 \makeatother
-\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
+\usepackage[font=scriptsize,skip=0pt]{caption}
+\captionsetup[table]{labelformat=empty}
+\captionsetup[table]{labelfont=bf,textfont=normalfont,singlelinecheck=off,justification=raggedright}
+\captionsetup[figure]{labelformat=empty}
+\captionsetup[figure]{labelfont=bf,textfont=normalfont,singlelinecheck=off,justification=justified}
+
 
 \usepackage{listings}
 
@@ -138,7 +140,6 @@
 
 \section{CouchDB}
 \input{3-couchdb/1-overview}
-\input{3-couchdb/2-api}
 
 \section{nETL}
 \input{4-netl/1-requirements}
@@ -146,9 +147,20 @@
 \input{4-netl/3-configuration}
 
 \section{Evaluation \& Results}
-\input{5-evaluation/1-overview}
-\input{5-evaluation/2-setup}
-\input{5-evaluation/3-methods}
+
+%  Data
+\input{5-evaluation/1-data/data-overview}
+\input{5-evaluation/1-data/tables/events}
+\input{5-evaluation/1-data/tables/grades}
+\input{5-evaluation/1-data/tables/fu}
+\input{5-evaluation/1-data/tables/json-entities}
+
+% Analysis
+\input{5-evaluation/2-analysis/1-overview}
+
+
+% \input{5-evaluation/2-setup}
+% \input{5-evaluation/3-methods}
 
 \section{Discussion}
 \input{6-discussion/1-results}
@@ -166,12 +178,20 @@
 % Appendix
 \begin{appendix}
     \section{Appendix}
-    \input{8-appendix/slack}
-    \input{8-appendix/designDoc}
-    \input{8-appendix/netl}
-    \input{8-appendix/couch}
-    \input{8-appendix/data}
+
+    % nETL code
+    \input{8-appendix/netl-framework}
+    \input{8-appendix/netl-modules}
+
+    % CouchDB
+    \input{8-appendix/couchdb}
+
+    % Logs from nETL and CouchDB
     \input{8-appendix/logs}
+
+    % Slack conversations
+    \input{8-appendix/slack}
+
     \listoffigures
     \listoftables
 \end{appendix}
