@@ -78,12 +78,12 @@
 
 % Inline-code
 \usepackage[outputdir=./_build]{minted}
-\definecolor{dhscodebg}{rgb}{0.01,0.199,0.1}
+\definecolor{dhscodebg}{rgb}{0.9,0.9,0.92}
 \setminted{
     breaksymbolleft=,
     fontsize=\scriptsize,
     baselinestretch=1.1,
-    % bgcolor=dhscodebg,
+    bgcolor=dhscodebg,
     % rulecolor=\color{gray!40},
     % framesep=\fboxsep,
     % frame=single,
@@ -95,15 +95,15 @@
     tabsize=4
 }
 \usemintedstyle{tango}
-\BeforeBeginEnvironment{minted}
-{\begin{tcolorbox}[
-            breakable,
-            boxrule=0.2pt,
-            % colback=gray!40,
-            % toprule=1pt,
-            % rule=1pt,
-            arc=0pt
-        ]}\AfterEndEnvironment{minted}{\end{tcolorbox}}
+% \BeforeBeginEnvironment{minted}
+% {\begin{tcolorbox}[
+%             breakable,
+%             boxrule=0.2pt,
+%             % colback=gray!40,
+%             % toprule=1pt,
+%             % rule=1pt,
+%             arc=0pt
+%         ]}\AfterEndEnvironment{minted}{\end{tcolorbox}}
 
 % Bibliography
 \usepackage{natbib}
