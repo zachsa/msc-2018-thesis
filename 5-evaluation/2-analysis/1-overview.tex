@@ -2,24 +2,39 @@
 As mentioned previously, CouchDB views are optimized when using built-in reduce functions, with custom reduce functions performing most poorly on Windows machines. Since this project was completed on a Windows machine, the analysis on how best to aggregate the different entities (grades, demographics and events) was confined to using just the \textit{\_stats} built in reduce function. Of the three available built-in reduce functions, \textit{\_count}, \textit{\_sum}, and \textit{\_stats}, the \textit{\_stats} function provides all functionality of the \textit{\_count} and \textit{\_sum} functions plus additional output. Using custom reduce functions would greatly increase the number of possible methods of joining entities since output of map functions would not be constrained to match the contracts of the built-in reduce functions. Such an approach shouldn't be discounted considering that on platforms other than Windows, reduce function calculation (whether custom or built-in) represents a small percentage of computer resources used in view calculations overall (see appendix \ref{slack-1-nov}). And in any case, a system that utilizes CouchDB is likely to be based on a cluster of Linux machines rather than a single Windows machine. However, looking at utilizing the built-in reduce functions for aggregating data across many entities is worthy of an investigation in and of itself and is the subject of this project.
 
 \subsubsection{The Reduce function contract}
-With map function output constrained to adhere to the contract of the \textit{\_stats} reduce function it makes sense to define exactly what that contract is.
+With map function output constrained to adhere to the contract of the \textit{\_stats} reduce function it makes sense to define exactly what that contract is. The \textit{\_stats} function (i.e. CouchDB reduce functions) accept 3 arguments as summarized in \cite{reduceFunctions}:
+
+\begin{enumerate}
+    \item \textit{keys}: a list of tuples of the form \textless \textit{key}, \textit{id} \textgreater. \textit{key} is the key emitted by the map function, and \textit{id} is the id of the document that was processed by the map function to emit the key. This argument is null when rereduce = true.
+    \item \textit{values}: a list of the values emitted by the map function for correlated with the respective element in the \textit{keys} list rereduce = false, or a list of values output by this reduce function when rereduce = true
+    \item \textit{rereduce}: a boolean field indicating whether the function is invoked with output from the map function (rereduce = false), or output from this reduce function (rereduce = true)
+\end{enumerate}
+
+Figure \ref{stats-reduce-fn} describes the contract of the \textit{\_stats} reduce function in terms of the expected map function output.
 
 Since the work of this project is being completed on a Windows machine, and to limit the scope of this MSc, only the 'built-in' \textit{\_stats} reduce function is used. This function takes an array of numbers as the \textit{values} parameter of the reduce-contract and calculates numerical statistics per index of emitted values. For example, a map function that emits
 
-\begin{minted}{javascript}
-{"somKey": [1,1,0]}
-{"somKey": [3,1,3]}
-\end{minted}
-
-shows a reduce output (when using the \_stats reduce function) of:
-
-\begin{minted}{javascript}
+\begin{listing}[ht]
+    \begin{minted}{javascript}
+/**
+ * Example output from the _stats reduce function
+ */
 {"somKey": [
     {"sum":4,"count":2,"min":1,"max":3,"sumsqr":10}
     {"sum":2,"count":2,"min":1,"max":1,"sumsqr":2}
     {"sum":3,"count":2,"min":0,"max":3,"sumsqr":9}
-], /* ... */}
+]}
+
+/**
+ * Example input to the _stats reduce function when rereduce = false (i.e. map function output)
+ */
+{"somKey": [1,1,0]}
+{"somKey": [3,1,3]}
 \end{minted}
+    \caption{}
+    \label{stats-reduce-fn}
+\end{listing}
+
 
 using the \textit{\_stats} function (and other built-in functions) all values must be numerical by nature, so such an approach won't work if joined datasets need to include strings. This limitation is not a problem in the domain of EDM where analyses are based around numerical indicators (grades), but this may not always be the case in other problem domains. For the purposes of this project the \textit{Map} function will be explored in terms of implementing JOINS through use of CouchDB's compound-keys feature. That is, that the key component in Map output may in itself be a tuple. Groupings of such keys can be configured to take into account a varying number of the indexes in tuples (or all) - with each value at any given index treated as a string.
 
