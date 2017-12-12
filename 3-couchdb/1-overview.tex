@@ -75,7 +75,7 @@ Figure \ref{stats-reduce-fn} describes the contract of the \textit{\_stats} redu
     {"sum":3,"count":2,"min":0,"max":3,"sumsqr":9}
 ]}
     \end{minted}
-    \caption[\textit{\_stats} function contract]{The \textit{\_stats} function accepts either a single number or a list of numbers (as used in this project) as the \textit{values} argument for the reduce function. Grouping is performed per key, with values at corresponding indexes of the values list aggregated per common key. In the example above, two groupings are performed: 1) grouping per key output by Map function, and 2) as a key now corresponds to several lists, values in these lists are grouped by common indexes.}
+    \caption[\textit{\_stats} function contract]{\textbf{Figure \ref{stats-reduce-fn}: Reduce function contract.} The \textit{\_stats} function accepts either a single number or a list of numbers (as used in this project) as the \textit{values} argument for the reduce function. Grouping is performed per key, with values at corresponding indexes of the values list aggregated per common key. In the example above, two groupings are performed: 1) grouping per key output by Map function, and 2) as a key now corresponds to several lists, values in these lists are grouped by common indexes.}
     \label{stats-reduce-fn}
 \end{figure}
 

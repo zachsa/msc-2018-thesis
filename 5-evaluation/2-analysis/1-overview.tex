@@ -1,12 +1,32 @@
 \subsection{Data Analysis}
 As mentioned previously, CouchDB views are optimized when using built-in reduce functions, with custom reduce functions performing most poorly on Windows machines. Since this project was completed on the Windows OS, the analysis on how best to aggregate the different entities (grades, demographics and events) was confined to using just the \textit{\_stats} built in reduce function. Of the three available built-in reduce functions, \textit{\_count}, \textit{\_sum}, and \textit{\_stats}, the \textit{\_stats} function provides the same output of the \textit{\_count} and \textit{\_sum} functions plus additional output. Using custom reduce functions would greatly increase the number of possible methods of joining entities since output of map functions would not be constrained to match the contracts of the \textit{\_stats} functions. Such an approach shouldn't be discounted considering that on platforms other than Windows, reduce function calculation (whether custom or built-in) represents a small percentage of computer resources used in view calculations overall (see appendix \ref{slack-1-nov}). And in any case, a system that utilizes CouchDB is likely to be based on a cluster of Linux machines rather than a single Windows machine. However, looking at utilizing the built-in reduce functions for aggregating data across many entities is worthy of an investigation in and of itself and is the subject of this project.
 
-To initiate the analysis, a Map function is required with the constraint that output should adhere to the input requirements of the \textit{\_stats} function; that values are lists of numbers, and that lists should be of the same length, and that each index of the list corresponds with defined output. Analysis of the data will occur in two phases:
+To initiate the analysis, a Map function is required with the constraint that output should adhere to the input requirements of the \textit{\_stats} function; that values are lists of numbers, and that lists should be of the same length, and that each index of the list corresponds with defined output. Analysis of the data will occur in two phases - a process of outlining the join between Grade and Demographic data, and then building on that by including the Sakai event data.
 
-\begin{enumerate}
-    \item Outlining the process of joining on Grade and Demographic data
-    \item Introducing the 3rd entity (Sakai usage) as an additional component to the existing join
-\end{enumerate}
+\begin{figure}[ht]
+    \centering
+    \begin{verbatim}
++----------+---------+------+----------------+
+|   Col1   |  Col2   | Col3 | Numeric Column |
++----------+---------+------+----------------+
+| Value 1  | Value 2 | 123  |           10.0 |
+| Separate | cols    | x    |       -2,027.1 |
++----------+---------+------+----------------+
+    \end{verbatim}
+    \caption[Analysis dataset output format]{\textbf{Figure \ref{dataset-output}: Format of output dataset.} This project outlines the steps taken to produce a dataset of this format.}
+    \label{dataset-output}
+\end{figure}
+
+\subsubsection*{Joining Grade and Demographic data}
+Demographic data includes benchmarking results for the first year of registration, whereas grade data includes results from these same students over 3 years for each course they took. To join on student ID alone would result in an aggregation of all courses a student took over the 3 years - clearly not very useful. Using CouchDB's compound keys (where keys are tuples that allow for a configurable level of grouping), it is possible to differentiate the grade data by student, course and year; i.e. by tuples of \textless studentID, courseCode, year \textgreater.
+
+However, the demographic dataset does not contain information to achieve this same key grouping. The solution is, similarly to the concept of a SQL join, to duplicate rows from the demographic data for each key that may exist in the grade data. In other words, a single row from the demographic data should be duplicated for every course taken by that student and the year the course was taken. Without having to manually comb through the demographic and grade data to decide where and how to duplicate demographic rows, it's necessary to output every possible key combination of \textless courseId, year\textgreater for each studentId. With 1 464 distinct course codes with suffixes of 'F', 'S', 'W', 'H' and 3 years of registration, each demographic row needs to be duplicated $ 3 \times 1464 = 4938 $ times. Such a join takes a surprisingly short time to run, though the Map function becomes rather verbose since each courseId needs to be specified.
+
+
+
+
+\subsubsection*{Joining on the Sakai usage data}
+
 
 This limitation is not a problem in the domain of EDM where analyses are based around numerical indicators (grades), but this may not always be the case in other problem domains. For the purposes of this project the \textit{Map} function will be explored in terms of implementing JOINS through use of CouchDB's compound-keys feature. That is, that the key component in Map output may in itself be a tuple.
 
