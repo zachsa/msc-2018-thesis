@@ -1,7 +1,44 @@
 \subsection{Data Analysis}
 As mentioned previously, CouchDB views are optimized when using built-in reduce functions, with custom reduce functions performing most poorly on Windows machines. Since this project was completed on the Windows OS, the analysis on how best to aggregate the different entities (grades, demographics and events) was confined to using just the \textit{\_stats} built in reduce function. Of the three available built-in reduce functions, \textit{\_count}, \textit{\_sum}, and \textit{\_stats}, the \textit{\_stats} function provides the same output of the \textit{\_count} and \textit{\_sum} functions plus additional output. Using custom reduce functions would greatly increase the number of possible methods of joining entities since output of map functions would not be constrained to match the contracts of the \textit{\_stats} functions. Such an approach shouldn't be discounted considering that on platforms other than Windows, reduce function calculation (whether custom or built-in) represents a small percentage of computer resources used in view calculations overall (see appendix \ref{slack-1-nov}). And in any case, a system that utilizes CouchDB is likely to be based on a cluster of Linux machines rather than a single Windows machine. However, looking at utilizing the built-in reduce functions for aggregating data across many entities is worthy of an investigation in and of itself and is the subject of this project.
 
-To initiate the analysis, a Map function is required with the constraint that output should adhere to the input requirements of the \textit{\_stats} function; that values are lists of numbers, and that lists should be of the same length, and that each index of the list corresponds with defined output. Analysis of the data will occur in two phases - a process of outlining the join between Grade and Demographic data, and then building on that by including the Sakai event data.
+To initiate the analysis, a Map function is required with the constraint that output should adhere to the input requirements of the \textit{\_stats} function; that values are lists of numbers, and that lists should be of the same length, and that each index of the list corresponds with defined output. Analysis of the data will occur in two phases - a process of outlining the join between Grade and Demographic data, and then building on that by including the Sakai event data. For each analysis a dataset is required - this involves a 3-part process as shown, with software performance of these components summarized in \ref{performance-analysis}.
+
+\begin{enumerate}
+    \item Configuring \textit{nETL} to load the required data
+    \item Writing a Map function to perform the join (along with the \_stats reduce function)
+    \item Writing a List function to transform the MapReduce output into tabular data
+\end{enumerate}
+
+
+\begin{table}[h]
+    \begin{threeparttable}
+        \textbf{Table \ref{performance-analysis}}\par\medskip\par\medskip
+        \caption[Software performance analysis]{Running time analysis of \textit{nETL} tasks and CouchDB MapReduce indexing}
+        \label{performance-analysis}
+        \begin{tabularx}{\textwidth}{>{\hsize=0.5\hsize}Y>{\hsize=0.8\hsize}X>{\hsize=0.8\hsize}X>{\hsize=1.9\hsize}X}
+            \toprule
+            \mC{c}{}  }                                           & \mC{c}{Grade-Demographic joins} & \mC{c}{} & \mC{c}{} \\
+            \midrule
+            Demographic lines extracted                           & 12 219                          &          &          \\
+            Demographic lines loaded                              & 9 874                           &          &          \\
+            Demographic task time (sec)\tnote{\textsuperscript{1} & 3.517                           &          &          \\
+            Grade lines extracted                                 & 513 872                         &          &          \\
+            Grade lines loaded                                    & 305 252                         &          &          \\
+            Grade task time (sec)\tnote{\textsuperscript{1}       & 61.421                          &          &          \\
+            CouchDB footprint (MB)\tnote{\textsuperscript{2}      & 79.5                            &          &          \\
+            View calculation time (sec)\tnote{\textsuperscript{3} & 2112.129                        &          &          \\
+            View size (GB)                                        & 2.29                            &          &          \\
+            \bottomrule
+        \end{tabularx}
+        \scriptsize
+        \begin{tablenotes}
+            \item[\textsuperscript{1}]Tasks are run asynchronously, so time taken includes processing of other tasks in this run. Task run times are printed out to the log
+            \item[\textsuperscript{2}]This is representative of the amount of data processed by \textit{nETL}
+            \item[\textsuperscript{3}]CouchDB views are calculated per shard. By default a database contains 8 shards (even in single node mode). The log file shows start and end times of view calculations for each shard, the time is taken as time the first shard starts indexing, to the time the last shard stops indexing.
+        \end{tablenotes}
+    \end{threeparttable}
+\end{table}
+
 
 \begin{figure}[ht]
     \centering
@@ -20,7 +57,37 @@ To initiate the analysis, a Map function is required with the constraint that ou
 \subsubsection*{Joining Grade and Demographic data}
 Demographic data includes benchmarking results for the first year of registration, whereas grade data includes results from these same students over 3 years for each course they took. To join on student ID alone would result in an aggregation of all courses a student took over the 3 years - clearly not very useful. Using CouchDB's compound keys (where keys are tuples that allow for a configurable level of grouping), it is possible to differentiate the grade data by student, course and year; i.e. by tuples of \textless studentID, courseCode, year \textgreater.
 
-However, the demographic dataset does not contain information to achieve this same key grouping. The solution is, similarly to the concept of a SQL join, to duplicate rows from the demographic data for each key that may exist in the grade data. In other words, a single row from the demographic data should be duplicated for every course taken by that student and the year the course was taken. Without having to manually comb through the demographic and grade data to decide where and how to duplicate demographic rows, it's necessary to output every possible key combination of \textless courseId, year\textgreater for each studentId. With 1 464 distinct course codes with suffixes of 'F', 'S', 'W', 'H' and 3 years of registration, each demographic row needs to be duplicated $ 3 \times 1464 = 4938 $ times. Such a join takes a surprisingly short time to run, though the Map function becomes rather verbose since each courseId needs to be specified.
+However, the demographic dataset does not contain information to achieve this same key grouping. The solution is, similarly to the concept of a SQL join, to duplicate rows from the demographic data for each key that may exist in the grade data. In other words, a single row from the demographic data should be duplicated for every course taken by that student and the year the course was taken. Without having to manually comb through the demographic and grade data to decide where and how to duplicate demographic rows, it's necessary to output every possible key combination of \textless courseId, year\textgreater for each studentId. With 1 464 distinct course codes with suffixes of 'F', 'S', 'W', 'H' and 3 years of registration, each demographic row needs to be duplicated $ 3 \times 1464 = 4938 $ times within the CouchDB MapReduce.
+
+Configuration for the \textit{nETL} task is shown in the appendix (see \ref{netl-config-grades-join-demographics}), as is the Map function and list function (see\ref{msc-design-doc}). The output of the map function is a tuple, which is then filtered in the list function - as indicated in \ref{grades-join-demographics-output}.
+
+\begin{figure}[ht]
+    \centering
+    \begin{minted}{javascript}
+ [
+    // Exclude where sum is 0
+    "CSC1015F %",
+
+    // Exclude where all below are 0 
+    "Gr12 Eng %", 
+    "Gr12 Sci %",
+    "Gr12 Mth %",
+    "Gr12 Mth Lit %",
+    "Gr12 Mth Adv %",
+    "NBT AL %",
+    "NBT QL %",
+    "NBT Mth %",
+ ]    
+    \end{minted}
+    \caption[Analysis 1: Grades joined with Demographics]{\textbf{Figure \ref{grades-join-demographics-output}: Output of map function for grades joined with demographics.} Filtering is performed on the list function to exclude rows with no meaningful data. I.e. }
+    \label{grades-join-demographics-output}
+\end{figure}
+
+
+
+
+
+
 
 
 

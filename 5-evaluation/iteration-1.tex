@@ -44,22 +44,7 @@ Filtering was applied to the demographic data to load only students who had take
 
 The \textit{nETL} configuration comprised two tasks run asynchronously to produce the above entities. The \textit{nETL} configuration is shown in \ref{appendix:config-i1}, with execution results of the \textit{nETL} shown in \ref{i1-results} alongside the database document summary (produced by the MapReduce index shown in \ref{appendix:dbInfo}).
 
-\begin{table}[]
-    \centering
-    \caption{\textit{nETL} runtime results for I1 analysis}
-    \label{i1-results}
-    \begin{tabular}{lcc}
-                                      & FU documents                    & Grade documents \\ \hline
-        CSV lines extracted           & 12219                           & 513872          \\
-        CSV lines loaded              & 1380                            & 1891            \\
-        \textit{nETL} task time (sec) & 2.4                             & 31.9            \\
-        CouchDB footprint             & \multicolumn{2}{c}{0.8MB}                         \\
-        Year 2016 doc-count           & 524                             & 738             \\
-        Year 2015 doc-count           & 460                             & 618             \\
-        Year 2014 doc-count           & 396                             & 535             \\
-        View calculation time (sec)   & \multicolumn{2}{c}{\textless 5}                   \\
-    \end{tabular}
-\end{table}
+
 
 The MapReduce join in the context of this analysis should be performed on key tuples of <year, studentId>, with a result output of <\textit{CSC1015F} \%, Gr12Eng \%>. The design document to achieve this format is shown in \ref{appendix:ddoc-i1}. The Map function includes logic to translate grade symbols to percentages; since the reduce phase (the built-in \_stats function in this case) requires that value-output of the Map function be an array of numbers. The list of numbers in the output in this case has reserved indexes for output of each document type. In this case each document has 1 output and there are 2 documents - so the output for this MapReduce task is a \textit{key:value} tuple of the form:
 
