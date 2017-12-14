@@ -4,18 +4,19 @@ On Windows OS, CouchDB logs are located at 'C:\\CouchDB\\var\\log\\couchdb.log'.
 
 \begin{minted}{sh}
 grep -E '2017-12-13.*Starting\s.*_design/msc|2017-12-13.*Index\supdate\sfinished.*_design/msc' couchdb.log
+tail -f couchdb.log | grep -E '2017-12-13.*Starting\s.*_design/msc|2017-12-13.*Index\supdate\sfinished.*_design/msc' # For following the log
 \end{minted}
 
 
 \subsubsection*{grades-join-demographics}
 
-\p{\textit{nETL} logs}
+\textit{nETL} logs
 \begin{minted}{sh}
 1513154846557 : INFO : "Task : Student Demographics for CSC1015F (2014/15/66) : Task completed in 3.517 seconds : 12219 Items extracted : 9874 Items processed"
 1513154905013 : INFO : "Task : Student Grades for CSC1015F  (2016, 2015, 2014) : Task completed in 61.421 seconds : 513872 Items extracted : 305252 Items processed"
 \end{minted}
 
-\p{\textit{CouchDB} logs}
+\textit{CouchDB} logs
 \begin{minted}{sh}
 [info] 2017-12-13T09:18:40.366000Z couchdb@localhost <0.20722.46> -------- Starting index update for db: shards/00000000-1fffffff/msc.1513154828 idx: _design/msc
 [info] 2017-12-13T09:18:40.366000Z couchdb@localhost <0.20709.46> -------- Starting index update for db: shards/60000000-7fffffff/msc.1513154828 idx: _design/msc
