@@ -1,41 +1,92 @@
 \subsection{Logs}
-\label{appendix:logs}
 On Windows OS, CouchDB logs are located at 'C:\\CouchDB\\var\\log\\couchdb.log'. To look for logs related to indexing times, the following code was used (note that this is run on a Linux termninal that has access to underlying Windows file system).
 
+\textit{\textbf{Retreiving CouchDB logs}}
 \begin{minted}{sh}
-grep -E '2017-12-13.*Starting\s.*_design/msc|2017-12-13.*Index\supdate\sfinished.*_design/msc' couchdb.log
-tail -f couchdb.log | grep -E '2017-12-13.*Starting\s.*_design/msc|2017-12-13.*Index\supdate\sfinished.*_design/msc' # For following the log
+grep -E '2017-12-13.*Starting\s.*_design/msc|2017-12-13.*Index\supdate\sfinished.*_design/msc' couchdb.log;
+tail -f couchdb.log | grep -E '2017-12-15.*Starting\s.*_design/msc|2017-12-15.*Index\supdate\sfinished.*_design/msc';
+tail -f couchdb.log | grep -E 'Starting\sindex\supdate.*_design/msc|.*Index\supdate\sfinished.*_design/msc'
+\end{minted}
+
+\textit{\textbf{Retreiving nETL logs}}
+\begin{minted}{sh}
+grep "completed" netl.log;
 \end{minted}
 
 
-\subsubsection*{grades-join-demographics}
+\subsubsection{Run 1}
+\textit{\textbf{nETL logs}}
+\begin{verbatim}
+1513328289697 : INFO : "Task : Student Demographics for CSC1015F (2014/15/66) : Task completed in 2.488 seconds : 12219 Items extracted : 1381 Items processed"
+1513328325367 : INFO : "Task : Student Grades for CSC1015F  (2016, 2015, 2014) : Task completed in 37.684 seconds : 513872 Items extracted : 1891 Items processed"
+\end{verbatim}
 
-\textit{nETL} logs
-\begin{minted}{sh}
-1513154846557 : INFO : "Task : Student Demographics for CSC1015F (2014/15/66) : Task completed in 3.517 seconds : 12219 Items extracted : 9874 Items processed"
-1513154905013 : INFO : "Task : Student Grades for CSC1015F  (2016, 2015, 2014) : Task completed in 61.421 seconds : 513872 Items extracted : 305252 Items processed"
-\end{minted}
+\textit{\textbf{CouchDB logs}}
+\begin{verbatim}
+[info] 2017-12-15T09:30:00.674000Z couchdb@localhost <0.19752.30> -------- Starting index update for db: shards/20000000-3fffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:00.680000Z couchdb@localhost <0.19751.30> -------- Starting index update for db: shards/00000000-1fffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:00.683000Z couchdb@localhost <0.19755.30> -------- Starting index update for db: shards/40000000-5fffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:00.683000Z couchdb@localhost <0.19810.30> -------- Starting index update for db: shards/60000000-7fffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:00.683000Z couchdb@localhost <0.19761.30> -------- Starting index update for db: shards/e0000000-ffffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:00.683000Z couchdb@localhost <0.19779.30> -------- Starting index update for db: shards/a0000000-bfffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:00.684000Z couchdb@localhost <0.19809.30> -------- Starting index update for db: shards/c0000000-dfffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:00.684000Z couchdb@localhost <0.19775.30> -------- Starting index update for db: shards/80000000-9fffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:01.337000Z couchdb@localhost <0.19810.30> -------- Index update finished for db: shards/60000000-7fffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:01.342000Z couchdb@localhost <0.19755.30> -------- Index update finished for db: shards/40000000-5fffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:01.350000Z couchdb@localhost <0.19761.30> -------- Index update finished for db: shards/e0000000-ffffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:01.351000Z couchdb@localhost <0.19752.30> -------- Index update finished for db: shards/20000000-3fffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:01.353000Z couchdb@localhost <0.19751.30> -------- Index update finished for db: shards/00000000-1fffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:01.354000Z couchdb@localhost <0.19809.30> -------- Index update finished for db: shards/c0000000-dfffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:01.357000Z couchdb@localhost <0.19775.30> -------- Index update finished for db: shards/80000000-9fffffff/msc_run1.1513328101 idx: _design/msc
+[info] 2017-12-15T09:30:01.359000Z couchdb@localhost <0.19779.30> -------- Index update finished for db: shards/a0000000-bfffffff/msc_run1.1513328101 idx: _design/msc
+\end{verbatim}
 
-\textit{CouchDB} logs
-\begin{minted}{sh}
-[info] 2017-12-13T09:18:40.366000Z couchdb@localhost <0.20722.46> -------- Starting index update for db: shards/00000000-1fffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:18:40.366000Z couchdb@localhost <0.20709.46> -------- Starting index update for db: shards/60000000-7fffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:18:40.369000Z couchdb@localhost <0.20769.46> -------- Starting index update for db: shards/20000000-3fffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:18:40.369000Z couchdb@localhost <0.20734.46> -------- Starting index update for db: shards/40000000-5fffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:18:40.386000Z couchdb@localhost <0.20743.46> -------- Starting index update for db: shards/e0000000-ffffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:18:40.387000Z couchdb@localhost <0.20767.46> -------- Starting index update for db: shards/c0000000-dfffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:18:40.397000Z couchdb@localhost <0.20744.46> -------- Starting index update for db: shards/80000000-9fffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:18:40.398000Z couchdb@localhost <0.20754.46> -------- Starting index update for db: shards/a0000000-bfffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:51:38.336000Z couchdb@localhost <0.20754.46> -------- Index update finished for db: shards/a0000000-bfffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:53:03.019000Z couchdb@localhost <0.20734.46> -------- Index update finished for db: shards/40000000-5fffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:53:03.439000Z couchdb@localhost <0.20744.46> -------- Index update finished for db: shards/80000000-9fffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:53:07.219000Z couchdb@localhost <0.20743.46> -------- Index update finished for db: shards/e0000000-ffffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:53:14.890000Z couchdb@localhost <0.20722.46> -------- Index update finished for db: shards/00000000-1fffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:53:34.295000Z couchdb@localhost <0.20769.46> -------- Index update finished for db: shards/20000000-3fffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:53:37.247000Z couchdb@localhost <0.20709.46> -------- Index update finished for db: shards/60000000-7fffffff/msc.1513154828 idx: _design/msc
-[info] 2017-12-13T09:53:52.495000Z couchdb@localhost <0.20767.46> -------- Index update finished for db: shards/c0000000-dfffffff/msc.1513154828 idx: _design/msc
-\end{minted}
+\subsubsection{Run 2}
+\textit{\textbf{nETL logs}}
+\begin{verbatim}
+1513331668811 : INFO : "Task : Student Demographics for Run2 (2014/15/66) : Task completed in 3.114 seconds : 12219 Items extracted : 9874 Items processed"
+1513331708172 : INFO : "Task : Student Grades for Run2  (2016, 2015, 2014) : Task completed in 42.001 seconds : 513872 Items extracted : 79849 Items processed"
+\end{verbatim}
 
-Start: 2017-12-13T09:18:40.366000Z
-End: 2017-12-13T09:53:52.495000Z
-Difference = 2112.129 sec
+\textit{\textbf{CouchDB logs}}
+\begin{verbatim}
+[info] 2017-12-15T09:58:54.632000Z couchdb@localhost <0.19395.31> -------- Starting index update for db: shards/00000000-1fffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:58:54.637000Z couchdb@localhost <0.19393.31> -------- Starting index update for db: shards/40000000-5fffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:58:54.638000Z couchdb@localhost <0.19390.31> -------- Starting index update for db: shards/80000000-9fffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:58:54.638000Z couchdb@localhost <0.19413.31> -------- Starting index update for db: shards/60000000-7fffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:58:54.638000Z couchdb@localhost <0.19366.31> -------- Starting index update for db: shards/20000000-3fffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:58:54.638000Z couchdb@localhost <0.19353.31> -------- Starting index update for db: shards/c0000000-dfffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:58:54.638000Z couchdb@localhost <0.19360.31> -------- Starting index update for db: shards/e0000000-ffffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:58:54.639000Z couchdb@localhost <0.19423.31> -------- Starting index update for db: shards/a0000000-bfffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:59:41.350000Z couchdb@localhost <0.19366.31> -------- Index update finished for db: shards/20000000-3fffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:59:42.159000Z couchdb@localhost <0.19353.31> -------- Index update finished for db: shards/c0000000-dfffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:59:42.280000Z couchdb@localhost <0.19423.31> -------- Index update finished for db: shards/a0000000-bfffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:59:42.426000Z couchdb@localhost <0.19390.31> -------- Index update finished for db: shards/80000000-9fffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:59:42.727000Z couchdb@localhost <0.19393.31> -------- Index update finished for db: shards/40000000-5fffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:59:42.808000Z couchdb@localhost <0.19413.31> -------- Index update finished for db: shards/60000000-7fffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:59:43.099000Z couchdb@localhost <0.19360.31> -------- Index update finished for db: shards/e0000000-ffffffff/msc_run2.1513331660 idx: _design/msc
+[info] 2017-12-15T09:59:43.674000Z couchdb@localhost <0.19395.31> -------- Index update finished for db: shards/00000000-1fffffff/msc_run2.1513331660 idx: _design/msc
+\end{verbatim}
+
+
+\subsubsection{Run 3}
+\textit{\textbf{nETL logs}}
+\begin{verbatim}
+\end{verbatim}
+
+\textit{\textbf{CouchDB logs}}
+\begin{verbatim}
+\end{verbatim}
+
+
+\subsubsection{Run 4}
+\textit{\textbf{nETL logs}}
+\begin{verbatim}
+\end{verbatim}
+
+\textit{\textbf{CouchDB logs}}
+\begin{verbatim}
+\end{verbatim}
+
+
+
