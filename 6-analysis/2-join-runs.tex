@@ -7,14 +7,14 @@ With the ease at which the \textit{nETL} software handled loading data in Run 1,
 Compared to Run1, there is a significant increase in the size footprint of the view index (from \textless 1MB to 143MB) do to the requirement of duplicating demographic output in the map function. Performance of the list function degraded considerably, with streaming of the 2MB CSV taking several minutes. To efficiently retrieve view output of larger indexes would require implementing data retrieval outside of CouchDB. List functions require iterating through every view output individually, whereas working with the view directly would allow for retrieving in batches which is much more efficient. \textit{nETL} could be configured to do this, but hasn't been.
 
 \subsubsection{Correlation analysis}
-The results for \textit{Run 1} and \textit{Run 2} have been summarized in the graphs in Figure \ref{CSC1015F-results}; several courses were picked at random to show correlation between course grades and student benchmarks. The results show that in general, higher benchmarking scores are indicative of higher course results overall. Some of the benchmarks show stronger correlation to grade results than other, as seen by steeper trendline gradient.
+The results for \textit{Run 1} and \textit{Run 2} have been summarized in the graphs in Figure \ref{run1-chart1}; several courses were picked at random to show correlation between course grades and student benchmarks. The results show that in general, higher benchmarking scores are indicative of higher course results overall. Some of the benchmarks show stronger correlation to grade results than other, as seen by steeper trendline gradient.
 
 \begin{figure}[H]
     \centering
     \begin{mdframed}
         \centering
-        \includegraphics[scale=0.55]{./resources/figures/run1.png}
+        \includegraphics[scale=0.55]{./resources/figures/run1-chart1.png}
     \end{mdframed}
-    \caption[CSC1015 grade vs benchmark correlation]{\textbf{Figure \ref{CSC1015F-results}: Correlation between student benchmarks and CSC1015F results.} Benchmarking is relatively inconsistent between students in that not all students took all benchmark tests. Missing benchmark scores turns up as '0', these results were ignored in the analysis.}
-    \label{CSC1015F-results}
+    \caption[CSC1015 grade vs benchmark correlation]{\textbf{Figure \ref{run1-chart1}: Correlation between student benchmarks and CSC1015F results.} Benchmarking is relatively inconsistent between students in that not all students took all benchmark tests. Missing benchmark scores turns up as '0', these results were ignored in the analysis.}
+    \label{run1-chart1}
 \end{figure}

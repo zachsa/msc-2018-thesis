@@ -11,19 +11,21 @@ To produce a key of the tuple \textless studentID, courseCode, year \textgreater
     \item Manipulation of derived dataset in Excel
 \end{enumerate}
 
-Configurations used for \textit{nETL} for all the runs done while creating the analysis described below are shown in the appendix - see \ref{netl-run1-config}). Runtime results of \textit{nETL}, CouchDB indexing times, database/index storage footprints are shown in Table \ref{performance-analysis}
+Configurations used for \textit{nETL} for all the runs done while creating the analysis described below are shown in the appendix - see \ref{netl-run1-config}). Runtime results of \textit{nETL}, CouchDB indexing times, database/index storage footprints are shown in Table \ref{performance-analysis}. Initial CouchDB view calculation was performed on a local machine, but subsequently to achieving the analysis results, indexing time was compared on different cluster sizes. These times are shown in \ref{couch-indexing}. As seen in the table, increasing the cluster size reduces the time taken to index a database as per the described \textit{MapReduce} function decreases. This is as expected since dispersing documents across shards should be random enough that documents get distributed across shards uniformly (see \ref{slack-7-nov}), meaning that increasing nodes in a cluster reduces the amount of work a node must do when calculating \textit{map} output. However, it is likely that small data sets would not benefit from clustering since there is a high network overhead of sharded databases.
 
 \subsection{Join of Grades/Demographics}
-For a join on the Grades and Demographics entities, the map function is configured to output key-value pairs of the form: \textless studentID, courseCode, year \textgreater : <9 element list>. A description of the 9-element value list is shown in \ref{grades-join-demographics-output}. Configuration for the \textit{nETL} task is shown in the appendix (see \ref{netl-config-grades-join-demographics}), as is the Map function and list function (see\ref{msc-design-doc}).
+For a join on the Grades and Demographics entities, the map function is configured to output key-value pairs of the form: \textless studentID, courseCode, year \textgreater : <9 element list>. A description of the 11-element value list is shown in \ref{grades-join-demographics-output}. Configuration for the \textit{nETL} task is shown in the appendix (see \ref{netl-config-grades-join-demographics}), as is the Map function and list function (see\ref{msc-design-doc}).
+
+The list shown in \ref{grades-join-demographics-output} shows ALL the values output by a map function on the join between all three entities. For the first two runs, event information is NOT emitted.
 
 \begin{figure}[ht]
     \centering
     \begin{minted}{javascript}
  [
-    // List function to exclude where sum is 0
+    // Grade Entitty output
     "CSC1015F %",
 
-    // Exclude where all below are 0 
+    // Demographic Entity output
     "Gr12 Eng %", 
     "Gr12 Sci %",
     "Gr12 Mth %",
@@ -32,16 +34,18 @@ For a join on the Grades and Demographics entities, the map function is configur
     "NBT AL %",
     "NBT QL %",
     "NBT Mth %",
+
+    // Event entity output
+    "eventCount S1", // Only included for Run 3/4
+    "eventCount S2" // Only included for Run 3/4
  ]    
     \end{minted}
-    \caption[2-way-join map output]{\textbf{Figure \ref{grades-join-demographics-output}: Output of map function for grades joined with demographics.} This list, shown as a JavaScript array, is the key to the map function output. The comments indicate additional treatment as performed in the filtering function.}
+    \caption[2-way-join map output]{\textbf{Figure \ref{grades-join-demographics-output}: Output of map function for grades joined with demographics.} This list, shown as a JavaScript array, is the key to the map function output. In other words, the map function outputs a list of values that correspond to this list. When retrieving the view output, headers can be given back to the columns retrieved using this key. View output can be achieved via a List function (as has been done in this project), or via bespoke JavaScript code.}
     \label{grades-join-demographics-output}
 \end{figure}
 
 % Runs
 \input{6-analysis/2-join-runs}
-
-
 
 \subsection{join of Grades/Demographics/Events}
 
