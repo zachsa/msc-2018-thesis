@@ -3,7 +3,7 @@
 \documentclass[
     parskip=full,
     a4paper
-]{scrartcl}
+]{report}
 \usepackage{blindtext}
 \usepackage[utf8]{inputenc}
 \usepackage{etoolbox}
@@ -17,6 +17,8 @@
     urlcolor=black
 }
 
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{2}
 
 
 % Graphics
@@ -123,7 +125,7 @@
 
 % Abstract
 \begin{abstract}
-    \input{1-abstract/1-abstract}
+    \input{1-abstract/abstract}
 \end{abstract}
 \newpage
 
@@ -132,37 +134,38 @@
 \newpage
 
 % Content
-\section{Introduction}
-\input{2-introduction/0-introduction}
-\input{2-introduction/1-motivation-aim}
-\input{2-introduction/2-related-work}
+\chapter{Introduction}
+\input{2-introduction/introduction}
 
-\section{CouchDB}
-\input{3-couchdb/1-overview}
+\chapter{Background}
+\input{3-background/1-nosql-overview}
+\input{3-background/2-map-reduce}
+\input{3-background/3-couchdb}
+\input{3-background/4-edm}
 
-\section{nETL}
+\chapter{nETL}
 \input{4-netl/1-requirements}
 \input{4-netl/2-design}
 \input{4-netl/3-configuration}
+\input{4-netl/4-couchdb-setup}
+\input{4-netl/5-implementation}
 
-\section{Data}
+\chapter{Data}
 \input{5-data/overview}
 \input{5-data/tables/events}
 \input{5-data/tables/grades}
 \input{5-data/tables/fu}
 \input{5-data/tables/json-entities}
 
-\section{Analysis}
+\chapter{Analysis}
 \input{6-analysis/1-overview} % sub sections are included in the overview
 \input{6-analysis/4-table}
 
-\section{Discussion}
-\input{7-discussion/1-overview}
-
-\section{Conclusion}
-\input{8-conclusion/0-conclusion}
-\input{8-conclusion/1-future_work}
-\input{8-conclusion/2-acknowledgments}
+\chapter{Conclusion}
+\input{7-conclusion/1-summary}
+\input{7-conclusion/2-discussion}
+\input{7-conclusion/3-future_work}
+\input{7-conclusion/4-acknowledgments}
 \newpage
 
 % Bibliogrpahy
@@ -170,16 +173,15 @@
 \bibliography{bibliography/msc_citations}
 
 % Appendix
-\begin{appendix}
-    \section{Appendix}
-    \input{appendix/netl-framework}
-    \input{appendix/netl-modules}
-    \input{appendix/couchdb}
-    \input{appendix/logs}
-    \input{appendix/slack}
-    \listoffigures
-    \listoftables
-\end{appendix}
+\appendix
+\chapter{Appendix}
+\input{appendix/netl-framework}
+\input{appendix/netl-modules}
+\input{appendix/couchdb}
+\input{appendix/logs}
+\input{appendix/slack}
+\listoffigures
+\listoftables
 \newpage
 
 % Close docuemnt
