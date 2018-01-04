@@ -67,13 +67,14 @@
   }
 
 % Layout
+\usepackage{parskip}
 \usepackage[margin=1.25in]{geometry}
 % \hoffset .25in
 \usepackage{setspace}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \setstretch{1.3}
-% \setlength{\parindent}{0em}
+\setlength{\parindent}{0em}
 % \setlength{\parskip}{1em}
 \usepackage{tabularx}
 
@@ -151,7 +152,8 @@
 \input{4-netl/5-implementation}
 
 \chapter{Data}
-\input{5-data/overview}
+\input{5-data/1-raw-data}
+\input{5-data/2-applying-netl}
 \input{5-data/tables/events}
 \input{5-data/tables/grades}
 \input{5-data/tables/fu}
