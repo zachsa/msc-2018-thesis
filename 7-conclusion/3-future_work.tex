@@ -6,3 +6,6 @@
     \item UI research for nETL - the JSON config is pretty cool. maybe non-techinical people could use it
     \item test same cluster sizes on different linux VMs (different amount of power per pc)
 \end{enumerate}
+
+
+As mentioned previously, CouchDB views are optimized when using built-in reduce functions, with custom reduce functions performing most poorly on Windows machines. As this project was completed on the Windows OS, the analysis on how best to aggregate the different entities (grades, demographics and events) was confined to using just the \textit{\_stats} built in reduce function. The output of this function overlaps output of the other two built-in reduce functions (\textit{\_count}, \textit{\_sum} (and provides additional metrics). Using custom reduce functions would greatly increase the number of possible methods of joining entities since output of map functions would not be constrained to match the contracts of the built-in functions. Such an approach shouldn't be discounted considering that on platforms other than Windows, reduce function calculation (whether custom or built-in) represents a small percentage of computer resources used in view calculations overall (see appendix \ref{slack-1-nov}). And in any case, a system that utilizes CouchDB is likely to be based on a cluster of Linux machines rather than a single Windows machine.

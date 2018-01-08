@@ -1,4 +1,9 @@
-\subsection{Run 1: CS1015F}
+\subsection{CS1015F: Course grades vs Student Benchmarks}
+
+
+across the FU data and course grades for CSC1015F,
+
+
 To create the dataset to show correlation between student benchmarking and achieved grades in the CS1015F course for undergraduates, \textit{nETL} was configured to filter Grade data on the field 'Course' to only allow the value 'CS1015F' in addition to the filtering and transforming \textit{nETL} is configured to on all Grade rows as described in the data overview. Additional filtering on the Demographic entity is performed on the StudentID field (anonIdnew) to load demographic data of the students who took the CSC2015F course. This list of students was prepared by Excel filtering, but could just as easily have been performed in CouchDB or any other database if the size of the file did not allow for opening in Excel. Since the view index is small, the list function returns the CSV output instantly. The CSV output size is 67Kb
 
 \subsection{Run 2: Multiple Courses}

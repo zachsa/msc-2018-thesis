@@ -20,6 +20,9 @@
 \setcounter{tocdepth}{4}
 \setcounter{secnumdepth}{2}
 
+% Custom commands
+\newcommand{\q}[1]{``#1''}
+
 
 % Graphics
 \usepackage{pdfpages}
@@ -126,7 +129,7 @@
 
 % Abstract
 \begin{abstract}
-    \input{1-abstract/abstract}
+  \input{1-abstract/abstract}
 \end{abstract}
 \newpage
 
@@ -142,6 +145,9 @@
 \input{3-background/1-nosql-overview}
 \input{3-background/2-map-reduce}
 \input{3-background/3-couchdb}
+\input{3-background/couchdb/1-server-api}
+\input{3-background/couchdb/2-mapreduce}
+\input{3-background/couchdb/3-stats-function}
 \input{3-background/4-edm}
 
 \chapter{nETL}
