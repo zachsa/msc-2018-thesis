@@ -11,15 +11,27 @@ Producing a dataset suitable for analysis involves the workflow specified in \re
     \label{analysis-workflow}
 \end{figure}
 
+Analyses are conducted in an iterative fashion; with each iteration an increasing volume of data is handled so as to gain insight into the viability of handling varying amounts of data in CouchDB. Data volume is controlled by the number of courses analyses (more courses taken into account results in higher volumes of data), And the number of entities joined together (grades \& FU data vs grades, FU data, \& Sakai usage). Results are discussed in terms of the insights into business domain (EDM) as well as the effectiveness of the data-mining approach.
+
+\section{Result 1}
+This initial analysis is a comparison of student benchmarks (FU data) with CSC1015F course grades.
 
 
-Joining across the 3 entities (Demographics, Grades and Events), in adherence with the \textit{\_stats} function contract, requires emitting common keys in the map function on which grouping can be performed. To maintain the resolution that exists within the Grade data, that is; \textit{results of a particular student in a particular year for a particular course}, a compound key of the tuple \textless studentID, courseCode, year \textgreater is used for grouping, i.e. for every document processed by the map function, a key:value pair with a key in the form of that tuple needs to be emitted. Emitting this compound key is straightforward for grade data since each document of \textit{type\_} courseGrade has fields for all three of these values. However, neither the demographic nor the event data contains fields for 'courseCode', and student benchmarking in the demographic data are only for the year that student first registered. As such, of the required fields to output the key for joining, Demographic data only contains a 'studentID' field. Documents of \textit{type\_} 'sakaiEvent' include fields for studentId and year, but not courseCode (there is a FK field \textit{course\_id}) but it doesn't point to any field in the grade data.
-
-To produce a key of the tuple \textless studentID, courseCode, year \textgreater for demographic data, the courseCode and year value have to be fabricated. In other words, demographic data has to be duplicated for every possible key combination on which it could be joined. In this case a single demographic document needs to be output for every course that a student can take, and then further duplicated for every year in which a student could take that course. Likewise the event data, which has fields for studentID and year, needs to be duplicated for every course that a student can take. Such an approach to joining is the basis of this analysis, which is done in iterations. Each iteration increases the volume of data processed by the map function so as to get insight in the effectiveness of this approach to joining documents. Analyses are discussed in terms of the results of each iteration. In general, each analysis involves 4 phases of data-wrangling:
 
 
 
-Configurations used for \textit{nETL} for all the runs done while creating the analysis described below are shown in the appendix - see \ref{netl-run1-config}). Runtime results of \textit{nETL}, CouchDB indexing times, database/index storage footprints are shown in Table \ref{performance-analysis}. Initial CouchDB view calculation was performed on a local machine, but subsequently to achieving the analysis results, indexing time was compared on different cluster sizes. These times are shown in \ref{couch-indexing}. As seen in the table, increasing the cluster size reduces the time taken to index a database as per the described \textit{MapReduce} function decreases. This is as expected since dispersing documents across shards should be random enough that documents get distributed across shards uniformly (see \ref{slack-7-nov}), meaning that increasing nodes in a cluster reduces the amount of work a node must do when calculating \textit{map} output. However, it is likely that small data sets would not benefit from clustering since there is a high network overhead of sharded databases.
+
+To maintain the resolution that exists within the Grade data, that is; \textit{results of a particular student in a particular year for a particular course}, joins are performed using a compound key of the tuple [studentID, courseCode, year], i.e. that map functions should emit a key of this tuple.
+
+
+
+
+
+
+
+Configurations used for \textit{nETL} for all the analyses - see \ref{netl-run1-config}). Runtime results of \textit{nETL}, CouchDB indexing times, database/index storage footprints are shown in Table \ref{performance-analysis}.
+
+
 
 \section{Join of Grades/Demographics}
 Creating datasets comprising grade and FU data involved filtering CSVs and loading that data into CouchDB using \textit{nETL}
