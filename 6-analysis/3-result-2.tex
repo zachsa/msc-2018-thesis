@@ -3,8 +3,22 @@ With the ease at which the \textit{nETL} software handled loading data in Run 1,
 
 Compared to Run1, there is a significant increase in the size footprint of the view index (from \textless 1MB to 143MB) do to the requirement of duplicating demographic output in the map function. Performance of the list function degraded considerably, with streaming of the 2MB CSV taking several minutes. To efficiently retrieve view output of larger indexes would require implementing data retrieval outside of CouchDB. List functions require iterating through every view output individually, whereas working with the view directly would allow for retrieving in batches which is much more efficient. \textit{nETL} could be configured to do this, but hasn't been.
 
+todo: The map function is the same as used for result 1
+
+\begin{figure}[ht]
+    \centering
+    \begin{mdframed}
+        \centering
+        \includegraphics[scale=0.35]{./resources/figures/activity-diagram-1.png}
+    \end{mdframed}
+    \caption[Result 1 Map function]{\textbf{Figure \ref{result-1-map-fn}: Activity diagram showing logic Map function logic for Result 1.} }
+    \label{result-1-map-fn}
+\end{figure}
+
 \subsection{Correlation analysis}
 The results for \textit{Run 1} and \textit{Run 2} have been summarized in the graphs in Figure \ref{run1-chart1}; several courses were picked at random to show correlation between course grades and student benchmarks. The results show that in general, higher benchmarking scores are indicative of higher course results overall. Some of the benchmarks show stronger correlation to grade results than other, as seen by steeper trendline gradient.
+
+
 
 \begin{figure}[H]
     \centering

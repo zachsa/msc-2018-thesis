@@ -69,10 +69,47 @@ function(keys, values, rereduce) {
 \subsection{Map functions}
 \subsubsection{Result 1}
 \label{result-1-map}
-\begin{minted}{json}
+\begin{minted}{javascript}
 \end{minted}
 \label{result-1-list}
-\begin{minted}{json}
+\begin{minted}{javascript}
+function(head, req) {
+    provides('csv', function() {
+        var headers = "Year,StudentAnonID,Course,Course %,Gr12 Eng %,Gr12 Sci %,Gr12 Mth %,Gr12 Mth Lit %,Gr12 Mth Adv %,NBT AL %,NBT QL %,NBT Mth %,Aggregation Count";
+        send(headers);
+        while (row = getRow()) {
+            var key = row.key;
+            var value = row.value;
+            var yr = key[0];
+            var id = key[1];
+            var course = key[2];
+            var courseGrade = value[0].max;
+            var engGrade = value[1].max;
+            var sciGrade = value[2].max;
+            var mthGrade = value[3].max;
+            var mthLitGrade = value[4].max;
+            var mthAdvGrade = value[5].max;
+            var nbtAl = value[6].max;
+            var nbtQl = value[7].max;
+            var nbtMth = value[8].max;
+            var aggrCount = value[8].count;
+            var line = "\n" + yr +
+                "," + id +
+                "," + course +
+                "," + courseGrade +
+                "," + engGrade +
+                "," + sciGrade +
+                "," + mthGrade +
+                "," + mthLitGrade +
+                "," + mthAdvGrade +
+                "," + nbtAl +
+                "," + nbtQl +
+                "," + nbtMth +
+                "," + aggrCount;
+            send(line);
+        };
+    });
+};
 \end{minted}
 
 \subsubsection{Result 2}
