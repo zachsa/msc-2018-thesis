@@ -1,6 +1,5 @@
 \section{CouchDB}
-
-\subsection{\textit{MapReduce} functions}
+\subsection{\textit{MapReduce} contract}
 \label{couchdb-mapreduce-contracts}
 \begin{minted}{javascript}
 /**
@@ -30,7 +29,7 @@ function(keys, values, rereduce) {
 };
 \end{minted}
 
-\subsubsection{Sample Design Document}
+\subsection{Sample Design Document}
 \label{couchdb-design-doc-sample}
 \begin{minted}{json}
 {
@@ -65,15 +64,37 @@ function(keys, values, rereduce) {
     },
     "validate_doc_update": "function(newDoc, oldDoc, userCtx, secObj) { ... }"
 }
-
 \end{minted}
 
-\subsubsection{Design Doc}
-\label{msc-design-doc}
-Included are all the MapReduce views used in this project in the design document below, although separate design documents were used for each view during analysis. In general, design documents should only include a single view each (unlike the example below, where all the MapReduce queries are included in a single design document), since changing any one view would force all the views in a design document to be recalculated from scratch regardless if other views in the same design document had been updated. This creates a needless performance overhead. Storing JavaScript code in JSON documents requires that newline markers are escaped, along with double quotes, as has been done in the example below.
-
-In this example, corresponding views and list functions for retrieving in CSV form have been given the same name.
-
+\subsection{Map functions}
+\subsubsection{Result 1}
+\label{result-1-map}
 \begin{minted}{json}
+\end{minted}
+\label{result-1-list}
+\begin{minted}{json}
+\end{minted}
 
+\subsubsection{Result 2}
+\label{result-2-map}
+\begin{minted}{json}
+\end{minted}
+\label{result-2-list}
+\begin{minted}{json}
+\end{minted}
+
+\subsubsection{Result 3}
+\label{result-3-map}
+\begin{minted}{json}
+\end{minted}
+\label{result-3-list}
+\begin{minted}{json}
+\end{minted}
+
+\subsubsection{Result 4}
+\label{result-4-map}
+\begin{minted}{json}
+\end{minted}
+\label{result-4-list}
+\begin{minted}{json}
 \end{minted}

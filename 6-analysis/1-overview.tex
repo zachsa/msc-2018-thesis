@@ -1,5 +1,7 @@
 \section{Overview}
-Producing a dataset suitable for analysis involves the workflow specified in \ref{analysis-workflow}. Effectively this is a 3 stage process, where a user configures and runs the \textit{nETL} application to load the data into CouchDB, and then configures a design document with instructions for CouchDB on how to produce an index and emit the contained data in CSV form. Once a CSV of the joined data has been obtained, the final stage of analysis is to load the data into Excel and produce results.
+Producing a dataset suitable for analysis involves the workflow specified in \ref{analysis-workflow}. The workflow involves configuration of \textit{nETL} tasks to load data from CSVs into CouchDB, authoring of a CouchDB design doc, including a view function (MapReduce) and a list function, asking CouchDB to build the index, retrieving the indexed result via the list function specified in the design document and working with the joined dataset in Excel.
+
+Analyses are conducted in an iterative fashion; with each iteration an increasing volume of data is handled so as to gain insight into the viability of handling varying amounts of data in CouchDB. Data volume is controlled by the number of courses analyses (more courses taken into account results in higher volumes of data), And the number of entities joined together (grades \& FU data vs grades, FU data, \& Sakai usage). Results are discussed in terms of the insights into business domain (EDM) as well as the effectiveness of the data-mining approach. Runtime results of \textit{nETL}, CouchDB indexing times, database/index storage footprints are shown in Table \ref{performance-analysis}.
 
 \begin{figure}[ht]
     \centering
@@ -10,66 +12,3 @@ Producing a dataset suitable for analysis involves the workflow specified in \re
     \caption[Analysis Workflow]{\textbf{Figure \ref{analysis-workflow}: Workflow to perform an analysis.}1) User creates a configuration file (JSON) that is loaded into the running \textit{\_nETL} service. This configuration includes instructions on which CSVs to load, which modules should be loaded to process the CSVs, and configurations for the modules. 2) Modules are loaded from a library of available modules into the \textit{\_nETL} service. 3) CSVs are loaded into the service, and transformations are applied to the CSV data as specified by the configuration in (1). 4) Data from the CSVs is loaded into CouchDB; this is also achieved via a module specified in (1). 5) A user creates a CouchDB design document, specifying the MapReduce functions, and a List function. 6) The user asks CouchDB to produce the view index as specified by the design document in (5). 7) The user retrieves the data from the view index using the list function specified in (5). 8) The user then loads the resultant CSV into Excel to produce useful metrics.}
     \label{analysis-workflow}
 \end{figure}
-
-Analyses are conducted in an iterative fashion; with each iteration an increasing volume of data is handled so as to gain insight into the viability of handling varying amounts of data in CouchDB. Data volume is controlled by the number of courses analyses (more courses taken into account results in higher volumes of data), And the number of entities joined together (grades \& FU data vs grades, FU data, \& Sakai usage). Results are discussed in terms of the insights into business domain (EDM) as well as the effectiveness of the data-mining approach.
-
-\section{Result 1}
-This initial analysis is a comparison of student benchmarks (FU data) with CSC1015F course grades.
-
-
-
-
-
-
-To maintain the resolution that exists within the Grade data, that is; \textit{results of a particular student in a particular year for a particular course}, joins are performed using a compound key of the tuple [studentID, courseCode, year], i.e. that map functions should emit a key of this tuple.
-
-
-
-
-
-
-
-Configurations used for \textit{nETL} for all the analyses - see \ref{netl-run1-config}). Runtime results of \textit{nETL}, CouchDB indexing times, database/index storage footprints are shown in Table \ref{performance-analysis}.
-
-
-
-\section{Join of Grades/Demographics}
-Creating datasets comprising grade and FU data involved filtering CSVs and loading that data into CouchDB using \textit{nETL}
-
-For a join on the Grades and Demographics entities, the map function is configured to output key-value pairs of the form: \textless studentID, courseCode, year \textgreater : <9 element list>. A description of the 11-element value list is shown in \ref{grades-join-demographics-output}. Configuration for the \textit{nETL} task is shown in the appendix (see \ref{netl-config-grades-join-demographics}), as is the Map function and list function (see\ref{msc-design-doc}).
-
-The list shown in \ref{grades-join-demographics-output} shows ALL the values output by a map function on the join between all three entities. For the first two runs, event information is NOT emitted.
-
-\begin{figure}[ht]
-    \centering
-    \begin{minted}{javascript}
- [
-    // Grade Entitty output
-    "CSC1015F %",
-
-    // Demographic Entity output
-    "Gr12 Eng %", 
-    "Gr12 Sci %",
-    "Gr12 Mth %",
-    "Gr12 Mth Lit %",
-    "Gr12 Mth Adv %",
-    "NBT AL %",
-    "NBT QL %",
-    "NBT Mth %",
-
-    // Event entity output
-    "eventCount S1", // Only included for Run 3/4
-    "eventCount S2" // Only included for Run 3/4
- ]    
-    \end{minted}
-    \caption[2-way-join map output]{\textbf{Figure \ref{grades-join-demographics-output}: Output of map function for grades joined with demographics.} This list, shown as a JavaScript array, is the key to the map function output. In other words, the map function outputs a list of values that correspond to this list. When retrieving the view output, headers can be given back to the columns retrieved using this key. View output can be achieved via a List function (as has been done in this project), or via bespoke JavaScript code.}
-    \label{grades-join-demographics-output}
-\end{figure}
-
-% Runs
-\input{6-analysis/2-join-runs}
-
-\section{join of Grades/Demographics/Events}
-
-% Runs
-\input{6-analysis/3-join-runs}

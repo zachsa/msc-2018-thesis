@@ -25,6 +25,8 @@ Although conceptually it's possible to produce composite return structures via C
 
 This is unlike other implementations of MapReduce, for example for Hadoop, where MapReduce tasks may comprise 'pipelines' of multiple map and reduce phases (contracts of these functions are defined by users), where composite return structures are acceptable output for map and reduce functions, and where data storage structures are not optimized for specific results.
 
+todo: mentione compound keys and grouping levels
+
 \subsubsection{The Reduce Function Contract}
 It makes sense to define precisely what the contract for reduce functions is at this point. All CouchDB reduce functions accept three arguments as summarized in \cite{reduceFunctions}. These are:
 

@@ -1,3 +1,30 @@
+\begin{figure}[ht]
+    \centering
+    \begin{minted}{javascript}
+ [
+    // Grade Entitty output
+    "CSC1015F %",
+
+    // Demographic Entity output
+    "Gr12 Eng %", 
+    "Gr12 Sci %",
+    "Gr12 Mth %",
+    "Gr12 Mth Lit %",
+    "Gr12 Mth Adv %",
+    "NBT AL %",
+    "NBT QL %",
+    "NBT Mth %",
+
+    // Event entity output
+    "eventCount S1", // Only included for Result 3/4
+    "eventCount S2" // Only included for Result 3/4
+ ]    
+    \end{minted}
+    \caption[2-way-join map output]{\textbf{Figure \ref{grades-join-demographics-output}: Output of map function for grades joined with demographics.} This list, shown as a JavaScript array, is the key to the map function output. In other words, the map function outputs a list of values that correspond to this list. When retrieving the view output, headers can be given back to the columns retrieved using this key. View output can be achieved via a List function (as has been done in this project), or via bespoke JavaScript code.}
+    \label{grades-join-demographics-output}
+\end{figure}
+
+
 \begin{table}[h]
     \begin{threeparttable}
         \textbf{Table \ref{performance-analysis}}\par\medskip\par\medskip
@@ -30,18 +57,3 @@
     \end{threeparttable}
 \end{table}
 
-todo: views have to be recalculated in individual design documents
-
-
-
-\begin{table}[]
-    \centering
-    \caption{CouchDB MapReduce index calculation time. For all cases, \textit{n} = 1 (shard copies), with variable \textit{q} (number of) shards and variables cluster size.}
-    \label{couch-indexing}
-    \begin{tabular}{cccc}
-                       & Single node & 3 node cluster & 6 node cluster \\ \hline
-        \textit{q} = 1 & 1           & 1              & 1              \\
-        \textit{q} = 3 & 1           & 1              & 1              \\
-        \textit{q} = 8 & 1           & 1              & 1              \\ \hline
-    \end{tabular}
-\end{table}
