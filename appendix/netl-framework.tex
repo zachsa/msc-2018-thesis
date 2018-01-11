@@ -1,6 +1,4 @@
-\section{\textit{nETL} Framework}
-
-\subsection*{API}
+\section{API}
 \label{appendix:netl-main}
 \begin{minted}{javascript}
 module.exports = function() {
@@ -20,7 +18,7 @@ module.exports = function() {
 };
 \end{minted}
 
-\subsection{Managing Async Tasks}
+\section{TaskManager}
 \label{appendix:netl-taskmanager}
 \begin{minted}{javascript}
 function TaskManager(extractions, transformations, loads) {
@@ -32,7 +30,7 @@ function TaskManager(extractions, transformations, loads) {
 TaskManager.prototype.newTask = function(task) { /* ... */ };
 \end{minted}
 
-\subsubsection{Extracting data}
+\section{Extracting data}
 \label{appendix:netl-extraction}
 \begin{minted}{javascript}
 /**
@@ -64,7 +62,7 @@ var lineReader = _readLines();
 var batch = getBatch.next();
 \end{minted}
 
-\subsection{Recursive ETL Engine}
+\section{Recursive ETL Engine}
 \label{appendix:netl-engine}
 \begin{minted}{javascript}
 (function doEtlTask(self) {
@@ -88,7 +86,7 @@ var batch = getBatch.next();
 })();
 \end{minted}
 
-\subsection{Loading data}
+\section{Loading data}
 \label{appendix:netl-loading}
 \begin{minted}{javascript}
 // Load the module into memory
