@@ -1,4 +1,4 @@
-\subsection{Result 3}
+\section{Result 3}
 Building on the Result 1 analysis, an additional entity - Sakai presence events - was taken into account, requiring configuration adjustments of nETL and CouchDB to aggregate across three entities instead of two entities. This analysis looks at the relationship between student benchmarks in the FU data and resultant course grades as a factor of Sakai usage. In other words, this analysis addresses the question of whether making more frequent use of the Sakai platform is shown to increase course performance for CSC1015F. However, the Sakai data - measured as presence events - cannot be associated with particular courses. As such the analysis takes into account only ``general usage'' of the Sakai LMS, and not usage of Sakai for these particular courses.
 
 The nETL task configurations to load Grade data and FU data into CouchDB are mostly the same as the task configurations as used to achieve Result 1, except that Grade data is filtered to only include course results from 2016 via whitelisting (since Event data is only for 2016). A 3rd task is added to the configuration object to load the Event data into CouchDB. Configuration for nETL and CouchDB Map and List functions is included in the appendix (see \ref{netl-run3-config}, \ref{result-3-map} and \ref{result-3-list} respectively).
@@ -13,9 +13,8 @@ The nETL task configurations to load Grade data and FU data into CouchDB are mos
     \item Each batch is loaded into CouchDB using the \textit{\_bulk\_docs} endpoint (as discussed previously), and the next batch is extracted on a success message from CouchDB
 \end{enumerate}
 
-
 \subsection*{The MapReduce function}
-TODO
+Compared to the function logic illustrated in \ref{result-1-map-fn}, an additional logical branch is required to handle Event data. This is shown in \ref{result-3-map-fn}.
 
 \begin{figure}[ht]
     \centering
@@ -28,4 +27,4 @@ TODO
 \end{figure}
 
 \subsection*{The List function}
-TODO
+Compared to the List function used to translate the index JSON output to CSV output, minor changes are implemented to handle the two additional fields in the values of the map function output. The function is included in the appendix for reference (see \ref{result-3-list})
