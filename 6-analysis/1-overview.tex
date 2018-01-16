@@ -50,3 +50,56 @@ Analyses are conducted in an iterative fashion; with each iteration an increasin
     \end{threeparttable}
 \end{table}
 
+todo:
+
+Hi Sonia.
+
+I’m looking at the two approaches to using MapReduce to aggregate data across different entities in CouchDB.
+
+A bit about how view are produced in CouchDB:
+CouchDB iterates through the docs, and runs the map function on every document, which the user configures to ‘emit’ values. For my function, the emitted value is a tuple with 11 indexes, with every value initialized at 0. So it’s this: [0,0,0,0,0,0,0,0,0,0,0]. Then depending on the document being processed by the map function, values at different indexes are changed.
+
+i.e. if the document being processed by the map function is a ‘grade’ document, then the map function adjusts the value tuple to emit the grade percent – i.e. [percent, 0,0,0,0,0,0,0,0,0,0]. Or if the document is of type ‘demographic’, the map function changes the values at indexes 2 through 9 and emits the value: [0, x,x,x,x,x,x,x,x, 0, 0]. If the document is of type ‘event’, then the map function alters the value at indexes 9 and 10. i.e. [0,0,0,0,0,0,0,0, s1Event, s2Event] (s1Event is 1 for first semester event, or 0 for second semester, etc.).
+
+And as you recommended, the keys are always emitted as [student id, course, year] for grade document, [student id, ‘a’, 1] for demographic documents, and [student id, ‘a’, year] for event documents.
+
+But then I can never group the different document types for a student id. Instead I’m guaranteed that all documents for a single student are ‘next’ to each other and I can join them from iteration as a result. i.e. this is the result of the map function for a single student for 2 courses
+
+    [smtzac002, ‘a’, 1]: [0, b1, b2, b3, b4, b5, b6, b7, b8, 0, 0]
+[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+[smtzac002, ‘CSC1015F’, 2016]: [98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[smtzac002, ‘MAM100F, 2016]: [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+Then the reduce function is only necessary to aggregate the event data (which will all have the same key). The result is something like this:
+
+[smtzac002, ‘a’, 1]: [0, b1, b2, b3, b4, b5, b6, b7, b8, 0, 0]
+[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3]
+[smtzac002, ‘CSC1015F’, 2016]: [98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[smtzac002, ‘MAM100F, 2016]: [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+(although the structure of the reduce output is a little different to this, the information is the same)
+
+Then the actual aggregation is done on retrieval. So it would be better to do the actual aggregation in nETL then.
+
+Is that ok? But this means that the importance of the reduce function is greatly diminished. So effectively I’m using CouchDB to order the information in the CSV, and nothing more really…
+
+Alternatively, what I did was this:
+[smtzac002, ‘x’, y]: [0, b1, b2, b3, b4, b5, b6, b7, b8, 0, 0] // this document is emitted twice: where x = CSC1015F, and then when x = MAM100F. y = 2016 (since only one year is analyzed)
+[smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] // emitted for x = CSC1015F and x = MAM100F
+    [smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] // emitted for x = CSC1015F and x = MAM100F
+    [smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] // emitted for x = CSC1015F and x = MAM100F
+    [smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] // emitted for x = CSC1015F and x = MAM100F
+    [smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] // emitted for x = CSC1015F and x = MAM100F
+    [smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] // emitted for x = CSC1015F and x = MAM100F
+    [smtzac002, ‘CSC1015F’, 2016]: [98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] // emitted once
+    [smtzac002, ‘MAM100F, 2016]: [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] // emitted once
+
+
+So then the result of the reduce function is an aggregation already. BUT. If I am analyzing 40 courses, then every single event is emitted 40 times. And if I were analyzing multiple years, then every event would be emitted 40 times for each year (so 120 times for 3 years). Obviously this is not scalable.
+
+Should I include the fact that I tried this approach in the write up? It seems like more a mistake than anything else in hindsite. I would prefer to just write up the steps to creating a correct and concise result.
