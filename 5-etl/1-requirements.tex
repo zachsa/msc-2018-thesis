@@ -1,4 +1,5 @@
-\section{Overview}
+
+\section{Requirements}
 \textit{nETL} (node.js ETL) was developed as a means of transferring a large amount of data to CouchDB from a flatfile (for example, a CSV); there is no officially released software of this type, so working directly in code is required to achieve this - unlike for RDBMSs where there is a plethora of software available for this task. I am most familiar with SSIS (now known as SSDT). which is largely on which \textit{nETL} is based.
 
 CouchDB stores documents as JSONs, so the \textit{nETL} application takes batches of CSV (or any other type of flatfile) rows, converts each CSV lines into a JSON document and sends batches of JSON documents to CouchDB's \textit{\_bulk\_docs} endpoint. This endpoint allows for sending multiple JSON documents to CouchDB via a single request (by default such inserts are non-atomic, though this is configurable). Batch sizes for \textit{nETL} are configurable; it was found that from a practical point of view both \textit{nETL} and CouchDB were easily able to handle batches of 100 000 lines or more. Smaller batches (\textless 50 000 lines) allow for more frequent user feedback in the form of log output. Taking network speed into account, useful batch sizes are around 10 000 documents in size.

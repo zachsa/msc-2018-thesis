@@ -1,0 +1,83 @@
+Working with data exports requires an ETL (Extraction, Transformation, and Loading) process, in which information stored in tabular form in the CSV files is loaded into computer memory, transformed into JSON-structured objects, and then inserted into CouchDB where it is persisted and then retrieved for analysis. Extraction is fairly straightforward; a variable is created in memory to reference the row of the CSV that contains table headers (usually the first row of the CSV). This row is then split by a column delimiter into a tuple of the form [val 1, val 2, val 3, etc]. Then all the remaining rows of the CSV are loaded into memory in turn and split into tuples according to a column delimiter, resulting in a tuple of the same length as the headers: [val 1, val 2, val 3, etc]. The resultant data is a 2 dimensional matrix: traversing D1 equates to an iteration over rows, and traversing D2 equates to an iteration over columns.
+
+Transformation involves a translation of rows as accessed via the D2 dimension into objects; values in the header tuple align exactly with values in the row tuples via matching indexes. As such it is easy to convert ordered row tuples into unordered collections of key:value pairs (objects) since a value in a row tuples at an index (i), has a corresponding key in the header tuple at index = i. Further transformations can then be applied to the resultant object before being loaded into CouchDB. As an optimization of the ETL process, extraction, transformation and loading operations are performed sequentially instead of in distinct phases. This allows for iteratively processing CSV data of unlimited size, since the whole file is never loaded into memory as would be required if all data was extracted before transformations were applied, followed by a loading process.
+
+In addition to the transformation from tabular rows to objects, specific transformations of the objects are required prior to loading the data to CouchDB. Required transformations used to produce the final results in this project are listed here:
+
+\begin{enumerate}
+    \item Filtering (both by whitelisting objects and whitelisting object fields) to reduce CouchDBs footprint and reduce indexing computational cost
+    \item Adding a `type' attribute to each object for entity classification of objects within CouchDB
+\end{enumerate}
+
+Loading data into CouchDB involves an HTTP post request with JSON data in the request body. As a further optimization the ETL process is batched. Several thousand lines are extracted, transformed and loaded into CouchDB at a time using CouchDB's \_bulk\_docs endpoint (as discussed previously CouchDB is able to handle batched data insertion more performantly than insertion of single documents). Batching results in a greatly reduced number of network requests to CouchDB (the main performance overhead in terms of time), and would also greatly limit IO overhead incurred during retrieval of data from the CSV files, since disk reads are utilized more efficiently.
+
+The ETL process is described in terms of coding requirements in pseudo code in Figure \ref{row-object-transformation}, but in terms of implementation, the reality of coding the ETL process is more complicated than is depicted for several reasons as shown here.
+
+\begin{enumerate}
+    \item Variable (but still valid) formatting that CSVs can have in terms of row delimiters, column delimiters, text qualifiers, character encoding, etc. etc.
+    \item Some CSVs don't include a header row, so headers need to be injected into the process during runtime
+    \item Real code is substantially longer than psuedo code in general, due to edge cases and implementation of general statements
+    \item Generic handling of different CSV sources and CoucDB database destinations require configurable extraction, transformation and loading logic
+    \item Generic handling of many different types of transformations that were used during project development but not for the final result (increasing the complexity of the case base):
+          \begin{enumerate}
+              \item Anonymizing object values
+              \item Text transformations of values
+              \item Transformation from objects back to lines (for CSV output)
+              \item Transformation from csv strings to SQL insert strings
+          \end{enumerate}
+    \item During project development, alternatives to CouchDB as load-destinations were required inlcuding for CSV files and SQL Server - as such the code required much adjustment in for these cases.
+\end{enumerate}
+
+Due to the ever-increasing complexity of the code being used for ETL, the codebase was formalized and structured as component-based ETL engine that performed configuration-based tasks. These tasks comprise sequential piping of output to input from one component to another, where components can be added in any order to a flow so long as input and output data contracts are adhered to. These components are user-configurable and implemented externally to the ETL engine, greatly decoupling logic of individual ETL components. This software is implemented in JavaScript (node.js), and is called \textit{nETL} (node.js ETL).
+
+\begin{figure}[H]
+    \centering
+    \begin{mdframed}
+        \centering
+        \begin{lstlisting}
+// Extract the headers of the CSV file, and keep reference in memory throughout ETL process
+file = loadFile('path')
+headers = getFirstCsvRow(file)
+headers = splitByColumnDelimiter() // ([val 1, val 2, val 3, etc])
+
+// Helper function to reduce code repetition
+function getObjectsFromCSV(file, pStart, pEnd) {
+    fileBuffer = file(pStart, pEnd)
+    rows = fileBuffer.splitIntoRows() // [row1, row2, row3, etc]
+    objects = []
+    for (j = 1; j <= rows.length; j++) {
+        row = row[j].splitByColDelim() // [val1, val2, val3, etc]
+        object = {}
+        for (k = 1; k <= row.length; k++) {
+            key = headers[k]
+            val = row[k]
+            object[key] = val
+        }
+        object = whitelistObject(object)
+        object = whitelistObjectFields(object)
+        object = addTypeField(object)
+
+        objects.push(object) $f(x)=ax^2+bx+c$
+    }
+    return objects
+}
+
+// Do ET & L
+batchSize = 65000
+pointerStart = startOfNonHeaderRow()
+for (i = pointerStart; i <= file.length; i += batchSize) {
+    pointerStart = i
+    pointerEnd = i + batchSize
+    objects = getObjectsFromCSV(file, pointerStart, pointerEnd)
+    insertToCouchDB(objects)
+}
+
+// Handle remaining part of file
+pointerEnd = fileSize
+objects = getObjectsFromCSV(file, pointerStart, pointerEnd)
+insertToCouchDB(objects)
+        \end{lstlisting}
+    \end{mdframed}
+    \caption[Row to object transformation]{\textbf{Figure \ref{row-object-transformation}: Algorithm to transform CSV rows to object.}}
+    \label{row-object-transformation}
+\end{figure}

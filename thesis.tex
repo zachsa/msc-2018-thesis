@@ -44,6 +44,12 @@
 \setlist{nosep} % or \setlist{noitemsep} to leave space around whole list
 
 % Tables & figures
+\usepackage{listings}
+\lstset{
+    basicstyle=\fontsize{11}{13}\selectfont\ttfamily,
+    mathescape
+}
+
 \usepackage{multirow}
 \usepackage{array}
 \usepackage{mdframed}
@@ -133,20 +139,20 @@
 \input{3-background/3-couchdb-api}
 \input{3-background/4-edm}
 
-\chapter{nETL}
-\input{4-netl/1-requirements}
-\input{4-netl/2-design}
-\input{4-netl/3-configuration}
-\input{4-netl/4-couchdb-setup}
-\input{4-netl/5-implementation}
-
 \chapter{Data}
-\input{5-data/1-raw-data}
-\input{5-data/2-applying-netl}
-\input{5-data/tables/events}
-\input{5-data/tables/grades}
-\input{5-data/tables/fu}
-\input{5-data/tables/json-entities}
+\input{4-data/1-raw-data}
+\input{4-data/tables/events}
+\input{4-data/tables/grades}
+\input{4-data/tables/fu}
+\input{4-data/tables/json-entities}
+
+\chapter{ETL}
+\input{5-etl/0-overview}
+\input{5-etl/1-requirements}
+\input{5-etl/2-design}
+\input{5-etl/3-configuration}
+\input{5-etl/4-couchdb-setup}
+\input{5-etl/5-implementation}
 
 \chapter{Analysis}
 \input{6-analysis/1-overview}
