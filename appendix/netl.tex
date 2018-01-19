@@ -1,7 +1,104 @@
-\section{Modules}
-\label{appendix:netl-modules}
+\section{nETL Engine}
+\subsection{Sequential Batch Iterator}
+\label{netl-batch-generator}
+\begin{minted}{javascript}
+const extraction;
+const batches = (function*() {
+    var finished = false;
+    while (!finished) {
+        let data = [];
+        for (let i = 0; i < batchSize; i++) {
+            let datum = extraction.getNext();
+            if (datum.done) {
+                finished = true;
+                break
+            };
+            data.push(datum.value);
+        };
+        log.info("Task : " + key + " : Batch extracted : Batch size : " + data.length);
+        yield data;
+    };
+})();
 
-%  Extractions
+// Iteratively generate next batch
+batch = batches.next();
+\end{minted}
+
+\subsection{TaskManager Constructor}
+\label{netl-taskmanager-constructor}
+\begin{minted}{javascript}
+function TaskManager(e, ts, l) {
+    this.tasks = {};
+    this.extractions = e;
+    this.transformations = ts;
+    this.loads = l;
+};
+TaskManager.prototype.newTask = function(task) { /* ... */ };
+\end{minted}
+
+\subsection{Main Application Module}
+\label{netl-application-module}
+\begin{minted}{javascript}
+(function() {
+    const _extractions = {};
+    const _transformations = {};
+    const _loads = {};        
+    const _taskManager = new TaskManager(_extractions, _transformations, _loads);
+    function _loadExtractionModule(eModule){/* ... */};
+    function _loadTransformationModule(tModule){/* ... */};
+    function _loadLoadModule(lModule){/* ... */};
+    return {
+        taskManager: _taskManager,
+        loadExtractionModule: _loadExtractionModule,
+        loadTransformationModule: _loadTransformationModule,
+        loadLoadModule: _loadLoadModule
+    };
+})();
+\end{minted}
+
+
+\subsection{Recursive ETL Iteration}
+\label{netl-recursive-iterator}
+\begin{minted}{javascript}
+const batches; // Assigned elsewhere
+const transformations; // Assigned elsewhere
+const load; // Assigned elsewhere
+(function doEtlTask(self) {
+    var payload = [];
+
+    // Extract next batch
+    batch = batches.next();
+    if (!batch.done) {
+        batch = batch.value;
+        self.tasks[key]._itemsExtracted += batch.length;
+        batch.forEach(function(item) {
+
+            // Do transformations
+            transformations.forEach(function(t) {
+                item = t.transform(item);
+            });
+            if (item && item !== {}) payload.push(item);
+        });
+
+        // Load to destination
+        load.batch(payload)
+            .then(function(msg) {
+                doEtlTask(self);
+            });
+    } else {
+        // .. Handle end of task execution
+    };
+})(this); // Bound to TaskManager instance context
+\end{minted}
+
+\section{Extraction, Transformation, Load Modules}
+\label{netl-modules}
+
+\subsection{Loading a Module}
+\label{netl-module-loading}
+
+
+
 \subsection{FLATFILE}
 \label{netl-extract-flatfile}
 \begin{minted}{javascript}

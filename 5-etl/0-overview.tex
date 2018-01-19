@@ -1,6 +1,8 @@
-Working with data exports requires an ETL (Extraction, Transformation, and Loading) process, in which information stored in tabular form in the CSV files is loaded into computer memory, transformed into JSON-structured objects, and then inserted into CouchDB where it is persisted and then retrieved for analysis. Extraction is fairly straightforward; a variable is created in memory to reference the row of the CSV that contains table headers (usually the first row of the CSV). This row is then split by a column delimiter into a tuple of the form [val 1, val 2, val 3, etc]. Then all the remaining rows of the CSV are loaded into memory in turn and split into tuples according to a column delimiter, resulting in a tuple of the same length as the headers: [val 1, val 2, val 3, etc]. The resultant data is a 2 dimensional matrix: traversing D1 equates to an iteration over rows, and traversing D2 equates to an iteration over columns.
+Working with data exports requires an ETL (Extraction, Transformation, and Loading) process, in which information stored in tabular form in the CSV files is loaded into computer memory, transformed into JSON-structured objects, and then inserted into CouchDB. Once persisted, data interactions in terms of producing analyses becomes a flexible and agile process with room for creative insight since the cumbersome work of extracting and transforming data into a suitable format for querying does not have to to repeated
 
-Transformation involves a translation of rows as accessed via the D2 dimension into objects; values in the header tuple align exactly with values in the row tuples via matching indexes. As such it is easy to convert ordered row tuples into unordered collections of key:value pairs (objects) since a value in a row tuples at an index (i), has a corresponding key in the header tuple at index = i. Further transformations can then be applied to the resultant object before being loaded into CouchDB. As an optimization of the ETL process, extraction, transformation and loading operations are performed sequentially instead of in distinct phases. This allows for iteratively processing CSV data of unlimited size, since the whole file is never loaded into memory as would be required if all data was extracted before transformations were applied, followed by a loading process.
+Extraction is fairly straightforward; a variable is created in memory to reference the row of the CSV that contains table headers (usually the first row of the CSV). This row is then split by a column delimiter into a tuple of the form [val 1, val 2, val 3, etc]. Then all the remaining rows of the CSV are iteratively loaded into memory in turn, and split into tuples according to a column delimiter. The result of this is iteratively producing a tuple of the same length and form as the header tuple ([val 1, val 2, val 3, etc]) for every row of data. Each row of data can then be manipulated to with each value in the row tuple corresponding to a value in the header tuple at the same index. By grouping the values of the header and row tuple by index, it is easy to convert CSV rows into unordered collections of key:value pairs (objects)
+
+Further transformations can then be applied to the resultant object before being loaded into CouchDB, completing a sequential processing of a single row of CSV data via first extracting information, transforming information, and loading information into the destination (ETL).
 
 In addition to the transformation from tabular rows to objects, specific transformations of the objects are required prior to loading the data to CouchDB. Required transformations used to produce the final results in this project are listed here:
 
@@ -9,7 +11,7 @@ In addition to the transformation from tabular rows to objects, specific transfo
     \item Adding a `type' attribute to each object for entity classification of objects within CouchDB
 \end{enumerate}
 
-Loading data into CouchDB involves an HTTP post request with JSON data in the request body. As a further optimization the ETL process is batched. Several thousand lines are extracted, transformed and loaded into CouchDB at a time using CouchDB's \_bulk\_docs endpoint (as discussed previously CouchDB is able to handle batched data insertion more performantly than insertion of single documents). Batching results in a greatly reduced number of network requests to CouchDB (the main performance overhead in terms of time), and would also greatly limit IO overhead incurred during retrieval of data from the CSV files, since disk reads are utilized more efficiently.
+Loading data into CouchDB involves an HTTP post request with JSON data in the request body. To optimize the ETL process, instead of processing CSVs line-by-line, CSV lines are batched and processed several thousand at a time. As discussed previously, CouchDB is able to handle batched data insertion more performantly than insertion of single documents via the \_bulk\_docs endpoint), and this approach also greatly reduces the number of network requests to CouchDB required to complete loading of all CSV data (which could be expensive in time if ETL was done on a different computer to the CouchDB database software). Batching is also done during CSV file reading to reduce IO overhead since fewer disk reads are required as the percentage of data retrieved per disk read (the batch) increases.
 
 The ETL process is described in terms of coding requirements in pseudo code in Figure \ref{row-object-transformation}, but in terms of implementation, the reality of coding the ETL process is more complicated than is depicted for several reasons as shown here.
 
@@ -28,7 +30,7 @@ The ETL process is described in terms of coding requirements in pseudo code in F
     \item During project development, alternatives to CouchDB as load-destinations were required inlcuding for CSV files and SQL Server - as such the code required much adjustment in for these cases.
 \end{enumerate}
 
-Due to the ever-increasing complexity of the code being used for ETL, the codebase was formalized and structured as component-based ETL engine that performed configuration-based tasks. These tasks comprise sequential piping of output to input from one component to another, where components can be added in any order to a flow so long as input and output data contracts are adhered to. These components are user-configurable and implemented externally to the ETL engine, greatly decoupling logic of individual ETL components. This software is implemented in JavaScript (node.js), and is called \textit{nETL} (node.js ETL).
+Due to the ever-increasing complexity of the code being used for ETL, the codebase was formalized and structured as a component-based ETL engine that performed ETL tasks based on independent and external configuration objects. These tasks comprise sequential piping of output from one component to input of another component. By providing input/output data contracts, components can be strung together in any order, allowing for versatile and configurable ETL pipelines. By implementing the components as user-configurable, external processes to the ETL engine, specific logic required to process specific information is greatly decoupled from the logic required to extract, transform and load information as a series of high level tasks. The resultant software to achieve this task is implemented in JavaScript (node.js), and is called \textit{nETL} (node.js ETL).
 
 \begin{figure}[H]
     \centering
@@ -40,7 +42,7 @@ file = loadFile('path')
 headers = getFirstCsvRow(file)
 headers = splitByColumnDelimiter() // ([val 1, val 2, val 3, etc])
 
-// Helper function to reduce code repetition
+// Helper function convert CSV lines to objects
 function getObjectsFromCSV(file, pStart, pEnd) {
     fileBuffer = file(pStart, pEnd)
     rows = fileBuffer.splitIntoRows() // [row1, row2, row3, etc]
@@ -57,7 +59,7 @@ function getObjectsFromCSV(file, pStart, pEnd) {
         object = whitelistObjectFields(object)
         object = addTypeField(object)
 
-        objects.push(object) $f(x)=ax^2+bx+c$
+        objects.push(object) Should I analysis the algorithm? $f(x)=ax^2+bx+c$
     }
     return objects
 }
