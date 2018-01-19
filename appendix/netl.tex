@@ -96,7 +96,31 @@ const load; // Assigned elsewhere
 
 \subsection{Loading a Module}
 \label{netl-module-loading}
-
+\begin{minted}{javascript}
+// Load the module into memory
+memoryObject[userModule.name] = userModule.exe;
+// Invoke the module's closure
+var loadedModule = memoryObject[userModule.Name].call(userModule);
+// Genrate batch from extraction module
+var batch = loadedModule.getNext()
+// Do transformations on batch
+batch = loadedModule.transform(batch);
+// Load transformed batch
+load.batch(batch).then(function(msg) {}).catch(function(msg) {});
+// An example userModule (an extraction module)
+userModule = (function() {
+    function exe(configurationObj) {
+        function getNext() { /* ... */};
+        return {
+            getNext: getNext
+        };
+    };
+    return {
+        name: "MODULE_NAME",
+        exe: exe
+    };
+})();
+\end{minted}
 
 
 \subsection{FLATFILE}

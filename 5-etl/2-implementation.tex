@@ -1,0 +1,6 @@
+\section{Setup \& Implementation}
+Running nETL requires an installation of node.js V8.9.0 +, which should include an installation of npm. After cloning the netl repository from Github to a local drive, dependencies should be restored using the npm CLI tool. Additionally, the directory $C:\log$ needs to be created, and then the nETL app can be started from a terminal. Once the CLI is running, typing anything into the terminal and pressing enter outputs help where further direction can be obtained.
+
+In conjunction with setting up nETL, a CouchDB server needs to be configure. This is easy to do on Windows machines - simply download the executable from apache.org and use the installer. Once installed the server should be run in single node configuration, binded to the 127.0.0.1 address. This allows access to the CouchDB UI via the browser at the address: http://127.0.0.1:5985/\_utils, where first an admin user should be created followed by the database destination.
+
+With nETL installed and CouchDB server running, configuration files, structured as JSON should be authored and then run by nETL using the CLI tool. All nETL configuration files used for this project are available in the appendix (see \ref{netl-configuration}).
