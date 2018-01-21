@@ -3,12 +3,12 @@ CouchDB falls under the very general classification of ``NoSQL'' (\textit{N}ot \
 
 But despite different storage models, conceptual requirements of data-persistence - such as well known \textit{ACID} properties are applicable to all database systems. \textit{ACID} properties provide certain guarantees required within a system to reliably persist information. Without such guarantees a database would not be useful since the integrity of any information stored in such a system would be questionable. In terms of the CouchDB software \textit{ACID} properties are applicable at the \textit{document} level meaning that interactions with single documents are either successful or not; a partial document could not be written nor read. In general terms \textit{ACID} properties stand for the following:
 
-\begin{enumerate}
+\begin{itemize}
     \item \textit{A}tomicity: a series of operations part of the same logical transaction should either pass or fail completely
     \item \textit{C}onsistency: building on the concept of atomicity, the result of a single logical transaction should leave the database in a working and valid state
     \item \textit{I}solation: transactions on a database are self contained and don't interact with each other
     \item \textit{D}urability: data is persisted permanently and reliably as a result of isolated transactions that leave the database in a consistent state due to their atomicity in nature
-\end{enumerate}
+\end{itemize}
 
 CouchDB serializes document interactions to guarantee isolation, document writes are guaranteed to be durable and result in a consistent database. In other words, in working with CouchDB, transactions involving single documents are completely reliable and fault tolerant, but transactions involving retrieving and storing information from multiple documents are not. Single-document \textit{ACID} guarantees make multistep transactions in CouchDB more difficult. "Multi-step transactional atomicity" is a key feature for many RDBMSs including \textit{MySQL}, \textit{SQL Server}, etc. and overcoming this limitation is something that is required in order to implement NoSQL databases in traditional RDBMS environments. This is possible, as shown by \cite{Rashmi2017} for CouchDB specifically and NoSQL in general \cite{LOTFY2016133} via implementing \textit{ACID}/transactional properties as bespoke middleware externally to these DBSs. But it would seem this is not an ideal alternative to systems where RDBMS-specific features are required! This is a trade-off that CouchDB (and other NoSQL) databases make in favor of less rigorous data models that are suitable for use-cases that RDBMSs are not.
 
@@ -21,10 +21,10 @@ Because of the potential for inconsistency, CouchDB seeks to provide a 'relaxed'
 \subsection{Entity Modeling}
 Despite moving away from the relational model as provided by RDBMSs, the concept of 'entities' is usually still highly relevant in many NoSQL databases; these database can, as such, be grouped into two categories \cite{fowlerAggregate}:
 
-\begin{enumerate}
+\begin{itemize}
     \item \textit{aggregate orientated} stores that model data similarly to the relational model but with isolated entity boundaries and
     \item \textit{aggregate ignorant} stores where the concept of entities is fundamentally different (e.g. a graph database such as \textit{Neo4J} where the entities are edges and nodes)
-\end{enumerate}
+\end{itemize}
 
 The vast majority of databases operate within a domain where data is (for the most part) entity-driven. As \cite{GANESHCHANDRA201513} points out there are hundreds of NoSQL data stores and a comprehensive categorization of such products is not sensible, but familiar examples within the family of \textit{aggregate orientated} NoSQL databases include \textit{key/value} stores such such as Amazon's \textit{Dynamo} database, column based stores such as \textit{Cassandra}, \textit{HBase} and document stores such as \textit{CouchDB}, \textit{Mongo}.
 

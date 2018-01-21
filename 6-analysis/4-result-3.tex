@@ -4,14 +4,14 @@ Building on the Result 1 analysis, an additional entity - Sakai presence events 
 The nETL task configurations to load Grade data and FU data into CouchDB are mostly the same as the task configurations as used to achieve Result 1, except that Grade data is filtered to only include course results from 2016 via whitelisting (since Event data is only for 2016). A 3rd task is added to the configuration object to load the Event data into CouchDB. Configuration for nETL and CouchDB Map and List functions is included in the appendix (see \ref{netl-run3-config}, \ref{result-3-map} and \ref{result-3-list} respectively).
 
 \subsection*{\textit{nETL} Event data configuration}
-\begin{enumerate}
+\begin{itemize}
     \item Batches of 30 000 lines are extracted iteratively (and sequentially) as an array of lines (30 000 lines per batch seemed to be the sweetspot for what could be loaded into CouchDB's \textit{\_bulk\_docs} endpoint using nETL and still receiving optimal visual feedback in terms of continuous logging)
     \item Within each batch, each line is converted to a JSON object, transforming the batch into an array of objects. These objects each have the following fields: ``event\_date'', ``event\_id'', ``uct\_id'',  ``site\_key'', ``ref''
     \item The array of objects is filtered via whitelising objects on two fields: 1) ``uct\_id'' - only IDs of students who attended CSC1015F are considered. 2) ``event\_id'' - only the value ``281'' is considered, as these are representative of `presence' events
     \item A field is added to each object in the batch (``type\_'') and give the value ``vulaEvent''
     \item Superfluous object fields are removed via a whitelisting process, resulting in a batch (an array) of objects with the fields: ``event\_date'', ``event\_id'', ``uct\_id'', ``site\_key'', ``type\_''
     \item Each batch is loaded into CouchDB using the \textit{\_bulk\_docs} endpoint (as discussed previously), and the next batch is extracted on a success message from CouchDB
-\end{enumerate}
+\end{itemize}
 
 \subsection*{The MapReduce function}
 Compared to the function logic illustrated in \ref{result-1-map-fn}, an additional logical branch is required to handle Event data. This is shown in \ref{result-3-map-fn}.

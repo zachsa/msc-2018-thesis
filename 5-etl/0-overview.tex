@@ -6,29 +6,29 @@ Further transformations can then be applied to the resultant object before being
 
 In addition to the transformation from tabular rows to objects, specific transformations of the objects are required prior to loading the data to CouchDB. Required transformations used to produce the final results in this project are listed here:
 
-\begin{enumerate}
+\begin{itemize}
     \item Filtering (both by whitelisting objects and whitelisting object fields) to reduce CouchDBs footprint and reduce indexing computational cost
     \item Adding a `type' attribute to each object for entity classification of objects within CouchDB
-\end{enumerate}
+\end{itemize}
 
 Loading data into CouchDB involves an HTTP post request with JSON data in the request body. To optimize the ETL process, instead of processing CSVs line-by-line, CSV lines are batched and processed several thousand at a time. As discussed previously, CouchDB is able to handle batched data insertion more performantly than insertion of single documents via the \_bulk\_docs endpoint), and this approach also greatly reduces the number of network requests to CouchDB required to complete loading of all CSV data (which could be expensive in time if ETL was done on a different computer to the CouchDB database software). Batching is also done during CSV file reading to reduce IO overhead since fewer disk reads are required as the percentage of data retrieved per disk read (the batch) increases.
 
 The ETL process is described in terms of coding requirements in pseudo code in Figure \ref{row-object-transformation}, but in terms of implementation, the reality of coding the ETL process is more complicated than is depicted for several reasons as shown here.
 
-\begin{enumerate}
+\begin{itemize}
     \item Variable (but still valid) formatting that CSVs can have in terms of row delimiters, column delimiters, text qualifiers, character encoding, etc. etc.
     \item Some CSVs don't include a header row, so headers need to be injected into the process during runtime
     \item Real code is substantially longer than psuedo code in general, due to edge cases and implementation of general statements
     \item Generic handling of different CSV sources and CoucDB database destinations require configurable extraction, transformation and loading logic
     \item Generic handling of many different types of transformations that were used during project development but not for the final result (increasing the complexity of the case base):
-          \begin{enumerate}
+          \begin{itemize}
               \item Anonymizing object values
               \item Text transformations of values
               \item Transformation from objects back to lines (for CSV output)
               \item Transformation from csv strings to SQL insert strings
-          \end{enumerate}
+          \end{itemize}
     \item During project development, alternatives to CouchDB as load-destinations were required inlcuding for CSV files and SQL Server - as such the code required much adjustment in for these cases.
-\end{enumerate}
+\end{itemize}
 
 Due to the ever-increasing complexity of the code being used for ETL, the codebase was formalized and structured as a component-based ETL engine that performed ETL tasks based on independent and external configuration objects. These tasks comprise sequential piping of output from one component to input of another component. By providing input/output data contracts, components can be strung together in any order, allowing for versatile and configurable ETL pipelines. By implementing the components as user-configurable, external processes to the ETL engine, specific logic required to process specific information is greatly decoupled from the logic required to extract, transform and load information as a series of high level tasks. The resultant software to achieve this task is implemented in JavaScript (node.js), and is called \textit{nETL} (node.js ETL).
 

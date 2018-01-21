@@ -17,12 +17,12 @@ E, T, and L operations consist of JavaScript modules (JavaScript modules are exe
 
 Figure \ref{nETL} shows a potential architecture for a configurable component-based ETL tool, including both the application framework and the E, T, and L operations components. JavaScript is a suitable language to prototype this application for a number of reasons:
 
-\begin{enumerate}
+\begin{itemize}
     \item It has a very succinct API making it fast to write code in (i.e. it is a highly abstracted language similarly to Ruby or Python)
     \item But unlike Ruby or Python (and other high level languages), it is opinionated in that it handles IO asynchronously by default
     \item The \textit{JavaScript} implementation of object-orientation is appealing (to some developers at least)
     \item And working and learning \textit{JavaScript} is very much in line with the spirit of CouchDB and the web in general
-\end{enumerate}
+\end{itemize}
 
 \subsection{Application Module}
 The taskManager object is a simple JavaScript constructor, invoked once on app startup. The resultant object is reference by the main application and made available to the CLI user via closure as is typical when using the JavaScript module patterns. This patterns involves execution of a function and returning references to variables scoped within the function. Since these references remain after function execution the JavaScript garbage collector ignores them. But since they are scoped to the original function call they are private to the referenced return object (JavaScript-eque namespacing). An example of the Application module, instantiation of the taskManager singleton and the \textit{TaskManager} constructor itself is included in the appendix (see \ref{netl-application-module} and \ref{netl-taskmanager-constructor}).

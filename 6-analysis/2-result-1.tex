@@ -4,24 +4,24 @@ Assessing the relationship between student benchmarks and CSC1015F grades for al
 Runtime statistics as shown in Figure \ref{performance-analysis} show that both nETL and CouchDB handle this analysis with ease, with a minimal CouchDB footprint (both for the data file and index file), and very quick running times for the nETL tasks and CouchDB index calculation.
 
 \subsection*{\textit{nETL} Grade data configuration}
-\begin{enumerate}
+\begin{itemize}
     \item Batches of 10 000 lines are extracted iteratively (and sequentially) as an array of lines
     \item Within each batch, each line is converted to a JSON object, transforming the batch into an array of objects. These objects each have the following fields: ``DownloadedDate'', ``RegAcadYear'', ``RegTerm'', ``anonIDnew'', ``RegProgram'', ``RegCareer'', ``Degree'', ``DegreeDescr'', ``Subject'', ``Catalog.'', ``Course'', ``CourseSuffix'', ``Session'', ``Percent'', ``Symbol'', ``UnitsTaken'', ``CourseID'', ``CourseDescr'', ``CourseCareer'', ``Faculty'', ``Dept'', ``MaximumCrseUnits'', ``CourseCount'', ``CourseLevel'', ``CESM'', ``Sub-CESM''
     \item The array of objects is filtered via whitelising objects on two fields: 1) ``RegCareer'' - only the value ``UGRD'' is considered. 2) ``Course'' - only the value ``CSC1015F'' is considered. As a result the resultant array (the batch) contains a reduced number of objects
     \item A field is added to each object in the batch (``type\_'') and give the value ``courseGrade'' (this allows for logically tracking the type of entity that each document represents)
     \item Superfluous object fields are removed via a whitelisting process, resulting in a batch (an array) of objects with the fields: ``type\_'', ``Course'', ``RegAcadYear'', ``anonIDnew'', ``Percent''
     \item Each batch is loaded into CouchDB using the \textit{\_bulk\_docs} endpoint (as discussed previously), and the next batch is extracted on a success message from CouchDB
-\end{enumerate}
+\end{itemize}
 
 \subsection*{\textit{nETL} FU data configuration}
-\begin{enumerate}
+\begin{itemize}
     \item Batches of 10 000 lines are extracted iteratively (and sequentially) as an array of lines
     \item Within each batch, each line is converted to a JSON object, transforming the batch into an array of objects. These objects each have the following fields: ``anonIDnew'', ``Career'', ``Citizenship Residency'', ``SA School'', ``Eng Grd12 Fin Rslt'', ``Math Grd12 Fin Rslt'', ``Mth Lit Grd12 Fin Rslt'', ``Adv Mth Grd12 Fin Rslt'', ``Phy Sci Grd12 Fin Rslt'', ``NBT AL Score'', ``NBT QL Score'', ``NBT Math Score'', ``RegAcadYear''
     \item The array of objects is filtered via whitelising objects on three fields: 1) ``Career'' - the values ``UGRD'', ``First Year'', ``Second Year'', and ``Third Year'' are considered. 2) ``Citizenship Residency'' - the values ``SA Citizen'', ``Permanent Resident'', ``C'', ``P'' are considered. 3) ``anonIDnew'' - a list of student Ids for students that attended CSC1015F at any time during their undergraduate careers. This list was prepared manually for the purposes of this project
     \item A field is added to each object in the batch (``type\_'') and give the value ``demographic'' (this data is actually a subset of general demographic data)
     \item Superfluous object fields are removed via a whitelisting process, resulting in a batch (an array) of objects with the fields: type\_'', ``anonIDnew'', ``Eng Grd12 Fin Rslt'', ``Math Grd12 Fin Rslt'', ``Mth Lit Grd12 Fin Rslt'', ``Adv Mth Grd12 Fin Rslt'', ``Phy Sci Grd12 Fin Rslt'', ``NBT AL Score'', ``NBT QL Score'', ``NBT Math Score'', ``RegAcadYear''
     \item Each batch is loaded into CouchDB using the \textit{\_bulk\_docs} and the next batch extracted
-\end{enumerate}
+\end{itemize}
 
 \subsection*{The MapReduce function}
 To maintain the resolution that exists within the Grade data, that is; \textit{results of a particular student in a particular year for a particular course}, the map function is configured to emit a tuple - [studentID, courseCode, year] - for keys. Compound keys are discussed previously, but effectively they allow for a configurable level of grouping values output by the map task. The benefit of emitting compound keys as keys is that different groupings can be taken without recalculation of indexes, but only `exact' grouping was used in this project. Specification for the value output is also a tuple of the form [course \%, Gr12 English \%, Gr12 science \%, Gr12 Math \%, Gr 12 Math Lit \%, Gr12 Adv Math \%, NBT AL \%, NBT QL \%, NBT Math \%].

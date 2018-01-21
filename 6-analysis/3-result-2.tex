@@ -3,10 +3,10 @@ Building on the process used to compile Result 1, the process was expanded to ha
 
 The same source CSV files as used in Result 1 are used for this analysis, with configuration of the \textit{nETL} tasks and CouchDB design document differing only slightly from the configuration to produce Result 1. The configuration files for Result 2 are shown in the appendix (see \ref{netl-run2-config} for ETL configuration, and \ref{result-2-map} and \ref{result-2-list} for CouchDB configuration). The configuration for Result 2 differs only in terms of how FU data and Grade data is filtered. The differences are listed here:
 
-\begin{enumerate}
+\begin{itemize}
     \item FU data is not filtered by student IDs. With the inclusion of 40 courses, the vast majority of students in the FU data would be included in such a filter. Instead of whitelisting students of particular IDs, it's more efficient to blacklist students that don't have results for the specified courses (a student that doesn't have a result for a course didn't take the course and shouldn't be included in the analysis). Blacklisting is applied during retrieval of the calculated MapReduce view by the List function
     \item Grade data is still filtered on the ``Course'' field, but instead of a list of one allowed course (CSC1015F in Result 1), the list includes all 40 allowed courses
     \item The Map function is exactly the same as for Result 1. However, the List function is altered slightly to skip FU data of students that didn't take the specified courses. Such students are identified by having FU document output from the Map function, but no Grade document output. This is easy to test because the b+tree index structure orders keys, so when a key pointing to an FU object exists, but the same key doesn't exist for Grade data, then the student is skipped.
-\end{enumerate}
+\end{itemize}
 
 In terms of performance, there is a substantial increase in the size of the database, and a corresponding increase in the size of the index file. Runtime of the nETL tasks and CouchDB index calculation is still very good. TODO: mention list retrieval constraints if it still exists.

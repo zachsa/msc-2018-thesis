@@ -1,6 +1,17 @@
-\section{Raw Data}
 Three different datasets were acquired for this project. Jane Hendry, UCT's CIO, provided data on first-time undergraduates including demographic information, matric results, and admission-acceptance test results as shown in \ref{tbl-fu}. Stephen Marquard, the Learning Technologies Coordinator from the Center for Innovation in Learning and Teaching at UCT (the CILT) provided data from the Sakai platform LMS (Learning Management Software) including course grades achieved by students (\ref{tbl-sakai-grades}) and student interactions with the LMS (\ref{tbl-sakai-events}). The tables show a listing of the fields provided in the CSV export and a description of the field in terms of a description. All three of these datasets include a student ID field, which was anonymized by Associate Professor Sonia Berman and, in the case of the Sakai interaction data, by Stephen Marquard. The anonymized student ID number field is anonymized consistently across all three datasets, making these datasets relatable and suitable for joining.
 
+\input{4-data/tables/json-entities}
+
+\section{FU Data}
+Demographic data (the \textit{FU} dataset) was includes the years 2014, 2015 and 2016. The schema of this dataset is not consistent across the different years, since in addition the registrant data, a row includes a summary of academic performance at UCT for subsequent years. As a result there were many repeated fields in these datasets and required manual processing before they were of use. Rows from all years of the demographic data were combined into a single sheet with a common list of fields as shown in table \ref{tbl-fu}. The grade data from all three years was also combined into a single sheet in Excel (without altering any field names of any entities). Event data was only received for the 2016 year.
+
+\input{4-data/tables/fu}
+
+\section{Grade Data}
 \textit{Course grade} data was received for 2014, 2015, and 2016. The field \textit{course\_id} was found to not correspond with the \textit{event} data field \textit{site\_key}, meaning that the \textit{event} and \textit{grade} data is only relatable by year and student ID, and not per individual course.
 
-Demographic data (the \textit{FU} dataset) was includes the years 2014, 2015 and 2016. The schema of this dataset is not consistent across the different years, since in addition the registrant data, a row includes a summary of academic performance at UCT for subsequent years. As a result there were many repeated fields in these datasets and required manual processing before they were of use. Rows from all years of the demographic data were combined into a single sheet with a common list of fields as shown in table \ref{tbl-fu}. The grade data from all three years was also combined into a single sheet in Excel (without altering any field names of any entities). Event data was only received for the 2016 year.
+\input{4-data/tables/grades}
+
+\section{Event Data}
+\input{4-data/tables/events}
+

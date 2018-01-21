@@ -2,24 +2,24 @@
 \subsubsection{HTTP Interface}
 All communication with CouchDB takes place via the HTTP protocol. The interface is resource orientated, and strives to be RESTful. This makes such interactions very clear since the HTTP endpoints that a user makes use of are logical and easy to remember - especially compared to clients used for interacting with relational databases. For example, the following endpoints (among many) are shown here, with the full API very well documented online at \cite{couch-api}.
 
-\begin{enumerate}
+\begin{itemize}
     \item \textit{GET} /dbName/:id (retrieves a document with the specified ID)
     \item \textit{PUT} /dbName/[:id] (inserts a document, optionally specifying an ID)
     \item \textit{POST} /\_bulk\_docs (inserts multiple documents - atomicity of batch insert is configurable but defaults to false)
     \item \textit{POST/GET} /\_all\_docs (Fetches multiple documents, specifying keys can be done in in the body of a post request)
-\end{enumerate}
+\end{itemize}
 
 \subsubsection{Design Documents}
 CouchDB allows a user to specify several different types of functions that are executed on the server-side Erlang application via JSON - i.e. a regular database document but with an ID of ``\_design/documentName''. Such documents are known as ``Design'' documents and are treated as special by the CouchDB application. A sample design document is included in the appendix (see \ref{couchdb-design-doc-sample}), showing the format in which JavaScript functions are included in CouchDB JSON documents (other languages other than JavaScript can be specified as well). There are 6 types of functions that are executed on the server:
 
-\begin{enumerate}
+\begin{itemize}
     \item \textit{views}
     \item \textit{shows}
     \item \textit{lists}
     \item \textit{updates}
     \item \textit{filters}
     \item \textit{validations}
-\end{enumerate}
+\end{itemize}
 
 Views comprise two components - a \textit{Map}-function component and a \textit{Reduce}-function component, the contracts of which are shown in the appendix (see \ref{couchdb-mapreduce-contracts}). Map functions process documents to output a key:value as specified by the map function, and then reduce functions further process the results of the map function to create reduced output.
 
@@ -28,7 +28,7 @@ Show functions act as a type of 'middleware', by allowing users to specify trans
 Other server functions are not used in this project, and so are discussed only briefly. Updates allow for specifying document updates indirectly via the HTTP API (functionally equivalent to retrieving a document, updating it and then reinserting it). Filters, true to their name, allow users to specify filters that can be used during view retrieval, document retrieval and in replicating data between CouchDB databases. Validations allow users to specify rules on when databases contained documents can be updated and by whom.
 
 \subsection{Views: Indexes via MapReduce}
-CouchDB doesn't actually provide a means of data-querying. Instead it allows for processing documents in database files via MapReduce to produce \textit{Views}. These files are separate from the database files and are structured as b+trees (as are the database files). In other words, CouchDB allows users to create b+tree indexes via MapReduce, and then to retrieve (view) projections, selections, aggregations, etc. of the database contents (documents). Essentially, CouchDB provides users a simple-to-use HTTP interface that allows for fine-grained control over b+tree structures.
+CouchDB doesn't actually provide a means of data-querying. Instead it allows for processing documents in database files via MapReduce to produce \textit{Views}. These files are separate from the database files and are structured as b+trees (as are the database files). In other words, CouchDB allows users to create b+tree indexes via MapReduce, and then to retrieve (view) projections, selections, aggregations, etc. of the database contents (documents). Essentially, CouchDB provides users a simple-to-use HTTP interface that allows for fine-grained control over b+tree structures. In the current CouchDB release (as of January 2018), there is actually an additional means of querying CouchDB databases called `Mango'; a selection-based syntax inspired by MongoDB, but it's not enabled by default and will likely never cover the full functionality available via bespoke MapReduce functions according to an answer on the StackExchnge network that allegidly references a core developer \cite{Mango}. The Mango syntax still processes documents via MapReduce under the hood, but is usually faster than with JavaScript functions since the MapReduce engine can be exectued directly within the Erlang process.
 
 \textit{Map} functions must be specified by a user and are always executed external to the main Erlang process via marshalling between the main Erlang process and the indexing engine. \textit{Reduce} functions, however, can either by executed via the main Erlang process (by specifying a built-in reduce function) or externally by the indexing engine when specifying custom reduce functions. CouchDB ships with an executable "couchjs.exe" - a JavaScript query-server (indexing engine) - coupled with Mozilla's \textit{SpiderMonkey} runtime engine. This query engine is drop-in replaceable by alternative implementations in JavaScript or other languages if required (this has not been done for this project). Unlike a traditional implementation of MapReduce where \textit{Map} and \textit{reduce} tasks are executed in parallel, CouchDB spawns a single \textit{couchjs} process per shard (see \ref{slack-1-nov} and \ref{slack-7-nov}) and the map index is calculated sequentially according to the order in which the database was changed.
 
@@ -36,11 +36,11 @@ Conceptually \textit{``fetching all documents of type x''} requires specifying a
 
 Users can specify whether to retrieve reduced results, or to access unreduced map results (so a reduce function isn't actually required to produce a CouchDB view). However, when passing output from the map function to reducer, where map output is grouped by key, there is no guarantee that all map output for a particular key will be sent to the same reduce function \cite{reduceFunctions}. As such, a reduce function may operate on the same same output of the map function more than once; necessitating `rereduction' of reduced output. The reduce function requires handling of the case when rereduce = true, and when rereduce = false within the same function body. As such, writing custom reduce functions that adhere to the reduce function contract is fairly difficult for anything but the simplest examples. The reduce function is described here, with an implementation of the \textit{\_count} reduce function honoring this contract included in the appendix (see \ref{couchdb-mapreduce-contracts}) as an example and reference.
 
-\begin{enumerate}
+\begin{itemize}
     \item \textit{keys}: a list of tuples of the form \textless \textit{key}, \textit{id} \textgreater. \textit{key} is the key emitted by the map function defined by the user, and \textit{id} is the id of the document that was processed by the map function to emit the key (this is implicit and not defined by a user). This argument is null in the case of rereduce = true.
     \item \textit{values}: a list of the values emitted by the map function as defined by the user, with each value correlating to a the respective element in the \textit{keys} list (when rereduce = false). When rereduce = true, this argument is a list of values previously output by this same reduce function on a previous execution.
     \item \textit{rereduce}: a boolean field indicating whether the function is invoked with output from the map function (rereduce = false), or previous output from this reduce function (rereduce = true). Reduce function results are cached on internal nodes in the B+tree view indexes to facilitate incremental tree updates without having to recalculate all reduce output (see appendix \ref{slack-25-oct}), making the rereduce contract necessary.
-\end{enumerate}
+\end{itemize}
 
 Because of the nature of the \textit{reduce} function contract (allowing for rereduce = true), joins via MapReduce as described by \cite{chandar2010} are simply not possible. A SQL query of the form: \textit{R(a,b)} joined with \textit{S(b,c)} joined with \textit{T(c,d)} (where \textit{R}, \textit{S} and \textit{T} are relations and \textit{a}, \textit{b}, \textit{c}, \textit{d} are attributes) cannot be achieved without prior processing of all or some of the relations, or in the spirit of CouchDB, via multiple interactions with a view.
 
