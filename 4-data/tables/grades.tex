@@ -1,55 +1,13 @@
-\begin{table}[h]
-    \begin{threeparttable}
-        \textbf{Table \ref{tbl-sakai-grades}}\par\medskip\par\medskip
-        \caption[Sakai grade data]{A description of the Sakai grade data as received in CSV format, and how these fields were treated in the ETL and analysis process}
-        \label{tbl-sakai-grades}
-        \begin{tabularx}{\textwidth}{>{\hsize=0.4\hsize}Y>{\hsize=1\hsize}X>{\hsize=0.7\hsize}X>{\hsize=1.9\hsize}X}
-            \toprule
-            \mC{c}{Include\tnote{\textsuperscript{1}}  } & \mC{c}{Field Name} & \mC{c}{Data type} & \mC{c}{Description}                                    \\
-            \midrule
-            \xmark                                       & DownloadedDate     & date              & Excel date format                                      \\
-            \cmark                                       & RegAcadYear        & number            & Year                                                   \\
-            \xmark                                       & RegTerm            & number            & Integer ID                                             \\
-            \cmark                                       & anonIDnew          & number            & Anonymized student number                              \\
-            \xmark                                       & RegProgram         & string            & Program abbreviation                                   \\
-            \xmark                                       & RegCareer          & string            & Academic level\tnote{\textsuperscript{3}}              \\
-            \xmark                                       & Degree             & string            & Degree code                                            \\
-            \xmark                                       & DegreeDescr        & string            & Degree title                                           \\
-            \xmark                                       & Subject            & string            & Three letter abbreviation                              \\
-            \xmark                                       & Catalog.           & string            & Catalog sub-component (number and session)             \\
-            \cmark                                       & Course             & string            & Full course code description                           \\
-            \xmark                                       & CourseSuffix       & string            & Course session identifier  \tnote{\textsuperscript{4}} \\
-            \xmark                                       & Session            & string            & Session name..                                         \\
-            \cmark                                       & Percent            & string            & Grade achieved by student \tnote{\textsuperscript{5}}  \\
-            \xmark                                       & Symbol             & string            & Symbol achieved by student                             \\
-            \xmark                                       & UnitsTaken         & number            & Total units taken by student?                          \\
-            \xmark                                       & CourseID           & number            & Numerical course Identifier                            \\
-            \xmark                                       & CourseDescr        & string            & Description of course                                  \\
-            \xmark                                       & CourseCareer       & string            & Academic level of course \tnote{\textsuperscript{6}}   \\
-            \xmark                                       & Faculty            & string            & Course faculty                                         \\
-            \xmark                                       & Dept               & string            & Faculty department                                     \\
-            \xmark                                       & MaximumCrseUnits   & number            & ??                                                     \\
-            \xmark                                       & CourseCount        & number            & ??                                                     \\
-            \xmark                                       & CourseLevel        & number            & ??                                                     \\
-            \xmark                                       & CESM               & number            & ??                                                     \\
-            \xmark                                       & Sub-CESM           & number            & ??                                                     \\
-            \bottomrule
-        \end{tabularx}
-        \scriptsize
-        \begin{tablenotes}
-            \item[\textsuperscript{1}]Attributes were included via a white-listing process.
-            \item[\textsuperscript{3}]Only courses taken by students registered as undergraduates (UGRD) were considered in this study.
-            \item[\textsuperscript{4}] A wide variety of course suffixes are present in the database, including: D,F,H,L,M,N,P,Q,R,S,W,X,Z.
-            \item[\textsuperscript{5}]The percent field included both numbers and abbreviations that need to be normalized so that this field can be treated as always holding a numerical value. A table showing how the different suffixes and abbreviations of the percent field is shown in \ref{tbl-sakai-grades-percent}
-            \item[\textsuperscript{6}]Only courses at undergraduate level (UGRD) were considered for this project.
-        \end{tablenotes}
-    \end{threeparttable}
-\end{table}
+\item[\textsuperscript{3}]Only courses taken by students registered as undergraduates (UGRD) were considered in this study.
+\item[\textsuperscript{4}]A wide variety of course suffixes are present in the database, including: D,F,H,L,M,N,P,Q,R,S,W,X,Z.
+\item[\textsuperscript{5}]The percent field included both numbers and abbreviations that need to be normalized so that this field can be treated as always holding a numerical value. A table showing how the different suffixes and abbreviations of the percent field is shown in \ref{tbl-sakai-grades-percent}
+\item[\textsuperscript{6}]Only courses at undergraduate level (UGRD) were considered for this project.
 
 
 
 
 
+\textit{Course grade} data was received for 2014, 2015, and 2016. The field \textit{course\_id} was found to not correspond with the \textit{event} data field \textit{site\_key}, meaning that the \textit{event} and \textit{grade} data is only relatable by year and student ID, and not per individual course.
 
 
 
