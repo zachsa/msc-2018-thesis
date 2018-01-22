@@ -1,12 +1,15 @@
 With special thanks to Jane Hendry (UCT's CIO) and Stephen Marquard (the Learning Technologies Coordinator from the Center for Innovation in Learning and Teaching at UCT), student data was made available encompassing UCT entrance assessments, course grades, and LMS (Sakai) interactions. This data was received as three separate datasets that are classified in terms of this project as listed below:
 
 \begin{itemize}
-    \item \textit{Benchmarks}: Student matric results and admission-acceptance test results provided by Jane Hendry
     \item \textit{Grades}: Student course results provided by Stephen Marquard
+    \item \textit{Benchmarks}: Student matric results and admission-acceptance test results provided by Jane Hendry
     \item \textit{Events}: Student interactions with the Sakai platform, measured as browser session events. This is was also provided by Stephen Marquard
 \end{itemize}
 
 All three datasets were received as CSV exports with student IDs anonymized prior to receiving them thanks to Associate Professor, Sonia Berman and Stephen Marquard. Anonymization was consistent across all three datasets, preserving the association of particular students with correct Benchmarks, Grades and Events.
+
+\section{Grades}
+CSV exports received for Grade data for the years 2014, 2015 and 2016 are consistent across all three years in terms of the fields and the ordering of these fields - the only structural difference is that the 2014 CSV is tab-delimited instead of comma delimited. Using Microsoft Excel the three files were combined into a single CSV, which is described in Table \ref{tbl-data-grades}; all the fields included in the CSV exports are included in the combined CSV that is used as a the data source for this project's analysis.
 
 \section{Benchmarks}
 CSV exports received for Benchmark contain data for the years 2014, 2015 and 2016. The fields in these CSVs are not consistent across all three years; certain fields are capitalized differently, fields are ordered differently from year to year. Additionally, fields are included to show UCT academic performance for years subsequent to each student's registration. For example, Benchmark data from 2014 includes academic performance for the years 2015/2016, and the 2015 Benchmark data includes academic performance for the year 2016 - resulting in many repeating fields.
@@ -21,47 +24,16 @@ CouchDB is an excellent tool for normalizing schemas, since user defined map fun
 
 The normalized Benchmark data comprises a single CSV containing an anonymized list of students that enrolled at UCT in 2014, 2015, and 2016 and the benchmark results of these students. A description of this CSV is shown in Table \ref{tbl-data-benchmarks} in terms of field names, a description of these fields and each field's data type.
 
-\begin{table}[H]
-    \begin{threeparttable}
-        \textbf{Table \ref{tbl-data-benchmarks}}\par\medskip\par\medskip
-        \caption[Benchmark Data CSV]{Fields received in the CSV export of Benchmark data}
-        \label{tbl-data-benchmarks}
-        \begin{tabularx}{\textwidth}{>{\hsize=0.4\hsize}Y>{\hsize=1\hsize}X>{\hsize=0.7\hsize}X>{\hsize=1.9\hsize}X}
-            \toprule
-            \mC{c}{Include\tnote{\textsuperscript{1}}  } & \mC{c}{Field Name}     & \mC{c}{Data type} & \mC{c}{Description}                                  \\
-            \midrule
-            \cmark                                       & anonIDnew              & number            & Anonymized student number\tnote{\textsuperscript{2}} \\
-            \xmark                                       & Career                 & string            & Academic level                                       \\
-            \xmark                                       & Citizenship Residency  & string            & Student citizenship                                  \\
-            \xmark                                       & SA School              & string            & School name (if in RSA)                              \\
-            \cmark                                       & Eng Grd12 Fin Rslt     & string            & Grade 12 English result                              \\
-            \cmark                                       & Math Grd12 Fin Rslt    & string            & Grade 12 Math result                                 \\
-            \cmark                                       & Mth Lit Grd12 Fin Rslt & string            & Grade 12 Math Literacy result                        \\
-            \cmark                                       & Adv Mth Grd12 Fin Rslt & string            & Grade 12 Advanced Math result                        \\
-            \cmark                                       & Phy Sci Grd12 Fin Rslt & string            & Grade 12 Science result                              \\
-            \cmark                                       & NBT AL Score           & string            & National benchmark test (NBT)                        \\
-            \cmark                                       & NBT QL Score           & string            & NBT                                                  \\
-            \cmark                                       & NBT Math Score         & string            & NBT                                                  \\
-            \cmark                                       & RegAcadYear            & number            & First registration at UCT                            \\
-            \bottomrule
-        \end{tabularx}
-        \scriptsize
-        \begin{tablenotes}
-            \item[\textsuperscript{1}]Attributes were included via a white-listing process using Microsoft Excel
-            \item[\textsuperscript{3}]Anonymization was performed by Associate Professor Sonia Berman
-        \end{tablenotes}
-    \end{threeparttable}
-\end{table}
+\section{Events}
+The CSV export received for Events data is for 2016, with a description of the fields shown in \ref{tbl-data-events}. The Events CSV export cannot be opened using Microsoft Excel due to it's large size (\textgreater 5GB).
 
-\section{Grades}
-CSV exports received for Grade data for the years 2014, 2015 and 2016 are consistent across all three years in terms of the fields and the ordering of these fields - the only structural difference is that the 2014 CSV is tab-delimited instead of comma delimited. Using Microsoft Excel the three files were combined into a single CSV, which is described in Table \ref{tbl-data-grades}; all the fields included in the CSV exports are included in the combined CSV that is used as a the data source for this project's analysis.
-
+\newpage
 \begin{table}[H]
     \begin{threeparttable}
         \textbf{Table \ref{tbl-data-grades}}\par\medskip\par\medskip
         \caption[Grade Data CSV]{Fields received in the CSV export of Grade data}
         \label{tbl-data-grades}
-        \begin{tabularx}{\textwidth}{>{\hsize=0.4\hsize}Y>{\hsize=1\hsize}X>{\hsize=0.7\hsize}X>{\hsize=1.9\hsize}X}
+        \begin{tabularx}{\textwidth}{>{\hsize=0.8\hsize}X>{\hsize=0.6\hsize}X>{\hsize=1.6\hsize}X}
             \toprule
             \mC{c}{Field Name} & \mC{c}{Data type} & \mC{c}{Description}                                  \\
             \midrule
@@ -100,16 +72,44 @@ CSV exports received for Grade data for the years 2014, 2015 and 2016 are consis
     \end{threeparttable}
 \end{table}
 
-
-\section{Events}
-CSV exports received for Events data for the year 2016, with a description of the fields shown in \ref{tbl-data-events}. The Events CSV export cannot be opened using Microsoft Excel due to it's large size (\textgreater 5GB).
-
+\newpage
+\begin{table}[H]
+    \begin{threeparttable}
+        \textbf{Table \ref{tbl-data-benchmarks}}\par\medskip\par\medskip
+        \caption[Benchmark Data CSV]{Fields received in the CSV export of Benchmark data}
+        \label{tbl-data-benchmarks}
+        \begin{tabularx}{\textwidth}{>{\hsize=0.4\hsize}Y>{\hsize=1\hsize}X>{\hsize=0.7\hsize}X>{\hsize=1.9\hsize}X}
+            \toprule
+            \mC{c}{Include\tnote{\textsuperscript{1}}  } & \mC{c}{Field Name}     & \mC{c}{Data type} & \mC{c}{Description}                                  \\
+            \midrule
+            \cmark                                       & anonIDnew              & number            & Anonymized student number\tnote{\textsuperscript{2}} \\
+            \xmark                                       & Career                 & string            & Academic level                                       \\
+            \xmark                                       & Citizenship Residency  & string            & Student citizenship                                  \\
+            \xmark                                       & SA School              & string            & School name (if in RSA)                              \\
+            \cmark                                       & Eng Grd12 Fin Rslt     & string            & Grade 12 English result                              \\
+            \cmark                                       & Math Grd12 Fin Rslt    & string            & Grade 12 Math result                                 \\
+            \cmark                                       & Mth Lit Grd12 Fin Rslt & string            & Grade 12 Math Literacy result                        \\
+            \cmark                                       & Adv Mth Grd12 Fin Rslt & string            & Grade 12 Advanced Math result                        \\
+            \cmark                                       & Phy Sci Grd12 Fin Rslt & string            & Grade 12 Science result                              \\
+            \cmark                                       & NBT AL Score           & string            & National benchmark test (NBT)                        \\
+            \cmark                                       & NBT QL Score           & string            & NBT                                                  \\
+            \cmark                                       & NBT Math Score         & string            & NBT                                                  \\
+            \cmark                                       & RegAcadYear            & number            & First registration at UCT                            \\
+            \bottomrule
+        \end{tabularx}
+        \scriptsize
+        \begin{tablenotes}
+            \item[\textsuperscript{1}]Attributes were included via a white-listing process using Microsoft Excel
+            \item[\textsuperscript{3}]Anonymization was performed by Associate Professor Sonia Berman
+        \end{tablenotes}
+    \end{threeparttable}
+\end{table}
 \begin{table}[H]
     \begin{threeparttable}
         \textbf{Table \ref{tbl-data-events}}\par\medskip\par\medskip
         \caption[Events Data CSV]{Fields received in the CSV export of Events data}
         \label{tbl-data-events}
-        \begin{tabularx}{\textwidth}{>{\hsize=0.5\hsize}Y>{\hsize=0.8\hsize}X>{\hsize=0.8\hsize}X>{\hsize=1.9\hsize}X}
+        \begin{tabularx}{\textwidth}{>{\hsize=0.8\hsize}X>{\hsize=0.6\hsize}X>{\hsize=1.6\hsize}X}
             \toprule
             \mC{c}{Field Name} & \mC{c}{Data type} & \mC{c}{Description}                                             \\
             \midrule

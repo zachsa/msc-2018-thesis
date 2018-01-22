@@ -15,6 +15,7 @@ In addition to data transformations applied suring the ETL process by \textit{nE
 Achieved via a combination of filtering and white-listing in \textit{nETL}, and further scrubbing in the MapReduce functions, the resultant datasets used for analysis, after scrubbing, filtering, etc. include: 1) benchmarks of undergraduate students that registered for UCT in 2014,2015,2016. 2) Undergraduate course results in 2014, 2015, 2016 for courses that ran in the first semester, second semester, or during the normal school year. 3) A count of 'presence' events for students in 2016 on the Sakai LMS.
 
 
+TODO: Include tables of JSON structure
 
 
 Producing a dataset suitable for analysis involves the workflow specified in \ref{analysis-workflow}. The workflow involves configuration of \textit{nETL} tasks to load data from CSVs into CouchDB, authoring of a CouchDB design doc, including a view function (MapReduce) and a list function, asking CouchDB to build the index, retrieving the indexed result via the list function specified in the design document and working with the joined dataset in Excel.
