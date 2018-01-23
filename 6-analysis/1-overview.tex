@@ -1,8 +1,27 @@
-Using the \textit{nETL} application, lines from the flat data files (CSV files) were extracted in batches of between 10 000 rows and 50 000 rows at at time and loaded into CouchDB. Data-transformation and cleansing, including translating data from tabular format to JSON format, filtering rows, and white-listing attributes was performed as part of this ETL process.
+Data analysis in the context of this project is completed as a series of stages, termed as \textit{Runs}. Each Run consists of a single ETL workflow and involves a series of steps as illustrated in \ref{analysis-workflow}. The workflow includes the following steps per Run:
 
-The difference between data in a tabular format (such as a CSV) compared to JSON documents is that every JSON document (row from a CSV) needs both attribute and value information, whereas in visual tables, attributes are specified once as an ordered list once. Rows then consist of ordered values relatable to the value of the attributes list at the corresponding index. Visually (i.e. when working on an Excel file), such association is trivial. JSON documents comprise a list of unordered \textless key:value \textgreater pairs as stipulated in \cite{rfc7159} necessitating the need for a computerized transformation process. Transforming CSV data into JSON data requires maintaining a list of attribute names, iterating through rows and applying those attribute names to values in those rows. The CREATE\_OBJ\_FIELD \textit{nETL} module was composed for this task, the code of which is available in the appendix (\ref{netl-trans-create-obj-field}). A representation of each entity as a JSON object is shown in Table \ref{tbl-json-examples}.
+\begin{itemize}
+    \item A nETL Configuration file specifying CSV extraction, transformations, and the task-specific database to load to
+    \item A CouchDB design document containing the MapReduce functions to create the view-index, and the List function to retrieve that index
+    \item A data-analysis stage, in which graphs are produced and discussed
+\end{itemize}
+\input{6-analysis/figures/workflow}
 
-\input{6-analysis/tables/json-entities}
+Configuration of the nETL application is discussed logically, and per Run. The contents of the configuration files (JSON structures) are shown as a reference in the appendix; see \ref{netl-configuration}.
+
+With the eventual aim of assessing the relationships between LMS usage and course grades, the following series of analyses is conducted in terms of the CSC1015F course.
+
+\begin{enumerate}
+    \item \textit{Run 1}: Assessing effectiveness of different benchmarking formulas using the Benchmarks data
+    \item \textit{Run 2}: Assessing the correlation between Events and Grades data
+    \item \textit{Run 3}: As a means of control, assessing the correlation between Events and Benchmarks
+    \item \textit{Run 4}: Assessing the relationship of student performance relative to their peers as benchmarked compared to course performance, in terms of LMS usage
+\end{enumerate}
+
+In addition to outlining a structured approach by which the results are obtained for CSC1015F, further discussion is provided on how multiple courses may be analyzed simultaneously via more advanced usage of CouchDB's MapReduce implementation.
+
+
+
 
 A batch of data extracted from the CSV files comprised a list of rows (a row comprised a list of values), each of which were individually transformed into JSON documents in this way and stored as a list of documents. This list was then transformed several times and eventually loaded into CouchDB as a list of JSON documents. The source code for \textit{nETL} module responsible for extracting CSV lines is shown in the appendix at \ref{netl-extract-flatfile}, and the source code for the module used to load the data into CouchDB is shown in the appendix at \ref{netl-load-couchdb}. Extracting values from a CSV was trickier than anticipated due to surprising variation in answers to the question "What is a CSV?". Variations in CSV formatting result in complexities with delimiting values; a 3rd party CSV-parsing library was used for this task that respects the entire CSV specification as outlined in the RFC standard \cite{rfc4180}.
 
@@ -24,15 +43,6 @@ In terms of defining MapReduce tasks, the map function is always user-defined, w
 
 Analyses are conducted in an iterative fashion; with each iteration an increasing volume of data is handled so as to gain insight into the viability of handling varying amounts of data in CouchDB. Data volume is controlled by the number of courses analyses (more courses taken into account results in higher volumes of data), And the number of entities joined together (grades \& FU data vs grades, FU data, \& Sakai usage). Results are discussed in terms of the insights into business domain (EDM) as well as the effectiveness of the data-mining approach. Runtime results of \textit{nETL}, CouchDB indexing times, database/index storage footprints are shown in Table \ref{performance-analysis}.
 
-\begin{figure}[ht]
-    \centering
-    \begin{mdframed}
-        \centering
-        \includegraphics[scale=0.35]{./resources/figures/analysis-workflow.png}
-    \end{mdframed}
-    \caption[Analysis Workflow]{\textbf{Figure \ref{analysis-workflow}: Workflow to perform an analysis.}1) User creates a configuration file (JSON) that is loaded into the running \textit{\_nETL} service. This configuration includes instructions on which CSVs to load, which modules should be loaded to process the CSVs, and configurations for the modules. 2) Modules are loaded from a library of available modules into the \textit{\_nETL} service. 3) CSVs are loaded into the service, and transformations are applied to the CSV data as specified by the configuration in (1). 4) Data from the CSVs is loaded into CouchDB; this is also achieved via a module specified in (1). 5) A user creates a CouchDB design document, specifying the MapReduce functions, and a List function. 6) The user asks CouchDB to produce the view index as specified by the design document in (5). 7) The user retrieves the data from the view index using the list function specified in (5). 8) The user then loads the resultant CSV into Excel to produce useful metrics.}
-    \label{analysis-workflow}
-\end{figure}
 
 
 \input{6-analysis/tables/performance-analysis}

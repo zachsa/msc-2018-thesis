@@ -1,8 +1,72 @@
 Working with data exports requires an ETL (Extraction, Transformation, and Loading) process, in which information stored in tabular form in the CSV files is loaded into computer memory, transformed into JSON-structured objects, and then inserted into CouchDB. Once persisted, data interactions in terms of producing analyses becomes a flexible and agile process with room for creative insight since the cumbersome work of extracting and transforming data into a suitable format for querying does not have to to repeated
 
-Extraction is fairly straightforward; a variable is created in memory to reference the row of the CSV that contains table headers (usually the first row of the CSV). This row is then split by a column delimiter into a tuple of the form [val 1, val 2, val 3, etc]. Then all the remaining rows of the CSV are iteratively loaded into memory in turn, and split into tuples according to a column delimiter. The result of this is iteratively producing a tuple of the same length and form as the header tuple ([val 1, val 2, val 3, etc]) for every row of data. Each row of data can then be manipulated to with each value in the row tuple corresponding to a value in the header tuple at the same index. By grouping the values of the header and row tuple by index, it is easy to convert CSV rows into unordered collections of key:value pairs (objects).
+Extraction is fairly straightforward; a variable is created in memory to reference the row of the CSV that contains table headers (usually the first row of the CSV). This row is then split by a column delimiter into a tuple of the form [val 1, val 2, val 3, etc]. Then all the remaining rows of the CSV are iteratively loaded into memory in turn, and split into tuples according to a column delimiter. The result of this is iteratively producing a tuple of the same length and form as the header tuple ([val 1, val 2, val 3, etc]) for every row of data. Each row of data can then be manipulated to with each value in the row tuple corresponding to a value in the header tuple at the same index. By grouping the values of the header and row tuple by index, it is easy to convert CSV rows into unordered collections of key:value pairs corresponding to JSON format as specified in the RFC \cite{rfc7159}. An example of how each entity (as discussed previously in \autoref{chapter:data}) can be represented as object structure is shown in Table \ref{tbl-json-examples}.
 
-Further transformations can then be applied to the resultant object before being loaded into CouchDB, completing a sequential processing of a single row of CSV data via first extracting information, transforming information, and loading information into the destination (ETL).
+
+\begin{table}[H]
+    \textbf{Table \ref{tbl-json-examples}}\par\medskip\par\medskip
+    \caption{JSON representation of data entities}
+    \label{tbl-json-examples}
+    \begin{tabular}{>{\centering\arraybackslash}p{\dimexpr 0.4\linewidth-2\tabcolsep}>{\centering\arraybackslash}m{\dimexpr 0.6\linewidth-2\tabcolsep}}
+        \toprule
+        \mC{c}{Entity} & \mC{c}{JSON representation} \\
+        \midrule
+        Sakai Event    &
+        \begin{verbatim}
+            {
+              "_id": "000e569ee321b915bae59fe62e0051e3",
+              "_rev": "1-7112afce121087818c33ebfd0fd7fed7",
+              "event_date": "2016-04-17T14:04:20.000Z",
+              "event_id": 281,
+              "uct_id": 3018438,
+              "site_key": 2297,
+              "type_": "vulaEvent"
+            }        
+        \end{verbatim}
+        \\
+        Sakai Grade    &
+        \begin{verbatim}
+            {
+              "_id": "7530f4eed7e6bc3ef0d99a53be8ba9a2",
+              "_rev": "8-232d0cf39728d41b4c5935f12469209d",
+              "RegAcadYear": 2016,
+              "RegTerm": 1161,
+              "anonIDnew": 1,
+              "RegCareer": "UGRD",
+              "Degree": "QHB002",
+              "Course": "PHI1010S",
+              "CourseSuffix": "S",
+              "Percent": "55",
+              "CourseID": 109157,
+              "Dept": "PHI",
+              "type_": "courseGrade"
+            }        
+        \end{verbatim}
+        \\
+        FU Entity      &
+        \begin{verbatim}
+            {
+              "_id": "6587aa5b36bba2a70aeba96d06f05d2b",
+              "_rev": "1-8c7d395e046e452442907e3388c74b41",
+              "anonIDnew": 3103212,
+              "Eng Grd12 Fin Rslt": 58,
+              "Math Grd12 Fin Rslt": 73,
+              "Mth Lit Grd12 Fin Rslt": "",
+              "Adv Mth Grd12 Fin Rslt": "",
+              "Phy Sci Grd12 Fin Rslt": 67,
+              "NBT AL Score": 53,
+              "NBT QL Score": 43,
+              "NBT Math Score": 60,
+              "RegAcadYear": 2016,
+              "type_": "demographic"
+            }
+        \end{verbatim}
+        \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Further transformations can then be applied to the entity-objects before being loaded into CouchDB, completing a sequential processing of a single row of CSV data via first extracting information, transforming information, and loading information into the destination (ETL).
 
 In addition to the transformation from tabular rows to objects, specific transformations of the objects are required prior to loading the data to CouchDB. Required transformations used to produce the final results in this project are listed here:
 
