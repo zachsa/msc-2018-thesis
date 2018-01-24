@@ -91,10 +91,10 @@ const load; // Assigned elsewhere
 })(this); // Bound to TaskManager instance context
 \end{minted}
 
-\section{Extraction, Transformation, Load Modules}
+\section{nETL Modules}
 \label{netl-modules}
 
-\subsection{Loading a Module}
+\subsection{Module Authoring and Loading}
 \label{netl-module-loading}
 \begin{minted}{javascript}
 // Load the module into memory
@@ -123,7 +123,8 @@ userModule = (function() {
 \end{minted}
 
 
-\subsection{FLATFILE}
+\subsection{Extraction Modules}
+\subsubsection{FLATFILE}
 \label{netl-extract-flatfile}
 \begin{minted}{javascript}
 'use strict';
@@ -248,7 +249,8 @@ module.exports = {
 
 % Loads
 
-\subsection{COUCHDB}
+\subsection{Load Modules}
+\subsubsection{COUCHDB}
 \label{netl-load-couchdb}
 \begin{minted}{javascript}
 'use strict';
@@ -314,8 +316,8 @@ module.exports = {
 \end{minted}
 
 % Transformations
-
-\subsection{TEXT\_LINE\_TO\_OBJ}
+\subsection{Transformation Modules}
+\subsubsection{TEXT\_LINE\_TO\_OBJ}
 \label{netl-trans-text-line-to-obj}
 \begin{minted}{javascript}
 'use strict';
@@ -376,8 +378,7 @@ module.exports = {
 };
 \end{minted}
 
-
-\subsection{FILTER}
+\subsubsection{FILTER}
 \label{netl-trans-filter}
 \begin{minted}{javascript}
 'use strict';
@@ -424,7 +425,7 @@ module.exports = {
 };
 \end{minted}
 
-\subsection{WHITELIST}
+\subsubsection{WHITELIST}
 \label{netl-trans-whitelist}
 \begin{minted}{javascript}
 /**
@@ -463,7 +464,7 @@ module.exports = {
 };
 \end{minted}
 
-\subsection{CREATE\_OBJ\_FIELD}
+\subsubsection{CREATE\_OBJ\_FIELD}
 \label{netl-trans-create-obj-field}
 \begin{minted}{javascript}
 'use strict';

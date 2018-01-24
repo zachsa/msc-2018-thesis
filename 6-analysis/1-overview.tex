@@ -1,4 +1,4 @@
-Data analysis in the context of this project is completed as a series of stages, each of which consists of a sequential process of ETL, followed by querying and analysis. Figure \ref{analysis-workflow} shows the sequential steps involved in a single stage of analysis; nETL is executed with a configuration file specifying CSV extraction, transformations, and the destination database as a parameter, A MapReduce view as specified via a design document is executed, data is retrieved via a List function also specified on the design document, and subsequent analyses (stages) are performed in context of the proceeding stages results. For each stage in the analysis, the configuration of nETL is discussed in terms of logical operations, and the configuration files themselves are included in the appendix (see \ref{netl-configuration}).
+Data analysis in the context of this project is completed as a series of stages, each of which consists of a sequential process of ETL, followed by querying and analysis. Figure \ref{analysis-workflow} shows the sequential steps involved in a single stage of analysis; nETL is executed with a configuration file specifying CSV extraction, transformations, and the destination database as a parameter, CouchDB builds a view-index according to the MapReduce view as specified via a design document, data is retrieved via a List function also specified on the design document, and subsequent analyses (stages) are performed in context of the proceeding stages results. For each stage in the analysis, the configuration of nETL is discussed in terms of logical operations, and the configuration files themselves are included in the appendix (see \ref{netl-configuration}).
 
 With the eventual aim of assessing the relationships between LMS usage and course grades, the following series of analyses is conducted in terms of the CSC1015F course.
 
@@ -8,33 +8,13 @@ With the eventual aim of assessing the relationships between LMS usage and cours
     \item \textit{Stage 3}: As a means of control, assessing the correlation between Events and Benchmarks
     \item \textit{Stage 4}: Assessing the relationship of student performance relative to their peers as benchmarked compared to course performance, in terms of LMS usage
 \end{enumerate}
+\input{6-analysis/figures/workflow}
 
-In addition to outlining a structured approach by which the results are obtained for CSC1015F, further discussion is provided on how multiple courses may be analyzed simultaneously via more advanced usage of CouchDB's MapReduce implementation.
-
-
-
-
-
-
-The FU data was filtered on two attributes: \textit{Career} with the values "UGRD", "First Year", "Second Year" and "Third Year" accepted, and \textit{Citizenship Residency} with the values "SA Citizen", "Permanent Resident", "C" and "P" accepted. Sakai course grades were filtered on four attributes: \textit{RegCareer} with the value "UGRD" accepted, \textit{Course} with only specific courses accepted (dependent on the analysis), \textit{CourseCareer} with the value "UGRD" accepted, and \textit{CourseSuffix} with the values "F" (semester 1), "S" (semester 2), "H" (single semester course over whole year), and "W" (whole year course) accepted. Sakai events were filtered on the the attribute \textit{event\_id}, with only the value "281" accepted (corresponding to presence events). Filtering was performed by the \textit{nETL} application by the FILTER module, with source code shown in the appendix \ref{netl-trans-filter}.
-
-Following filtering, a white-listing transformation was applied to reduce the number of attributes/document where those attributes were superfluous. In the case of the FU data, no white-listing was needed since unnecessary columns had already been removed when the flat files were manually aggregated in Excel. Grade data was white-listed extensively since only the \textit{Percent} field was really of interest in this study. White-listing was also performed by the \textit{nETL} application; code for the WHITELIST module is shown in the appendix \ref{netl-trans-whitelist}.
-
-
-In addition to data transformations applied during the ETL process by \textit{nETL}, two fields - \textit{Percent} in the grade data and all the percentage fields in the FU data - had inconsistent data types. These fields need to be analyzed as numerical values (i.e. percentages) but were exported as a mixture of percentages, symbols, and abbreviated statuses. These fields were normalized during the MapReduce process discussed later in this project. A description of the different values that needed to be normalized in the Grade data is shown in Table \ref{tbl-grades-normalize}, with numerical equivalents applied based on estimates of circumstance. Translation of the FU data involved a straight conversion of symbols to numerical numbers ("A" was translated to "80", "B" was translated to "70", etc.).
-
-\input{6-analysis/tables/grades-percent-normalize}
-
-Achieved via a combination of filtering and white-listing in \textit{nETL}, and further scrubbing in the MapReduce functions, the resultant datasets used for analysis, after scrubbing, filtering, etc. include: 1) benchmarks of undergraduate students that registered for UCT in 2014,2015,2016. 2) Undergraduate course results in 2014, 2015, 2016 for courses that ran in the first semester, second semester, or during the normal school year. 3) A count of 'presence' events for students in 2016 on the Sakai LMS.
-
-Producing a dataset suitable for analysis involves the workflow specified in \ref{analysis-workflow}. The workflow involves configuration of \textit{nETL} tasks to load data from CSVs into CouchDB, authoring of a CouchDB design doc, including a view function (MapReduce) and a list function, asking CouchDB to build the index, retrieving the indexed result via the list function specified in the design document and working with the joined dataset in Excel.
+In addition to outlining a structured approach by which the results are obtained for CSC1015F, further discussion is provided on how multiple courses may be analyzed simultaneously via more advanced usage of CouchDB's MapReduce implementation. During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{performance-analysis}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
 
 In terms of defining MapReduce tasks, the map function is always user-defined, whereas a built-in reduce function (\_stats) is always used. The built-in reduce function are implemented within the main Erlang process, which according to the documentation offers a performance boost since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is negated. Working on a Windows machine the IO cost is apparently exaggerated (see the slack correspondence with Jan Lehnardt in appendix \ref{slack-1-nov}) due to the difference between Unix-based and Windows kernel implementations.
 
-Analyses are conducted in an iterative fashion; with each iteration an increasing volume of data is handled so as to gain insight into the viability of handling varying amounts of data in CouchDB. Data volume is controlled by the number of courses analyses (more courses taken into account results in higher volumes of data), And the number of entities joined together (grades \& FU data vs grades, FU data, \& Sakai usage). Results are discussed in terms of the insights into business domain (EDM) as well as the effectiveness of the data-mining approach. Runtime results of \textit{nETL}, CouchDB indexing times, database/index storage footprints are shown in Table \ref{performance-analysis}.
-
-
-
+\input{6-analysis/tables/tbl-grades-normalize}
 \input{6-analysis/tables/performance-analysis}
 
 
