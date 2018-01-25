@@ -17,57 +17,46 @@ In terms of defining MapReduce tasks, the map function is always user-defined, w
 \input{6-analysis/tables/tbl-grades-normalize}
 \input{6-analysis/tables/performance-analysis}
 
+\section{MapReduce Considerations}
+Initial attempts at joining the three entities - Grades with Benchmarks, and then Grades with Benchmarks with Events were attempted directly via MapReduce (the custom Map and \_stats reduce function). This approach involved specifying the map function to always output a value of the same format for all three entities. This format is a tuple of [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; each of the 11 indexes correlate to a specific output attribute. In other words, i = 0 (indexes in JavaScript start at 0) correlates to Grade \%, i = 1,2,3,4,etc. correlated to the percents for Benchmark data, and the last 2 indexes (i = 9, i = 10) indicate an event occurrence (from the Event data) in either the first semester (i[9] = 1, i[10] = 0) or the second semester (i[9] = 0, i[10] = 1).
 
-todo:
+During index calculation, CouchDB then iterates through every database document, passing each document to the Map function. This Map function instantiates the output tuple ([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) on every execution, and then depending on the value of the `type\_' attribute of the document it's processing (this attribute is added to every document prior to insertion to CouchDB), the map function alters the tuple at certain indexes before returning and adding the key:value set to the view index currently being built.
 
-Hi Sonia.
+To further explain, if the document being processed by the map function is a ‘grade’ document, then the map function adjusts the value tuple to emit the grade percent – i.e. [percent, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]. Or if the document is of type ‘demographic’, the map function changes the values at indexes 2 through 9 and emits the value: [0, x, x, x, x, x, x, x, x, 0, 0]. If the document is of type ‘event’, then the map function alters the value at indexes 9 and 10. i.e. [0, 0, 0, 0, 0, 0, 0, 0, s1Event, s2Event] (s1Event is 1 for first semester event, or 0 for second semester, etc.).
 
-I’m looking at the two approaches to using MapReduce to aggregate data across different entities in CouchDB.
+The reduce function (whether that is the \_stats function a used in this study or any other function) then receives a tuple of tuples (a list of the tuples output by the map function executions), as the output per key, and can perform calculations across corresponding indexes; i.e. a single key references a list of 6 tuples: 1 Grade document output, 1 Benchmark document output, and 4 Event document outputs. By performing an aggregation across these 6 tuples at corresponding indexes, the Grades percentage (i=1) is an aggregation of the grade as output from the Grade entity along with five 0s, the Benchmark percentages are each aggregations of the Benchmark percent each along with five 0s, and the Events data is an aggregation of four event counts and two 0s. As such, aggregation across the output tuple effectively only takes into account relevant values (since all other values are 0) and a join is achieved.
 
-A bit about how view are produced in CouchDB:
-CouchDB iterates through the docs, and runs the map function on every document, which the user configures to ‘emit’ values. For my function, the emitted value is a tuple with 11 indexes, with every value initialized at 0. So it’s this: [0,0,0,0,0,0,0,0,0,0,0]. Then depending on the document being processed by the map function, values at different indexes are changed.
+However, for this approach to work, the reduce function needs to be able to group by common keys. To perform a grouping on the compound key [Student ID, Course, Course Year], all the entities need to output data in this format; but the Events data doesn't include Course, and the the Benchmarks data doesn't include Course or Course Year. As such, to allow for Grade data to be joined to Benchmark data on Course and Course Year in addition to Student ID, each Benchmark document needs to be output for every possible combination of Course and Course Year per student. That is the same with the Events documents - each Event needs to be output for every possible course that a student took in a given year.
 
-i.e. if the document being processed by the map function is a ‘grade’ document, then the map function adjusts the value tuple to emit the grade percent – i.e. [percent, 0,0,0,0,0,0,0,0,0,0]. Or if the document is of type ‘demographic’, the map function changes the values at indexes 2 through 9 and emits the value: [0, x,x,x,x,x,x,x,x, 0, 0]. If the document is of type ‘event’, then the map function alters the value at indexes 9 and 10. i.e. [0,0,0,0,0,0,0,0, s1Event, s2Event] (s1Event is 1 for first semester event, or 0 for second semester, etc.).
+In terms of performance this approach is disastrous. To analyze 40 courses taken over 3 years, each Benchmark document needs to be emitted for a student $40 x 3 = 120$ times so that the key of the Grade document [Student ID, Course, Year] can always be joined to Benchmark document. Likewise, Each Event data (which has year but not course information) needs to be emitted 40 times - once for each course a join could potentially be performed on. Considering that there are several million event documents this is impracticable.
 
-And as you recommended, the keys are always emitted as [student id, course, year] for grade document, [student id, ‘a’, 1] for demographic documents, and [student id, ‘a’, year] for event documents.
+Instead, CouchDB's usage of B+trees as a means of sorting view indexes by keys is utilized to allow for joining the 3 documents in the final dataset. Figure \ref{mapreduce-key-output} shows the key format for each type of document the Map function processes (Grade, Event, Benchmark). Keys are defined so that the index produced by the Map function is always ordered per particular student: i.e. for a particular Student ID, and scanning the B+tree, the first document found will be the Benchmark document, followed by Event document, and followed by Grade documents. The reduce function is then used to create an aggregation of all the event documents so that retrieval from the reduced view-index, for any student ID, iteratively produces first a Benchmark document, then a single (aggregated) Event document, then a single Grade document for each course that student enrolled in. This results in a much more efficient way of aggregating different types of documents for a given set of keys than was first attempted.
 
-But then I can never group the different document types for a student id. Instead I’m guaranteed that all documents for a single student are ‘next’ to each other and I can join them from iteration as a result. i.e. this is the result of the map function for a single student for 2 courses
+With ordered output, and Event data already aggregated via the reduce function, data retrieval involves iterating over view indexes, processing a single ID at a time. This is very efficient in terms of memory usage since only documents relating to a single ID need to be held in memory at a time.
 
-    [smtzac002, ‘a’, 1]: [0, b1, b2, b3, b4, b5, b6, b7, b8, 0, 0]
-[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
-[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
-[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
-[smtzac002, ‘CSC1015F’, 2016]: [98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-[smtzac002, ‘MAM100F, 2016]: [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+\begin{figure}[H]
+    \centering
+    \begin{mdframed}
+        \centering
+        \begin{verbatim}
+// Map output
+[<ID>, ‘0’, 1]: [0, b1, b2, b3, b4, b5, b6, b7, b8, 0, 0]
+[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+[<ID>, ‘CSC1015F’, <Year>]: [98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[<ID>, ‘MAM100F, <Year>]: [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-Then the reduce function is only necessary to aggregate the event data (which will all have the same key). The result is something like this:
-
-[smtzac002, ‘a’, 1]: [0, b1, b2, b3, b4, b5, b6, b7, b8, 0, 0]
-[smtzac002, ‘a’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3]
-[smtzac002, ‘CSC1015F’, 2016]: [98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-[smtzac002, ‘MAM100F, 2016]: [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-(although the structure of the reduce output is a little different to this, the information is the same)
-
-Then the actual aggregation is done on retrieval. So it would be better to do the actual aggregation in nETL then.
-
-Is that ok? But this means that the importance of the reduce function is greatly diminished. So effectively I’m using CouchDB to order the information in the CSV, and nothing more really…
-
-Alternatively, what I did was this:
-[smtzac002, ‘x’, y]: [0, b1, b2, b3, b4, b5, b6, b7, b8, 0, 0] // this document is emitted twice: where x = CSC1015F, and then when x = MAM100F. y = 2016 (since only one year is analyzed)
-[smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] // emitted for x = CSC1015F and x = MAM100F
-    [smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] // emitted for x = CSC1015F and x = MAM100F
-    [smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] // emitted for x = CSC1015F and x = MAM100F
-    [smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] // emitted for x = CSC1015F and x = MAM100F
-    [smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] // emitted for x = CSC1015F and x = MAM100F
-    [smtzac002, ‘x’, 2016]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] // emitted for x = CSC1015F and x = MAM100F
-    [smtzac002, ‘CSC1015F’, 2016]: [98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] // emitted once
-    [smtzac002, ‘MAM100F, 2016]: [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] // emitted once
-
-
-So then the result of the reduce function is an aggregation already. BUT. If I am analyzing 40 courses, then every single event is emitted 40 times. And if I were analyzing multiple years, then every event would be emitted 40 times for each year (so 120 times for 3 years). Obviously this is not scalable.
-
-Should I include the fact that I tried this approach in the write up? It seems like more a mistake than anything else in hindsite. I would prefer to just write up the steps to creating a correct and concise result.
+// Resulting reduce output
+[<ID>, ‘0’, 1]: [0, b1, b2, b3, b4, b5, b6, b7, b8, 0, 0]
+[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3]
+[<ID>, ‘CSC1015F’, <Year>]: [98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[<ID>, ‘MAM100F, <Year>]: [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        \end{verbatim}
+    \end{mdframed}
+    \caption[Aggregation By Sorted MapReduce output]{\textbf{Figure \ref{mapreduce-key-output}: Aggregating via a combination of MapReduce and relying on sorted B+tree keys.} The Map function should output keys in the form [ID, Course, Year] as shown above for all document processed. However this is not possible for document of type Benchmark (which don't include properties for Course or Year) or documents of type Events (which don't include the property Course). As such, a key of the required format is simply created so as to assure ordering of documents in the resultant B+tree index; in this case documents will all be ordered by Student ID, since all documents contain that property. For Benchmark data, the value `0' is emitted for Course since that value will result in the Benchmark data ordered before documents with a Course property. For the Year field, the value `1' is emitted for Benchmark data since that guarantees ordering of documents by year ahead of any real years. Likewise for documents of type Events, the value `0' is emitted for Course. The resultant B+tree index guarantees that for a particular ID, Benchmark output will occur before Event output which will occur before Grade output.}
+    \label{mapreduce-key-output}
+\end{figure}

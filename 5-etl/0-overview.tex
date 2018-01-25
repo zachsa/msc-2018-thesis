@@ -4,15 +4,15 @@ Extraction is fairly straightforward; a variable is created in memory to referen
 
 
 \begin{table}[H]
-    \textbf{Table \ref{tbl-json-examples}}\par\medskip\par\medskip
-    \caption{JSON representation of data entities}
-    \label{tbl-json-examples}
-    \begin{tabular}{>{\centering\arraybackslash}p{\dimexpr 0.4\linewidth-2\tabcolsep}>{\centering\arraybackslash}m{\dimexpr 0.6\linewidth-2\tabcolsep}}
-        \toprule
-        \mC{c}{Entity} & \mC{c}{JSON representation} \\
-        \midrule
-        Sakai Event    &
-        \begin{verbatim}
+  \textbf{Table \ref{tbl-json-examples}}\par\medskip\par\medskip
+  \caption{JSON representation of data entities}
+  \label{tbl-json-examples}
+  \begin{tabular}{>{\centering\arraybackslash}p{\dimexpr 0.4\linewidth-2\tabcolsep}>{\centering\arraybackslash}m{\dimexpr 0.6\linewidth-2\tabcolsep}}
+    \toprule
+    \mC{c}{Entity} & \mC{c}{JSON representation} \\
+    \midrule
+    Sakai Event    &
+    \begin{verbatim}
             {
               "_id": "000e569ee321b915bae59fe62e0051e3",
               "_rev": "1-7112afce121087818c33ebfd0fd7fed7",
@@ -23,9 +23,9 @@ Extraction is fairly straightforward; a variable is created in memory to referen
               "type_": "vulaEvent"
             }        
         \end{verbatim}
-        \\
-        Sakai Grade    &
-        \begin{verbatim}
+    \\
+    Sakai Grade    &
+    \begin{verbatim}
             {
               "_id": "7530f4eed7e6bc3ef0d99a53be8ba9a2",
               "_rev": "8-232d0cf39728d41b4c5935f12469209d",
@@ -42,9 +42,9 @@ Extraction is fairly straightforward; a variable is created in memory to referen
               "type_": "courseGrade"
             }        
         \end{verbatim}
-        \\
-        FU Entity      &
-        \begin{verbatim}
+    \\
+    FU Entity      &
+    \begin{verbatim}
             {
               "_id": "6587aa5b36bba2a70aeba96d06f05d2b",
               "_rev": "1-8c7d395e046e452442907e3388c74b41",
@@ -61,9 +61,9 @@ Extraction is fairly straightforward; a variable is created in memory to referen
               "type_": "demographic"
             }
         \end{verbatim}
-        \\
-        \bottomrule
-    \end{tabular}
+    \\
+    \bottomrule
+  \end{tabular}
 \end{table}
 
 Further transformations can then be applied to the entity-objects before being loaded into CouchDB, completing a sequential processing of a single row of CSV data via first extracting information, transforming information, and loading information into the destination (ETL).
@@ -71,8 +71,8 @@ Further transformations can then be applied to the entity-objects before being l
 In addition to the transformation from tabular rows to objects, specific transformations of the objects are required prior to loading the data to CouchDB. Required transformations used to produce the final results in this project are listed here:
 
 \begin{itemize}
-    \item Filtering (both by whitelisting objects and whitelisting object fields) to reduce CouchDBs footprint and reduce indexing computational cost
-    \item Adding a `type' attribute to each object for entity classification of objects within CouchDB
+  \item Filtering (both by whitelisting objects and whitelisting object fields) to reduce CouchDBs footprint and reduce indexing computational cost
+  \item Adding a `type' attribute to each object for entity classification of objects within CouchDB
 \end{itemize}
 
 Loading data into CouchDB involves an HTTP post request with JSON data in the request body. To optimize the ETL process, instead of processing CSVs line-by-line, CSV lines are batched and processed several thousand at a time. As discussed previously, CouchDB is able to handle batched data insertion more performantly than insertion of single documents via the \_bulk\_docs endpoint), and this approach also greatly reduces the number of network requests to CouchDB required to complete loading of all CSV data (which could be expensive in time if ETL was done on a different computer to the CouchDB database software). Batching is also done during CSV file reading to reduce IO overhead since fewer disk reads are required as the percentage of data retrieved per disk read (the batch) increases.
@@ -80,27 +80,28 @@ Loading data into CouchDB involves an HTTP post request with JSON data in the re
 The ETL process is described in terms of coding requirements in pseudo code in Figure \ref{row-object-transformation}, but in terms of implementation, the reality of coding the ETL process is more complicated than is depicted for several reasons as shown here.
 
 \begin{itemize}
-    \item Variable (but still valid) formatting that CSVs can have in terms of row delimiters, column delimiters, text qualifiers, character encoding, etc. etc.
-    \item Some CSVs don't include a header row, so headers need to be injected into the process during runtime
-    \item Real code is substantially longer than psuedo code in general, due to edge cases and implementation of general statements
-    \item Generic handling of different CSV sources and CoucDB database destinations require configurable extraction, transformation and loading logic
-    \item Generic handling of many different types of transformations that were used during project development but not for the final result (increasing the complexity of the case base):
-          \begin{itemize}
-              \item Anonymizing object values
-              \item Text transformations of values
-              \item Transformation from objects back to lines (for CSV output)
-              \item Transformation from csv strings to SQL insert strings
-          \end{itemize}
-    \item During project development, alternatives to CouchDB as load-destinations were required inlcuding for CSV files and SQL Server - as such the code required much adjustment in for these cases.
+  \item Variable (but still valid) formatting that CSVs can have in terms of row delimiters, column delimiters, text qualifiers, character encoding, etc. etc.
+  \item Some CSVs don't include a header row, so headers need to be injected into the process during runtime
+  \item Real code is substantially longer than psuedo code in general, due to edge cases and implementation of general statements
+  \item Generic handling of different CSV sources and CoucDB database destinations require configurable extraction, transformation and loading logic
+  \item Generic handling of many different types of transformations that were used during project development but not for the final result (increasing the complexity of the case base):
+        \begin{itemize}
+          \item Anonymizing object values
+          \item Text transformations of values
+          \item Transformation from objects back to lines (for CSV output)
+          \item Transformation from csv strings to SQL insert strings
+        \end{itemize}
+  \item During project development, alternatives to CouchDB as load-destinations were required inlcuding for CSV files and SQL Server - as such the code required much adjustment in for these cases.
 \end{itemize}
 
 Due to the ever-increasing complexity of the code being used for ETL, the codebase was formalized and structured as a component-based ETL engine that performed ETL tasks based on independent and external configuration objects. These tasks comprise sequential piping of output from one component to input of another component. By providing input/output data contracts, components can be strung together in any order, allowing for versatile and configurable ETL pipelines. By implementing the components as user-configurable, external processes to the ETL engine, specific logic required to process specific information is greatly decoupled from the logic required to extract, transform and load information as a series of high level tasks. The resultant software to achieve this task is implemented in JavaScript (node.js), and is called \textit{nETL} (node.js ETL).
 
+% lstlisting for maths inclusion: Should I analysis the algorithm? $f(x)=ax^2+bx+c$
 \begin{figure}[H]
+  \centering
+  \begin{mdframed}
     \centering
-    \begin{mdframed}
-        \centering
-        \begin{lstlisting}
+    \begin{verbatim}
 // Extract the headers of the CSV file, and keep reference in memory throughout ETL process
 file = loadFile('path')
 headers = getFirstCsvRow(file)
@@ -123,7 +124,7 @@ function getObjectsFromCSV(file, pStart, pEnd) {
         object = whitelistObjectFields(object)
         object = addTypeField(object)
 
-        objects.push(object) Should I analysis the algorithm? $f(x)=ax^2+bx+c$
+        objects.push(object)
     }
     return objects
 }
@@ -142,8 +143,8 @@ for (i = pointerStart; i <= file.length; i += batchSize) {
 pointerEnd = fileSize
 objects = getObjectsFromCSV(file, pointerStart, pointerEnd)
 insertToCouchDB(objects)
-        \end{lstlisting}
-    \end{mdframed}
-    \caption[Row to object transformation]{\textbf{Figure \ref{row-object-transformation}: Algorithm to transform CSV rows to object.}}
-    \label{row-object-transformation}
+        \end{verbatim}
+  \end{mdframed}
+  \caption[Row to object transformation]{\textbf{Figure \ref{row-object-transformation}: Algorithm to transform CSV rows to object.}}
+  \label{row-object-transformation}
 \end{figure}
