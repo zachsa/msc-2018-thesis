@@ -69,43 +69,247 @@ function(keys, values, rereduce) {
 \subsection{Result 1}
 \label{result-1-map}
 \begin{minted}{javascript}
+/**
+ * A simplified output of the map tasks for each document type
+ * 
+ * 1) Grades
+ *    => [doc.anonIDnew, doc.Course, doc.RegAcadYear] : [doc.Percent]
+ * 
+ * 2) Demographics
+ *    => [doc.anonIDnew, 0, 0]: [
+ *         Gr12 Eng %,
+ *         Gr12 Sci %,
+ *         Gr12 Mth %,
+ *         Gr12 Mth Lit %,
+ *         Gr12 Mth Adv %,
+ *         NBT AL %,
+ *         NBT QL %,
+ *         NBT Mth %
+ *    ]
+ * 
+ * This Map function does not require reduce output
+ * 
+ * @param {Object} doc 
+ */
+function(doc) {
+    /* Compound key */
+    var id;
+    var course;
+    var year;
+
+    /* Decision tree */
+    var type = doc.type_;
+    switch (type) {
+        case 'grade':
+
+            /* Key */
+            id = doc.anonIDnew;
+            course = doc.Course;
+            year = doc.RegAcadYear;
+
+            /* Value */
+            var percent = doc.Percent || '';
+
+            /* Normalize the percent field to a number */
+            var disallowedCourseGrades = ['ATT', 'DE', 'GIP', 'LOA', 'OS', 'OSS', 'PA', 'SAT', 'UNS', ''];
+            if (typeof percent !== 'number') {
+                if (typeof percent !== 'string') return;
+                var newP = percent.toUpperCase().trim();
+                if (disallowedCourseGrades.indexOf(percent) >= 0) return;
+                switch (newP) {
+                    case 'AB':
+                        percent = 40;
+                        break;
+                    case 'F':
+                        percent = 40;
+                        break;
+                    case 'DPR':
+                        percent = 20;
+                        break;
+                    case 'INC':
+                        percent = 20;
+                        break;
+                    case 'UF':
+                        percent = 30;
+                        break;
+                    case 'UP':
+                        percent = 50;
+                        break;
+                    default:
+                        percent = parseFloat(percent.substring(0, percent.length - 1));
+                        if (isNaN(percent)) return;
+                        break;
+                };
+            };
+
+            /* Output */
+            emit([id, course, year], [percent]);
+            break;
+
+        case 'benchmark':
+
+            /* Key */
+            id = doc.anonIDnew;
+            course = 0;
+            year = 0;
+
+            /* Value (each index corresponds to a benchmark) */
+            var benchmarks = [0, 0, 0, 0, 0, 0, 0, 0];
+
+            /* Normalize symbols to numbers */
+            var fuDictionary = {
+                "A*": 90,
+                "A": 80,
+                "B": 70,
+                "C": 60,
+                "D": 55,
+                "E": 50
+            };
+
+            function getDemographicGrade(gr) {
+                var g = parseInt(gr);
+                var retG;
+                if (isNaN(g)) { // True for sumbols
+                    if (typeof gr !== 'string') return 0;
+                    retG = fuDictionary[gr.toUpperCase().trim()] || 0;
+                } else {
+                    retG = g;
+                };
+                return retG;
+            };
+
+            // Gr12 Eng
+            var gEng12 = getDemographicGrade(doc["Eng Grd12 Fin Rslt"] || "");
+            benchmarks[0] = gEng12;
+
+            // Gr12 Sci
+            var gSci12 = getDemographicGrade(doc["Phy Sci Grd12 Fin Rslt"] || "");
+            benchmarks[1] = gSci12;
+
+            // Gr12 Mth
+            var gMth12 = getDemographicGrade(doc["Math Grd12 Fin Rslt"] || "");
+            benchmarks[2] = gMth12;
+
+            // Gr12 Mth Lit
+            var gMthLit12 = getDemographicGrade(doc["Mth Lit Grd12 Fin Rslt"] || "");
+            benchmarks[3] = gMthLit12;
+
+            // Gr12 Mth Adv
+            var gMthAdv12 = getDemographicGrade(doc["Adv Mth Grd12 Fin Rslt"] || "");
+            benchmarks[4] = gMthAdv12;
+
+            // NBT AL
+            var gNbtAl = getDemographicGrade(doc["NBT AL Score"] || "");
+            benchmarks[5] = gNbtAl;
+
+            // NBT QL
+            var gNbtQl = getDemographicGrade(doc["NBT QL Score"] || "");
+            benchmarks[6] = gNbtQl;
+
+            // NBT Mth
+            var gNbtMth = getDemographicGrade(doc["NBT Math Score"] || "");
+            benchmarks[7] = gNbtMth;
+
+            /* Output */
+            emit([id, course, year], benchmarks);
+            break;
+
+        default:
+            break;
+    };
+};
 \end{minted}
 \label{result-1-list}
 \begin{minted}{javascript}
 function(head, req) {
     provides('csv', function() {
-        var headers = "Year,StudentAnonID,Course,Course %,Gr12 Eng %,Gr12 Sci %,Gr12 Mth %,Gr12 Mth Lit %,Gr12 Mth Adv %,NBT AL %,NBT QL %,NBT Mth %,Aggregation Count";
+        /* Send the headers */
+        var headers = "Year,StudentAnonID,Course,Course %,Gr12 Eng %,Gr12 Sci %,Gr12 Mth %,Gr12 Mth Lit %,Gr12 Mth Adv %,NBT AL %,NBT QL %,NBT Mth %";
         send(headers);
+
+        /* Helper function; send current year */
+        function sendLine(obj) {
+            if (obj.benchmark && obj.grade) {
+                var line =
+                    "\n" + obj.year +
+                    "," + obj.id +
+                    "," + obj.course +
+                    "," + obj["Course %"] +
+                    "," + obj["Gr12 Eng %"] +
+                    "," + obj["Gr12 Sci %"] +
+                    "," + obj["Gr12 Mth %"] +
+                    "," + obj["Gr12 Mth Lit %"] +
+                    "," + obj["Gr12 Mth Lit %"] +
+                    "," + obj["NBT AL %"] +
+                    "," + obj["NBT QL %"] +
+                    "," + obj["NBT Mth %"];
+                send(line);
+            };
+        };
+
+        /* Current function scope variables */
+        var currentStudent = null;
+        var currentYear = null;
+        var currentLine = {};
+        var key;
+        var id;
+        var course;
+        var year;
+        var value;
+
+        /* Iterate through view results */
         while (row = getRow()) {
-            var key = row.key;
-            var value = row.value;
-            var yr = key[0];
-            var id = key[1];
-            var course = key[2];
-            var courseGrade = value[0].max;
-            var engGrade = value[1].max;
-            var sciGrade = value[2].max;
-            var mthGrade = value[3].max;
-            var mthLitGrade = value[4].max;
-            var mthAdvGrade = value[5].max;
-            var nbtAl = value[6].max;
-            var nbtQl = value[7].max;
-            var nbtMth = value[8].max;
-            var aggrCount = value[8].count;
-            var line = "\n" + yr +
-                "," + id +
-                "," + course +
-                "," + courseGrade +
-                "," + engGrade +
-                "," + sciGrade +
-                "," + mthGrade +
-                "," + mthLitGrade +
-                "," + mthAdvGrade +
-                "," + nbtAl +
-                "," + nbtQl +
-                "," + nbtMth +
-                "," + aggrCount;
-            send(line);
+
+            /* Key */
+            key = row.key;
+            id = key[0];
+            course = key[1];
+            year = key[2];
+
+            /* Value */
+            value = row.value;
+
+            /* Send previous line if it's a new student and then reset id */
+            if (currentStudent !== id) {
+                sendLine(currentLine);
+                currentLine = {};
+                currentStudent = id;
+            };
+
+            /* Send previous line if it's a new year; reset year, but not id */
+            if (currentYear !== year) {
+                sendLine(currentLine);
+                currentYear = year;
+            };
+
+            /* Append to/adjust current line */
+            var type = (course === 0 && year === 0) ? 'benchmark' : 'grade';
+            switch (type) {
+                case 'benchmark':
+                    currentLine.benchmark = true;
+                    currentLine.id = id;
+                    currentLine["Gr12 Eng %"] = value[0];
+                    currentLine["Gr12 Sci %"] = value[1];
+                    currentLine["Gr12 Mth %"] = value[2];
+                    currentLine["Gr12 Mth Lit %"] = value[3];
+                    currentLine["Gr12 Mth Adv %"] = value[4];
+                    currentLine["NBT AL %"] = value[5];
+                    currentLine["NBT QL %"] = value[6];
+                    currentLine["NBT Mth %"] = value[7];
+                    break;
+
+                case 'grade':
+                    currentLine.grade = true;
+                    currentLine.id = id; // Overwrite benchmark if neccessary
+                    currentLine.year = year;
+                    currentLine.course = course;
+                    currentLine["Course %"] = value[0];
+                    break;
+
+                default:
+                    send({ error: "Document type unexpected" });
+                    break;
+            };
         };
     });
 };

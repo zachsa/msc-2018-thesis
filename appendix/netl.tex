@@ -71,9 +71,9 @@ const load; // Assigned elsewhere
     if (!batch.done) {
         batch = batch.value;
         self.tasks[key]._itemsExtracted += batch.length;
+        
+        // Do transformations on each batch item
         batch.forEach(function(item) {
-
-            // Do transformations
             transformations.forEach(function(t) {
                 item = t.transform(item);
             });
@@ -323,6 +323,8 @@ module.exports = {
 'use strict';
 const Readable = require('stream').Readable;
 const csvParser = require('csv-parse/lib/sync');
+
+
 /**
  * Using RFC 4180 CSV definition
  * Configuration example:
@@ -356,22 +358,21 @@ function TEXT_LINE_TO_OBJ() {
         skip_lines_with_empty_values: true
     };
     const keys = csvParser(t.attributeNames, parseOptions)[0];
-    function transform(lines) {
-        var retObjs = [];
-        lines.forEach(function(line) {
-            var values = csvParser(line, parseOptions)[0];
-            var obj = Object.create(null);
-            keys.forEach(function(el, i, arr) {
-                obj[el] = values[i];
-            });
-            retObjs.push(obj);
+
+    function transform(line) {
+        var values = csvParser(line, parseOptions)[0];
+        var obj = Object.create(null);
+        keys.forEach(function(el, i, arr) {
+            obj[el] = values[i];
         });
-        return retObjs;
+        return obj;
     };
+
     return {
         transform: transform
     };
 };
+
 module.exports = {
     name: 'TEXT_LINE_TO_OBJ',
     exe: TEXT_LINE_TO_OBJ
@@ -387,38 +388,26 @@ module.exports = {
  * filterOn: {"key1"; [<list of allowed values>], "key2": [...], ...}
  * filtering can either be done on objects or arrays since
  * arrays 'keys' are treated as indexes
- *
- * Configuration example:
- * {
- *     "Name": "FILTER",
- *     "filterOn": {
- *         "field1": [<list of allowed values>],
- *         "field2": [<list of allowed values>],
- *         etc...
- *     },
- *     "afterTaskRunCBs": []
- * }
  */
 function FILTER() {
     const t = this;
     const filterOn = t.filterOn;
-    function transform(batch) {
-        const transformedBatch = [];
-        batch.forEach(function(datum) {
-            var includeThisObj = true;
-            Object.keys(filterOn).forEach(function(key) {
-                if (filterOn[key].indexOf(datum[key]) < 0) {
-                    includeThisObj = false;
-                }
-            });
-            if (includeThisObj) transformedBatch.push(datum);
+
+    function transform(obj) {
+        var includeThisObj = true;
+        Object.keys(filterOn).forEach(function(key) {
+            if (filterOn[key].indexOf(obj[key]) < 0) {
+                includeThisObj = false;
+            }
         });
-        return transformedBatch;
+        if (includeThisObj) return obj;
     };
+
     return {
         transform: transform
     };
 };
+
 module.exports = {
     name: 'FILTER',
     exe: FILTER
@@ -428,36 +417,35 @@ module.exports = {
 \subsubsection{WHITELIST}
 \label{netl-trans-whitelist}
 \begin{minted}{javascript}
+'use strict';
 /**
  * Configuration example:
  * {
- *     "Name": "WHITELIST",
- *     "allowedAttributes": [
- *         "type_", "RegAcadYear", "anonIDnew", "Course", "Percent"
- *     ],
- *     "afterTaskRunCBs": []
- *     } 
+ *   "Name": "WHITELIST",
+ *   "allowedAttributes": [
+ *       "type_", "RegAcadYear", "anonIDnew", "Course", "Percent"
+ *   ],
+ *   "afterTaskRunCBs": []
+ * } 
  */
-'use strict';
 function WHITELIST() {
     const t = this;
     var allowedAttributes = t.allowedAttributes;
-    function transform(docs) {
-        var retDocs = [];
-        docs.forEach(function(doc) {
-            var newDoc = {};
-            for (var attr in doc) {
-                if (!doc.hasOwnProperty(attr)) continue;
-                if (allowedAttributes.includes(attr)) newDoc[attr] = doc[attr];
-            };
-            if (Object.keys(newDoc).length !== 0) retDocs.push(newDoc);
-        });
-        return retDocs;
+
+    function transform(doc) {
+        var newDoc = {};
+        for (var attr in doc) {
+            if (!doc.hasOwnProperty(attr)) continue;
+            if (allowedAttributes.includes(attr)) newDoc[attr] = doc[attr];
+        };
+        if (Object.keys(newDoc).length !== 0) return newDoc;
     };
+
     return {
         transform: transform
     };
 };
+
 module.exports = {
     name: 'WHITELIST',
     exe: WHITELIST
@@ -480,24 +468,25 @@ module.exports = {
  */
 function CREATE_OBJ_FIELD() {
     const t = this;
-    function transform(batch) {
-        const transformedBatch = JSON.parse(JSON.stringify(batch));
-        transformedBatch.forEach(function(datum) {
-            if (datum.length == 0) return;
-            t.newAttributes.forEach(function(attr) {
-                // Throw error if key already exists
-                if (datum.hasOwnProperty(attr[0])) {
-                    throw new Error("New property not allowed!");
-                }
-                datum[attr[0]] = attr[1]
-            });
+
+    function transform(obj) {
+        if (obj === {} || !obj) return;
+        const transformedObj = JSON.parse(JSON.stringify(obj));
+        t.newAttributes.forEach(function(attr) {
+            // Throw error if key already exists
+            if (transformedObj.hasOwnProperty(attr[0])) {
+                throw new Error("New property not allowed!");
+            }
+            transformedObj[attr[0]] = attr[1]
         });
-        return transformedBatch;
+        return transformedObj;
     };
+
     return {
         transform: transform
     };
 };
+
 module.exports = {
     name: 'CREATE_OBJ_FIELD',
     exe: CREATE_OBJ_FIELD
