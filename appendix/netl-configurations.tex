@@ -1,11 +1,11 @@
 \section{Configuration Files}
 \label{netl-configuration}
 
-\subsection{Result 1}
-\label{netl-run1-config}
+\subsection{Tasks 1 \& 2}
+\label{netl-tasks-1-2-config}
 \begin{minted}{json}
 [{
-    "ID": "2014/15/16 FU: Run 1",
+    "ID": "Task 1",
     "Extraction": {
         "Name": "FLATFILE",
         "path": "C:/MSc/Data/Demographics/FU-CombinedGrades-2016Reg.csv",
@@ -68,7 +68,7 @@
         "afterTaskRunCBs": []
     }
 }, {
-    "ID": "2014/15/16 Grades: Run 1",
+    "ID": "Task 2",
     "Extraction": {
         "Name": "FLATFILE",
         "path": "C:/MSc/Data/Grades/CombinedGrades.csv",
@@ -122,8 +122,8 @@
 }]
 \end{minted}
 
-\subsection{Result 2}
-\label{netl-run2-config}
+\subsection{Task 2}
+\label{netl-task2-config}
 \begin{minted}{json}
 [{
     "ID": "2014/15/16 FU: Run 2",
@@ -242,181 +242,12 @@
 }]
 \end{minted}
 
-\subsection{Result 3}
-\label{netl-run3-config}
+\subsection{Task 3}
+\label{netl-task3-config}
 \begin{minted}{json}
-[{
-        "ID": "2014/15/16 FU: Run 3",
-        "Extraction": {
-            "Name": "FLATFILE",
-            "path": "C:/MSc/Data/Demographics/FU-CombinedGrades-2016Reg.csv",
-            "skipHeaderRows": 1,
-            "bufferSize": 65536,
-            "batchSize": 10000,
-            "startFrom": 0,
-            "afterTaskRunCBs": []
-        },
-        "Transformations": [{
-                "Name": "TEXT_LINE_TO_OBJ",
-                "attributeNames": "anonIDnew,Career,Citizenship Residency,SA School,Eng Grd12 Fin Rslt,Math Grd12 Fin Rslt,Mth Lit Grd12 Fin Rslt,Adv Mth Grd12 Fin Rslt,Phy Sci Grd12 Fin Rslt,NBT AL Score,NBT QL Score,NBT Math Score,RegAcadYear",
-                "delimiter": ",",
-                "textQualifier": "\"",
-                "escapeChar": "\\",
-                "afterTaskRunCBs": []
-            },
-            {
-                "Name": "FILTER",
-                "filterOn": {
-                    "Career": ["UGRD", "First Year", "Second Year", "Third Year"],
-                    "Citizenship Residency": ["SA Citizen", "Permanent Resident", "C", "P"],
-                    "anonIDnew": ["List of student IDs of students who attended 1015F"]
-                },
-                "afterTaskRunCBs": []
-            },
-            {
-                "Name": "CREATE_OBJ_FIELD",
-                "newAttributes": [
-                    ["type_", "demographic"]
-                ],
-                "afterTaskRunCBs": []
-            },
-            {
-                "Name": "WHITELIST",
-                "allowedAttributes": [
-                    "type_",
-                    "anonIDnew",
-                    "Eng Grd12 Fin Rslt",
-                    "Math Grd12 Fin Rslt",
-                    "Mth Lit Grd12 Fin Rslt",
-                    "Adv Mth Grd12 Fin Rslt",
-                    "Phy Sci Grd12 Fin Rslt",
-                    "NBT AL Score",
-                    "NBT QL Score",
-                    "NBT Math Score",
-                    "RegAcadYear"
-                ],
-                "afterTaskRunCBs": []
-            }
-        ],
-        "Load": {
-            "Name": "COUCHDB",
-            "username": "admin",
-            "password": "password",
-            "server": "localhost",
-            "port": 5984,
-            "ssl": false,
-            "database": "msc_run3",
-            "afterTaskRunCBs": []
-        }
-    }, {
-        "ID": "2014/15/16 Grades: Run 3",
-        "Extraction": {
-            "Name": "FLATFILE",
-            "path": "C:/MSc/Data/Grades/CombinedGrades.csv",
-            "skipHeaderRows": 1,
-            "bufferSize": 65536,
-            "batchSize": 10000,
-            "startFrom": 0,
-            "afterTaskRunCBs": []
-        },
-        "Transformations": [{
-                "Name": "TEXT_LINE_TO_OBJ",
-                "attributeNames": "DownloadedDate, RegAcadYear, RegTerm, anonIDnew, RegProgram, RegCareer, Degree, DegreeDescr, Subject, Catalog., Course, CourseSuffix, Session, Percent, Symbol, UnitsTaken, CourseID, CourseDescr, CourseCareer, Faculty, Dept, MaximumCrseUnits, CourseCount, CourseLevel, CESM, Sub-CESM",
-                "delimiter": ",",
-                "textQualifier": "\"",
-                "escapeChar": "\\",
-                "afterTaskRunCBs": []
-            },
-            {
-                "Name": "FILTER",
-                "filterOn": {
-                    "RegCareer": ["UGRD"],
-                    "Course": ["CSC1015F"],
-                    "RegAcadYear": [2016]
-                },
-                "afterTaskRunCBs": []
-            },
-            {
-                "Name": "CREATE_OBJ_FIELD",
-                "newAttributes": [
-                    ["type_", "courseGrade"]
-                ],
-                "afterTaskRunCBs": []
-            },
-            {
-                "Name": "WHITELIST",
-                "allowedAttributes": [
-                    "type_", "Course", "RegAcadYear", "anonIDnew", "Percent"
-                ],
-                "afterTaskRunCBs": []
-            }
-        ],
-        "Load": {
-            "Name": "COUCHDB",
-            "username": "admin",
-            "password": "password",
-            "server": "localhost",
-            "port": 5984,
-            "ssl": false,
-            "database": "msc_run3",
-            "afterTaskRunCBs": []
-        }
-    },
-    {
-        "ID": "2014/15/16 Events: Run 3",
-        "Extraction": {
-            "Name": "FLATFILE",
-            "path": "C:/MSc/Data/VulaUsage/allEvents2016.csv",
-            "skipHeaderRows": 1,
-            "bufferSize": 65536,
-            "batchSize": 30000,
-            "startFrom": 0,
-            "afterTaskRunCBs": []
-        },
-        "Transformations": [{
-                "Name": "TEXT_LINE_TO_OBJ",
-                "attributeNames": "event_date,event_id,uct_id,site_key,ref",
-                "delimiter": ",",
-                "textQualifier": "\"",
-                "escapeChar": "\\",
-                "afterTaskRunCBs": []
-            },
-            {
-                "Name": "FILTER",
-                "filterOn": {
-                    "uct_id": ["List of student IDs of students who attended CSC105F"],
-                    "event_id": [281]
-                },
-                "afterTaskRunCBs": []
-            },
-            {
-                "Name": "CREATE_OBJ_FIELD",
-                "newAttributes": [
-                    ["type_", "vulaEvent"]
-                ],
-                "afterTaskRunCBs": []
-            },
-            {
-                "Name": "WHITELIST",
-                "allowedAttributes": ["event_date", "event_id", "uct_id", "site_key", "type_"],
-                "afterTaskRunCBs": []
-            }
-        ],
-        "Load": {
-            "Name": "COUCHDB",
-            "username": "admin",
-            "password": "password",
-            "server": "localhost",
-            "port": 5984,
-            "ssl": false,
-            "database": "msc_run3",
-            "afterTaskRunCBs": []
-        }
-    }
-]
 \end{minted}
 
-\subsection{Result 4}
-\label{netl-run4-config}
+\subsection{Task 4}
+\label{netl-task4-config}
 \begin{minted}{json}
 \end{minted}

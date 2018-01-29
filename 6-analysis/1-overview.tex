@@ -1,20 +1,9 @@
-Data analysis in the context of this project is completed as a series of stages, each of which consists of a sequential process of ETL, followed by querying and analysis. Figure \ref{analysis-workflow} shows the sequential steps involved in a single stage of analysis; nETL is executed with a configuration file specifying CSV extraction, transformations, and the destination database as a parameter, CouchDB builds a view-index according to the MapReduce view as specified via a design document, data is retrieved via a List function also specified on the design document, and subsequent analyses (stages) are performed in context of the proceeding stages results. For each stage in the analysis, the configuration of nETL is discussed in terms of logical operations, and the configuration files themselves are included in the appendix (see \ref{netl-configuration}).
+todo: figure showing the picture drawn with Sonia and mention how the list function retrieves results from the view.
 
-With the eventual aim of assessing the relationships between LMS usage and course grades, the following series of analyses is conducted in terms of the CSC1015F course.
+In terms of defining MapReduce tasks, the map function is always user-defined, whereas only built-in reduce functions are used. The built-in reduce functions are implemented within the main Erlang process, which according to the documentation offers a performance boost since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is negated. Working on a Windows machine the IO cost is apparently exaggerated (see the slack correspondence with Jan Lehnardt in appendix \ref{slack-1-nov}) due to the difference between Unix-based and Windows kernel implementations.
 
-\begin{enumerate}
-    \item \textit{Stage 1}: Assessing effectiveness of different benchmarking formulas using the Benchmarks data
-    \item \textit{Stage 2}: Assessing the correlation between Events and Grades data
-    \item \textit{Stage 3}: As a means of control, assessing the correlation between Events and Benchmarks
-    \item \textit{Stage 4}: Assessing the relationship of student performance relative to their peers as benchmarked compared to course performance, in terms of LMS usage
-\end{enumerate}
-\input{6-analysis/figures/workflow}
+During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{performance-analysis}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
 
-In addition to outlining a structured approach by which the results are obtained for CSC1015F, further discussion is provided on how multiple courses may be analyzed simultaneously via more advanced usage of CouchDB's MapReduce implementation. During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{performance-analysis}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
-
-In terms of defining MapReduce tasks, the map function is always user-defined, whereas a built-in reduce function (\_stats) is always used. The built-in reduce function are implemented within the main Erlang process, which according to the documentation offers a performance boost since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is negated. Working on a Windows machine the IO cost is apparently exaggerated (see the slack correspondence with Jan Lehnardt in appendix \ref{slack-1-nov}) due to the difference between Unix-based and Windows kernel implementations.
-
-\input{6-analysis/tables/tbl-grades-normalize}
 \input{6-analysis/tables/performance-analysis}
 
 \section{MapReduce Considerations}
@@ -60,3 +49,9 @@ With ordered output, and Event data already aggregated via the reduce function, 
     \caption[Aggregation By Sorted MapReduce output]{\textbf{Figure \ref{mapreduce-key-output}: Aggregating via a combination of MapReduce and relying on sorted B+tree keys.} The Map function should output keys in the form [ID, Course, Year] as shown above for all document processed. However this is not possible for document of type Benchmark (which don't include properties for Course or Year) or documents of type Events (which don't include the property Course). As such, a key of the required format is simply created so as to assure ordering of documents in the resultant B+tree index; in this case documents will all be ordered by Student ID, since all documents contain that property. For Benchmark data, the value `0' is emitted for Course since that value will result in the Benchmark data ordered before documents with a Course property. For the Year field, the value `1' is emitted for Benchmark data since that guarantees ordering of documents by year ahead of any real years. Likewise for documents of type Events, the value `0' is emitted for Course. The resultant B+tree index guarantees that for a particular ID, Benchmark output will occur before Event output which will occur before Grade output.}
     \label{mapreduce-key-output}
 \end{figure}
+
+\subsection{Grade normalization}
+Percent fields in the Grade and Benchmark data are irregular, in that both symbols and numbers are used. Table \ref{tbl-grades-normalize} shows the logic used to translate grade symbols to percentages, and Table \ref{table-benchmarks-normalize} shows the same logic for the Benchmarks data.
+
+\input{6-analysis/tables/tbl-grades-normalize}
+\input{6-analysis/tables/tbl-benchmarks-normalize}
