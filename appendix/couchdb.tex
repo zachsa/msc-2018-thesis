@@ -65,9 +65,10 @@ function(keys, values, rereduce) {
 }
 \end{minted}
 
-\section{Map Functions}
-\subsection{Result 1}
-\label{result-1-map}
+\section{Design Document Functions}
+\subsection{2-Way Join}
+\subsubsection{Map Function}
+\label{2-way-join-map-function}
 \begin{minted}{javascript}
 /**
  * A simplified output of the map tasks for each document type
@@ -111,31 +112,44 @@ function(doc) {
             var percent = doc.Percent || '';
 
             /* Normalize the percent field to a number */
-            var disallowedCourseGrades = ['ATT', 'DE', 'GIP', 'LOA', 'OS', 'OSS', 'PA', 'SAT', 'UNS', ''];
             if (typeof percent !== 'number') {
                 if (typeof percent !== 'string') return;
-                var newP = percent.toUpperCase().trim();
-                if (disallowedCourseGrades.indexOf(percent) >= 0) return;
-                switch (newP) {
-                    case 'AB':
-                        percent = 40;
-                        break;
+                var percentCleaned = percent.toUpperCase().trim();
+
+                /* Return if percent is a disallowed symbol */
+                if ([
+                        'ATT',
+                        'DE',
+                        'GIP',
+                        'LOA',
+                        'OS',
+                        'OSS',
+                        'PA',
+                        'SAT',
+                        'UNS',
+                        'AB',
+                        ''
+                    ].indexOf(percentCleaned) >= 0) return;
+
+                /* Get the percentage */
+                switch (percentCleaned) {
                     case 'F':
                         percent = 40;
                         break;
                     case 'DPR':
-                        percent = 20;
-                        break;
-                    case 'INC':
-                        percent = 20;
-                        break;
-                    case 'UF':
                         percent = 30;
                         break;
+                    case 'INC':
+                        percent = 30;
+                        break;
+                    case 'UF':
+                        percent = 49;
+                        break;
                     case 'UP':
-                        percent = 50;
+                        percent = 45;
                         break;
                     default:
+                        /* Convert percent to number */
                         percent = parseFloat(percent.substring(0, percent.length - 1));
                         if (isNaN(percent)) return;
                         break;
@@ -143,7 +157,7 @@ function(doc) {
             };
 
             /* Output */
-            emit([id, course, year], [percent]);
+            emit([id, course, year], percent);
             break;
 
         case 'benchmark':
@@ -219,7 +233,9 @@ function(doc) {
     };
 };
 \end{minted}
-\label{result-1-list}
+
+\subsubsection{List Function}
+\label{2-Way-join-list-function}
 \begin{minted}{javascript}
 function(head, req) {
     provides('csv', function() {
@@ -276,12 +292,6 @@ function(head, req) {
                 currentStudent = id;
             };
 
-            /* Send previous line if it's a new year; reset year, but not id */
-            if (currentYear !== year) {
-                sendLine(currentLine);
-                currentYear = year;
-            };
-
             /* Append to/adjust current line */
             var type = (course === 0 && year === 0) ? 'benchmark' : 'grade';
             switch (type) {
@@ -299,8 +309,15 @@ function(head, req) {
                     break;
 
                 case 'grade':
+
+                    /* Send previous line if it's a new year */
+                    if (currentYear !== year) {
+                        sendLine(currentLine);
+                        currentYear = year;
+                    };
+
                     currentLine.grade = true;
-                    currentLine.id = id; // Overwrite benchmark if neccessary
+                    currentLine.id = id; // In case no demographic doc exists
                     currentLine.year = year;
                     currentLine.course = course;
                     currentLine["Course %"] = value[0];
