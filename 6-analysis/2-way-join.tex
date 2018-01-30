@@ -99,15 +99,7 @@ The map function for this analysis is included in the appendix (see \ref{result-
 
 Normalization of the percentage fields (i.e. ``Percent'' for the Grades entity and the test results in the Benchmarks entity) is done via a nested function within the Map function and according to the logic as discussed in that tables previously. No reduce function is used to achieve this 2-way join. This is because, theoretically, a student should only have a single set of Benchmark results and should only achieve a single grade per course per year. As such there is no need to aggregate output from the Map function (which is done via reduction) before performing the document join via the List function.
 
-\begin{figure}[ht]
-    \centering
-    \begin{mdframed}
-        \centering
-        \includegraphics[scale=0.35]{./resources/figures/activity-diagram-1.png}
-    \end{mdframed}
-    \caption[Result 1 Map function]{\textbf{Figure \ref{result-1-map-fn}: Activity diagram showing logic Map function logic for Results 1 \& 2.} This logic is applied to every document during index calculation (excluding documents with an \_id of ``\_design/*'').}
-    \label{result-1-map-fn}
-\end{figure}
+\input{6-analysis/figures/2-way-join-map}
 
 \subsection{List Function}
 TODO

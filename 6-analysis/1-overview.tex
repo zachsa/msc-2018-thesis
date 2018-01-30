@@ -1,10 +1,16 @@
-todo: figure showing the picture drawn with Sonia and mention how the list function retrieves results from the view.
+The nETL and CouchDB applications are incorporated into an analysis workflow as represented in Figure \ref{analysis}. CSVs are parsed by the nETL application and loaded into a CouchDB database via the CouchDB server application. An index is created from the CouchDB database, and data is retrieved directly from the index file using a List function. The index is primarily used as a means of sorting the data from the main CouchDB file; both the 2-way join and 3-way join are performed directly on the sorted index rather than in the MapReduce function. Although the MapReduce function fills the important role of aggregating entities prior to joining them (as discussed in 3-way join section), it is technically possible to join documents directly on retrieval from the main database file since both the main database file and derived indexes are structured as B+trees and can be sorted. However there are three problems with retrieving data directly from the main database file and skipping index creation:
+
+\begin{itemize}
+    \item CouchDB database files are sorted by the ``\_id'' field, which when unspecified on document insert is initialized as a UUID. Using UUIDs as unique document identifiers allow for dispersed systems, and so even though not required by this project, best practices in this case are followed. A B+tree sorted by a UUID is not useful for document retrieval, and as such, views are required of the underlying datastore for any kind of sorted querying
+    \item Since List functions are invoked via an HTTP GET request with the requirement of specifying a view within the URI, without using a view in this project an alternative means of data retrieval to using List functions would be required. Although List functions are effectively deprecated and alternative means of database interaction are recommended, they exist in the current release of CouchDB 2.1.1. They are convenient and present a strong case for usage in terms of this project
+    \item When aggregations of specific entities are required, retrieving data directly from these indexes is vastly easier than having to aggregate during data retrieval. As aggregation logic becomes more complicated the difficulty of such direct data retrieval increases and the benefit of using indexes increases as a result
+\end{itemize}
 
 In terms of defining MapReduce tasks, the map function is always user-defined, whereas only built-in reduce functions are used. The built-in reduce functions are implemented within the main Erlang process, which according to the documentation offers a performance boost since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is negated. Working on a Windows machine the IO cost is apparently exaggerated (see the slack correspondence with Jan Lehnardt in appendix \ref{slack-1-nov}) due to the difference between Unix-based and Windows kernel implementations.
 
 During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{performance-analysis}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
 
-\input{6-analysis/tables/performance-analysis}
+\input{6-analysis/figures/workflow}
 
 \section{MapReduce Considerations}
 Initial attempts at joining the three entities - Grades with Benchmarks, and then Grades with Benchmarks with Events were attempted directly via MapReduce (the custom Map and \_stats reduce function). This approach involved specifying the map function to always output a value of the same format for all three entities. This format is a tuple of [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; each of the 11 indexes correlate to a specific output attribute. In other words, i = 0 (indexes in JavaScript start at 0) correlates to Grade \%, i = 1,2,3,4,etc. correlated to the percents for Benchmark data, and the last 2 indexes (i = 9, i = 10) indicate an event occurrence (from the Event data) in either the first semester (i[9] = 1, i[10] = 0) or the second semester (i[9] = 0, i[10] = 1).
@@ -23,35 +29,7 @@ Instead, CouchDB's usage of B+trees as a means of sorting view indexes by keys i
 
 With ordered output, and Event data already aggregated via the reduce function, data retrieval involves iterating over view indexes, processing a single ID at a time. This is very efficient in terms of memory usage since only documents relating to a single ID need to be held in memory at a time.
 
-\begin{figure}[H]
-    \centering
-    \begin{mdframed}
-        \centering
-        \begin{verbatim}
-// Map output
-[<ID>, ‘0’, 1]: [0, b1, b2, b3, b4, b5, b6, b7, b8, 0, 0]
-[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
-[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
-[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
-[<ID>, ‘CSC1015F’, <Year>]: [98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-[<ID>, ‘MAM100F, <Year>]: [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-// Resulting reduce output
-[<ID>, ‘0’, 1]: [0, b1, b2, b3, b4, b5, b6, b7, b8, 0, 0]
-[<ID>, ‘0’, <Year>]: [0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3]
-[<ID>, ‘CSC1015F’, <Year>]: [98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-[<ID>, ‘MAM100F, <Year>]: [94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        \end{verbatim}
-    \end{mdframed}
-    \caption[Aggregation By Sorted MapReduce output]{\textbf{Figure \ref{mapreduce-key-output}: Aggregating via a combination of MapReduce and relying on sorted B+tree keys.} The Map function should output keys in the form [ID, Course, Year] as shown above for all document processed. However this is not possible for document of type Benchmark (which don't include properties for Course or Year) or documents of type Events (which don't include the property Course). As such, a key of the required format is simply created so as to assure ordering of documents in the resultant B+tree index; in this case documents will all be ordered by Student ID, since all documents contain that property. For Benchmark data, the value `0' is emitted for Course since that value will result in the Benchmark data ordered before documents with a Course property. For the Year field, the value `1' is emitted for Benchmark data since that guarantees ordering of documents by year ahead of any real years. Likewise for documents of type Events, the value `0' is emitted for Course. The resultant B+tree index guarantees that for a particular ID, Benchmark output will occur before Event output which will occur before Grade output.}
-    \label{mapreduce-key-output}
-\end{figure}
+\input{6-analysis/figures/reduce-example}
 
 \subsection{Grade normalization}
-Percent fields in the Grade and Benchmark data are irregular, in that both symbols and numbers are used. Table \ref{tbl-grades-normalize} shows the logic used to translate grade symbols to percentages, and Table \ref{table-benchmarks-normalize} shows the same logic for the Benchmarks data.
-
-\input{6-analysis/tables/tbl-grades-normalize}
-\input{6-analysis/tables/tbl-benchmarks-normalize}
+Percent fields in the Grade and Benchmark data are irregular, in that both symbols and numbers are used. Table \ref{tbl-grades-normalize} shows the logic used to translate grade symbols to percentages, and Table \ref{tbl-benchmarks-normalize} shows the same logic for the Benchmarks data.
