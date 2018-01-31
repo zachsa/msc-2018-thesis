@@ -1,0 +1,2 @@
+1. 2-way join map and reduce function slightly different in tex vs used
+2. citations
