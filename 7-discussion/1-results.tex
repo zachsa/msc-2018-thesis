@@ -1,0 +1,12 @@
+\section{Benchmark / Grade Correlation}
+A sample of the CSV file containing the joined Grades and Benchmarks datasets as retrieved from CouchDB is shown in Figure \ref{fig-2-way-csv-output}. Using Microsoft Excel's correlation function, correlation between the Grades and various combinations of the Benchmarks data shows that compared to Gr12 results, the NBT scores correlate significantly better with CSC1015F performance. The highest correlation between benchmarking and CSC1015F course results occurs when the NBT scores are averaged, with either the NBT QL or NBT Mth (or both) scores double weighted; such a correlation is 0.50, which is considered a moderate correlation.
+
+A full list of the correlations tested are shown in Table \ref{tbl-correlation-variance}. Because none of the students have grades for the ``G 12 Mth Lit'' and ``G12 Mth Adv'' columns who attended the CSC1015F course, these benchmarks are not taking into account.
+
+\section{Variance}
+todo
+
+\section{LMS Usage}
+A sample of the CSV file containing joined Grades, Benchmarks, and Events datasets as exported from CouchDB is shown in Figure \ref{fig-3-way-csv-output}. Using Excel two columns are created: ``Benchmark Rank'', and ``Grade Rank''. Student's are ranked in ascending order according to their benchmark results and course results in these columns using the Excel \texttt{RANK.AVG()} function (the \texttt{RANK()} function is replaced by the \texttt{RANK.AVG()} and \texttt{RANK.EG()} functions in newer versions of Excel). When multiple students have the same rank, the average of that ranking is returned.
+
+A 3rd column is added to the CSV file ``Benchmark rank - Grade rank'', showing the change in rank of students benchmark results compared to final course grades. Using Excel's correlation function, it is found that there is very little correlation between change in class ranking (Benchmark ranking - Grade ranking) and a student's Sakai presence event count. Correlation coefficients are shown in \ref{tbl-correlation-variance}. Taking the NBT QL benchmark as an example (which has a comparatively high correlation with course grades compared to other benchmarks), the \( \delta \) class rank of benchmark score vs grade score is plotted against presence event count of each student in \ref{fig-delta-rank} for a visual feel of how the correlation analysis plots. The correlation between course grades (for CSC1015F) and LMS usage is relatively insignificant according to these results.
