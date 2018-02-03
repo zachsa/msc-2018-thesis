@@ -10,24 +10,24 @@ Using nETL, Task 5 execution comprises an iterative extraction of 30 000 lines a
 
 \subsubsection{Task 5 Transformations (Events)}
 \begin{enumerate}
-    \item A line is converted into a JavaScript object (which relates directly to the JSON format of CouchDB documents) with the fields:
-          \begin{itemize}
-              \item event\_date
-              \item event\_id
-              \item uct\_id
-              \item site\_key
-              \item ref
-          \end{itemize}
-    \item Lines are filtered on the ``uct\_id'' and ``event\_id'' fields; only events with an event type of ``presence'' (event\_id = 282) for students enrolled in CSC1015F in 2016 are considered.
-    \item An attribute (``type\_'') is then added to each line (that weren't removed in filtering step), and given the value ``event'' to identify each object as a line of the Event entity type.
-    \item Line attributes are whitelisted. The resultant lines each have the the following attributes:
-          \begin{itemize}
-              \item type\_
-              \item event\_date
-              \item event\_id
-              \item uct\_id
-              \item site\_key
-          \end{itemize}
+  \item A line is converted into a JavaScript object (which relates directly to the JSON format of CouchDB documents) with the fields:
+        \begin{itemize}
+          \item event\_date
+          \item event\_id
+          \item uct\_id
+          \item site\_key
+          \item ref
+        \end{itemize}
+  \item Lines are filtered on the ``uct\_id'' and ``event\_id'' fields; only events with an event type of ``presence'' (event\_id = 282) for students enrolled in CSC1015F in 2016 are considered.
+  \item An attribute (``type\_'') is then added to each line (that weren't removed in filtering step), and given the value ``event'' to identify each object as a line of the Event entity type.
+  \item Line attributes are whitelisted. The resultant lines each have the the following attributes:
+        \begin{itemize}
+          \item type\_
+          \item event\_date
+          \item event\_id
+          \item uct\_id
+          \item site\_key
+        \end{itemize}
 \end{enumerate}
 
 \subsection{MapReduce Functions}
@@ -36,4 +36,14 @@ The map function for this analysis is included in the appendix (see \ref{3-way-j
 Using the \_sum reduce function, an aggregation is done across all documents with the same key; this means that per a student, an aggregation is performed on a single Grade document, a single Benchmark document, and many Events documents in which the S1 and S2 variables are summed to form the tuple [sum of S1, sum of S2]. Because of the key output of each type of entity, the resulting view-index is ordered by StudentID; for each StudentID documents are ordered by the second index in the key output (course), which means that Benchmarks and Events entities are sorted to be before grades for a student; and sorting via the 3rd index of each key results in benchmark data always being sorted to be before Events documents. As such, during view-index retrieval it can be taken as given that for a single student ID, first documents of type Benchmark will be retrieved, followed by documents of type Event, followed by documents of type Grade.
 
 \subsection{List Function}
-todo
+The List function is invoked via an HTTP request to the URI: \texttt{https://localhost:5984/msc/\_design/3-way-join/\_list/3-way-join-list/3-way-join-view?reduce=true}. On execution the list function executes the ``provides'' function, in which output type of ``CSV'' (plain text) is specified as as download file. List function logic as shown in Figure \ref{fig-3-way-join-list-function} is executed in the callback passed as a parameter to the ``provides'' function.
+
+On initial invocation and within the body of the callback, the variables `currentStudent', `currentYear', and `currentLine' are set to null. Following this an iteration over the index is initiated within a while loop with the loop invariant the result of a call to the ``getRow'' function. While the loop invariant remains true (i.e. so long as the ``getRow'' function returns a row and not `false', which occurs after the last row has been retrieved from the index), a row - a reduced result - is processed (in the URI the parameter ``reduce'' is set to true, so ONLY reduced output is retrieved from the view).
+
+For every result retrieved from the reduce output , the StudentID of the row being processed is checked and compared to the StudentID of the previous row. If the current StudentID is not the same as the previous StudentID, a line of the CSV is emitted before the row is processed. Then, the type of result being processed is checked (either the document is of type ``benchmark'', ``event'' or ``grade''), and depending on the type different values are stored in a variable called ``currentLine''. For every StudentID, all types of documents are processed in turn (first the benchmark documents, then the event documents, then the grade documents) before being emitted. This allows the join to be performed via sequentially adding to the ``currentLine'' variable for a single student.
+
+As as result of the MapReduce function, for every StudentID, exactly one ``benchmark'' result and one ``event'' document is processed. But a student can have several ``grade'' documents if the course was repeated in subsequent years. To catch this case, when processing documents of type ``grade'' within the switch statement, a further check is done to see if the attribute `year' of the current row has already been processed and is different from a preceding row. If so, the ``currentLine'' is emitted and the fields relating to grade documents are reset, and then repopulated with values from the current row (``currentLine'' itself is not reset).
+
+Conceptually, sending ``currentLine'' involves a call to a helper function provided within the execution context of CouchDB List functions - the ``send'' function. This function is wrapped within a subroutine (a function nested within the callback) that first checks that the currentLine variable contains data from the Grades and Benchmarks and Events entity, and then sends a comma-delimited string along a stay-alive network request - this is handled automatically by the HTTP client, which in the case of this project is simply the Google Chrome browser. From a user's perspective, it appears that a file is simply being downloaded; the rate at which the file downloads is equal to the rate at which the loop data is output by the send function. The download completes on completion of the List function.
+
+Code for the loop function is included in the appendix at \ref{3-way-join-list-function}.
