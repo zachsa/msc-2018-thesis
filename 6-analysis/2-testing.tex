@@ -1,0 +1,68 @@
+\section{Testing}
+This section discusses test coverage of project components used for ETL, MapReduce and data retrieval. Testing is performed using the open source JavaScript \textit{Mocha} testing framework \cite{mochaTest} and involves isolating components in terms of input and output - i.e. unit testing. These tests are discussed in terms of sample CSV files for each data entity with the aim of emulating as many cases that the ETL and CouchDB functions need to handle as possible. The CSV files are shown in \ref{fig-sample-csv-files}.
+
+Broadly speaking, theses tests are indicative of the accuracy with which the three data entities are joined on Student ID for a particular year and a particular course. The accuracy of the data representation for these entities is also shown to be correct. This involves testing across the ETL process (the nETL application), the CouchDB Map function (built-in reduce functions are tested as part of the CouchDB software suite), and the CouchDB List function. Assertions stipulated in the unit tests are discussed in terms of 'modular' coded components.
+
+Looking at the analysis process as a whole - i.e. high level assertions that if automated would fall under the category of 'integrated' tests, the following assertions are made:
+
+\begin{itemize}
+    \item nETL testing:
+          \begin{itemize}
+              \item Benchmarking and course grades in the joined dataset correspond to the source data
+              \item Sakai events are counted correctly per student
+              \item Grade symbols (in both the benchmarking and grade data) are handled according to the logic discussed previously
+          \end{itemize}
+    \item Map function testing:
+          \begin{itemize}
+          \end{itemize}
+    \item List function testing:
+          \begin{itemize}
+          \end{itemize}
+\end{itemize}
+
+\subsection{nETL Assertions}
+The basic premise of the ETL process is that the lines are extracted from CSVs and loaded into CouchDB reliably. Assertions are used to ensure that each nETL module (the extraction module, the transformation modules, and the loading module) perform as expected. No integration tests are performed except by manually checking that the test data is loaded into CouchDB in the anticipated format.
+
+\subsubsection{Extraction}
+Test code is included in the appendix at \ref{FLATFILE-tests}. Tests assert the following:
+
+\begin{itemize}
+    \item Lines from the CSV are extracted iteratively and not all loaded into memory
+    \item All lines from the CSV are extracted
+\end{itemize}
+
+\subsubsection{Transformations}
+Extensive test coverage is used fro the TEXT\_LINE\_TO\_OBJ transformation module since CSV value separation is generally demarcated by ASCII characters that can themselves be part of value text (for example, the comma). As such, it is important to make sure that the RFC 4180 spec is adhered to closely when parsing CSV data - tests (as included in the appendix at \ref{TEXT_LINE_TO_OBJ-tests}) ensure that this is the case.
+
+Test assertions stipulate that strings (lines extracted verbatim from CSV files) are reliably split into columns, that the columns line up correctly with the headers, that values are handled correctly, and that lines are correctly transformed into JavaScript objects.
+
+Unit tests for filtering cover the cases where objects may be filtered for individual values for up to multiple attributes, for any number of value on any number of attributes, and that filtering is done on an all-or-nothing-basis (objects either meet all filter requirements or are returned as ``null''). Code for the FILTER unit tests is included in the appendix at \ref{FILTER-tests}
+
+Unit tests covering the CREATE\_OBJECT\_FIELD transformation's functionality are included in the appendix at \ref{CREATE_OBJECT_FIELD-tests} and code covering functionality of the WHITELIST transformation is included at \ref{WHITELIST-tests}. Functionality of these modules is fairly straightforward and as such unit tests are quite superficial.
+
+Assertions for the different transformation modules include:
+
+\begin{itemize}
+    \item TEXT\_LINE\_TO\_OBJ
+          \begin{itemize}
+              \item
+          \end{itemize}
+    \item FILTER
+          \begin{itemize}
+              \item
+          \end{itemize}
+    \item CREATE\_OBJECT\_FIELD
+          \begin{itemize}
+              \item
+          \end{itemize}
+    \item WHITELIST
+          \begin{itemize}
+              \item
+          \end{itemize}
+\end{itemize}
+
+\subsubsection{Load}
+Test code is included in the appendix at \ref{COUCHDB-tests}, and consists of simply inserting 3 documents into CouchDB via the the \_bulk\_docs API, with the assertion that a 201 HTTP response is returned in a promise.
+
+\subsection{Map and List Function Assertions}
+Code for these tests is included in the appendix at \ref{Map-List-tests}.
