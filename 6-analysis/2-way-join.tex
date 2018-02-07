@@ -105,3 +105,7 @@ The list function is executed via a call to CouchDB's HTTP API. For the project 
 Then the type of row being processed is check (whether this key:value pair was emitted from a grade or benchmark document). If from a benchmark document, the scored are added to the currentLine variable and the loop re-executes. If a Grade document, there is a check as to whether the currentYear variable is has the same value as the Year property in the current row. If not, the currentLine variable is emitted and currentYear is adjusted to the new Year value and the loop re-executes.
 
 The currentLine variable is emitted via a subroutine which first checks that the currentLine variable contains data from both the Grades and Benchmarks entity, and then sends a comma-delimited string along a stay-alive network request - this is handled automatically by the HTTP client, which in the case of this project is simply the Google Chrome browser. From a user's perspective, they just watch as a file downloads; the rate at which the file downloads is equal to the rate at which the loop data is output by the send function. Code for the loop function is included in the appendix at \ref{2-way-join-list-function}.
+
+\subsection{Output}
+A sample of the resultant joined dataset is shown in Figure \ref{fig-2-way-csv-output}
+\input{6-analysis/figures/fig-2-way-csv-output}

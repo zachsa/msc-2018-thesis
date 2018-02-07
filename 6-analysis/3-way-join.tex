@@ -47,3 +47,7 @@ As as result of the MapReduce function, for every StudentID, exactly one ``bench
 Conceptually, sending ``currentLine'' involves a call to a helper function provided within the execution context of CouchDB List functions - the ``send'' function. This function is wrapped within a subroutine (a function nested within the callback) that first checks that the currentLine variable contains data from the Grades and Benchmarks and Events entity, and then sends a comma-delimited string along a stay-alive network request - this is handled automatically by the HTTP client, which in the case of this project is simply the Google Chrome browser. From a user's perspective, it appears that a file is simply being downloaded; the rate at which the file downloads is equal to the rate at which the loop data is output by the send function. The download completes on completion of the List function.
 
 Code for the loop function is included in the appendix at \ref{3-way-join-list-function}.
+
+\subsection{Output}
+A sample of the resultant joined dataset is shown in Figure \ref{fig-3-way-csv-output}
+\input{6-analysis/figures/fig-3-way-csv-output}
