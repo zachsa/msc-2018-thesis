@@ -1,6 +1,6 @@
 \section{MapReduce Contract}
 \label{couchdb-mapreduce-contracts}
-\begin{minted}{javascript}
+\begin{minted}{text}
 /**
  * Map function
  * @param  {Object} doc Each document in the database is passed in turn to the function
@@ -69,7 +69,7 @@ function(keys, values, rereduce) {
 \subsection{2-Way Join}
 \subsubsection{Map Function}
 \label{2-way-join-map-function}
-\begin{minted}{javascript}
+\begin{minted}{text}
 function(doc) {
     /* Compound key */
     var id;
@@ -214,7 +214,7 @@ function(doc) {
 
 \subsubsection{List Function}
 \label{2-way-join-list-function}
-\begin{minted}{javascript}
+\begin{minted}{text}
 function(head, req) {
     provides('csv', function() {
         /* Send the headers */
@@ -313,7 +313,7 @@ function(head, req) {
 \subsection{3-Way Join}
 \subsubsection{Map Function}
 \label{3-way-join-map-function}
-\begin{minted}{javascript}
+\begin{minted}{text}
 function(doc) {
     /* Compound key */
     var id;
@@ -481,7 +481,7 @@ function(doc) {
 
 \subsubsection{List Function}
 \label{3-way-join-list-function}
-\begin{minted}{javascript}
+\begin{minted}{text}
 function(head, req) {
     provides('csv', function() {
         /* Send the headers */

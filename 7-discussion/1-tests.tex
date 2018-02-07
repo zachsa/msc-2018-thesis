@@ -1,0 +1,40 @@
+\section{Testing}
+This section discusses test coverage of project components used for ETL, MapReduce and data retrieval. Testing is performed using the open source JavaScript \textit{Mocha} testing framework \cite{mochaTest} and involves isolating components in terms of input and output, and testing that output is as anticipated for various inputs - i.e. test coverage is via unit testing. These tests are discussed in terms of sample CSV files for each data entity with the aim of emulating as many cases that the ETL and CouchDB functions need to handle as possible. The CSV files used for these tests are shown in \ref{fig-sample-csv-files} and contain fabricated data for the StudentIDs: 1, 2, 3, 4, and 5. The Benchmark CSV contains a single row for each ID, the Events CSV contains several rows for each ID, and the Grades CSV has either one or two rows per ID. The StudentID of 5 is included as a means of testing the filtering process and shouldn't be included in any of the results.
+
+Broadly speaking, Unit tests in this project are designed to indicate of the accuracy with which the three data entities are joined on Student ID for a particular year and a particular course. The accuracy of the data representation for these entities is also shown to be correct. This involves testing across the ETL process (the nETL application), the CouchDB Map function (built-in reduce functions are tested as part of the CouchDB software suite), and the CouchDB List function. Assertions stipulated in the unit tests are discussed in terms of 'modular' coded components. Looking at the analysis process as a whole - i.e. high level assertions that if automated would fall under the category of 'integrated' tests, the following assertions are made:
+
+\begin{itemize}
+  \item nETL performs as expected
+  \item Grade symbols (in both the benchmarking and grade data) are handled according to the logic discussed previously
+  \item Joining is performed correctly:
+        \begin{itemize}
+          \item Several students have repeated courses taken over multiple years. These courses should result in separate rows in the joined output
+          \item Grade data contains multiple course results for each student - only the desired courses should be used for the final join
+          \item Joining on the Event data should only take into account course results from 2016
+        \end{itemize}
+  \item Averages and rankings are calculated
+        \begin{itemize}
+          \item Some Benchmark scores are 0 - i.e. one of the rows in the sample CSV has 0 for all NBT scores. These numbers should be ignored in averages
+          \item Sakai events are counted correctly per student
+        \end{itemize}
+\end{itemize}
+
+\subsection{nETL Assertions}
+The basic premise of the ETL process is that the lines are extracted from CSVs and loaded into CouchDB reliably. Assertions are used to ensure that each nETL module (the extraction module, the transformation modules, and the loading module) perform as expected. No integration tests are performed except by manually checking that the test data is loaded into CouchDB in the anticipated format - which is indeed the case.
+
+Tests relating to CSV-line extraction are included in the appendix at \ref{FLATFILE-tests}. These tests assert that all lines from the CSV are extracted iteratively and not all loaded into memory at once, and that all lines are extracted from CSVs.
+
+The process of converting text lines to objects requires extensive test coverage due to the nature since many of the fields contain ASCII characters used for demarcating value separation in CSVs (for example, the comma). Tests ensure that CSVs are treated according to the RFC 4180 spec and treat qualifiers correctly, hat the columns line up correctly with the headers, that values are handled correctly, and that lines are correctly transformed into JavaScript objects. Code for these unit tests is include in the appendix at \ref{TEXT_LINE_TO_OBJ-tests}).
+
+Unit tests for filtering cover the cases where objects may be filtered for individual values for up to multiple attributes, for any number of value on any number of attributes, and that filtering is done on an all-or-nothing-basis (objects either meet all filter requirements or are returned as ``null''). Unit test code is included in the appendix at \ref{FILTER-tests}.
+
+Unit tests covering creating fields with values in objects (lines) extracted from CSVs is included in the appendix at \ref{CREATE_OBJECT_FIELD-tests}, and code covering functionality of the white-listing attributes of these objects is included at \ref{WHITELIST-tests}.
+
+Unit tests relating to the functionality of loading objects into CouchDB simply consist of inserting 3 documents into CouchDB via the the \_bulk\_docs API, with the assertion that a 201 HTTP response is returned in a promise. Test code is included in the appendix at \ref{COUCHDB-tests}.
+
+\subsection{CouchDB Function Assertions}
+Code for these tests is included in the appendix at \ref{Map-List-tests}.
+
+Figure \ref{fig-test-map-output} shows how the test CSV rows translate to CouchDB documents
+
+Figure \ref{fig-test-list-output} Shows the result of the list function

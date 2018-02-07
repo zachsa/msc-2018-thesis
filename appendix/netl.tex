@@ -1,7 +1,7 @@
 \section{nETL Engine}
 \subsection{Sequential Batch Iterator}
 \label{netl-batch-generator}
-\begin{minted}{javascript}
+\begin{minted}{text}
 const extraction;
 const batches = (function*() {
     var finished = false;
@@ -26,7 +26,7 @@ batch = batches.next();
 
 \subsection{TaskManager Constructor}
 \label{netl-taskmanager-constructor}
-\begin{minted}{javascript}
+\begin{minted}{text}
 function TaskManager(e, ts, l) {
     this.tasks = {};
     this.extractions = e;
@@ -38,7 +38,7 @@ TaskManager.prototype.newTask = function(task) { /* ... */ };
 
 \subsection{Main Application Module}
 \label{netl-application-module}
-\begin{minted}{javascript}
+\begin{minted}{text}
 (function() {
     const _extractions = {};
     const _transformations = {};
@@ -59,7 +59,7 @@ TaskManager.prototype.newTask = function(task) { /* ... */ };
 
 \subsection{Recursive ETL Iteration}
 \label{netl-recursive-iterator}
-\begin{minted}{javascript}
+\begin{minted}{text}
 const batches; // Assigned elsewhere
 const transformations; // Assigned elsewhere
 const load; // Assigned elsewhere
@@ -96,7 +96,7 @@ const load; // Assigned elsewhere
 
 \subsection{Module Authoring and Loading}
 \label{netl-module-loading}
-\begin{minted}{javascript}
+\begin{minted}{text}
 // Load the module into memory
 memoryObject[userModule.name] = userModule.exe;
 // Invoke the module's closure
@@ -126,7 +126,7 @@ userModule = (function() {
 \subsection{Extraction Modules}
 \subsubsection{FLATFILE}
 \label{netl-extract-flatfile}
-\begin{minted}{javascript}
+\begin{minted}{text}
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -252,7 +252,7 @@ module.exports = {
 \subsection{Load Modules}
 \subsubsection{COUCHDB}
 \label{netl-load-couchdb}
-\begin{minted}{javascript}
+\begin{minted}{text}
 'use strict';
 const request = require('request');
 /**
@@ -319,7 +319,7 @@ module.exports = {
 \subsection{Transformation Modules}
 \subsubsection{TEXT\_LINE\_TO\_OBJ}
 \label{netl-trans-text-line-to-obj}
-\begin{minted}{javascript}
+\begin{minted}{text}
 'use strict';
 const Readable = require('stream').Readable;
 const csvParser = require('csv-parse/lib/sync');
@@ -381,7 +381,7 @@ module.exports = {
 
 \subsubsection{FILTER}
 \label{netl-trans-filter}
-\begin{minted}{javascript}
+\begin{minted}{text}
 'use strict';
 /**
  * Configuration looks like this:
@@ -416,7 +416,7 @@ module.exports = {
 
 \subsubsection{WHITELIST}
 \label{netl-trans-whitelist}
-\begin{minted}{javascript}
+\begin{minted}{text}
 'use strict';
 /**
  * Configuration example:
@@ -454,7 +454,7 @@ module.exports = {
 
 \subsubsection{CREATE\_OBJ\_FIELD}
 \label{netl-trans-create-obj-field}
-\begin{minted}{javascript}
+\begin{minted}{text}
 'use strict';
 /**
  * Configuration example:
