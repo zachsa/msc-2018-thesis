@@ -5,34 +5,36 @@ const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 const docs2Way = [
-    // benchmarks
-    { "anonIDnew": 2448646, "Eng Grd12 Fin Rslt": 82, "Math Grd12 Fin Rslt": 94, "Mth Lit Grd12 Fin Rslt": "", "Adv Mth Grd12 Fin Rslt": "", "Phy Sci Grd12 Fin Rslt": 96, "NBT AL Score": 64, "NBT QL Score": 72, "NBT Math Score": 86, "RegAcadYear": 2016, "type_": "benchmark" },
+    { "anonIDnew": 1, "Eng Grd12 Fin Rslt": 84, "Math Grd12 Fin Rslt": 88, "Mth Lit Grd12 Fin Rslt": "", "Adv Mth Grd12 Fin Rslt": "", "Phy Sci Grd12 Fin Rslt": 94, "NBT AL Score": 80, "NBT QL Score": 76, "NBT Math Score": 89, "RegAcadYear": 2016, "type_": "benchmark" },
+    { "RegAcadYear": 2016, "anonIDnew": 1, "Course": "CSC1015F", "Percent": 70, "type_": "grade" },
+    { "anonIDnew": 2, "Eng Grd12 Fin Rslt": 76, "Math Grd12 Fin Rslt": 78, "Mth Lit Grd12 Fin Rslt": "", "Adv Mth Grd12 Fin Rslt": "", "Phy Sci Grd12 Fin Rslt": 76, "NBT AL Score": 75, "NBT QL Score": 58, "NBT Math Score": 61, "RegAcadYear": 2016, "type_": "benchmark" },
+    { "RegAcadYear": 2016, "anonIDnew": 2, "Course": "CSC1015F", "Percent": 55, "type_": "grade" },
+    { "anonIDnew": 3, "Eng Grd12 Fin Rslt": 75, "Math Grd12 Fin Rslt": 78, "Mth Lit Grd12 Fin Rslt": "", "Adv Mth Grd12 Fin Rslt": "", "Phy Sci Grd12 Fin Rslt": 84, "NBT AL Score": 0, "NBT QL Score": 0, "NBT Math Score": 0, "RegAcadYear": 2015, "type_": "benchmark" },
+    { "RegAcadYear": 2015, "anonIDnew": 3, "Course": "CSC1015F", "Percent": 77, "type_": "grade" },
+    { "anonIDnew": 4, "Eng Grd12 Fin Rslt": 82, "Math Grd12 Fin Rslt": 85, "Mth Lit Grd12 Fin Rslt": "", "Adv Mth Grd12 Fin Rslt": "", "Phy Sci Grd12 Fin Rslt": 94, "NBT AL Score": 73, "NBT QL Score": 71, "NBT Math Score": 86, "RegAcadYear": 2015, "type_": "benchmark" },
+    { "RegAcadYear": 2015, "anonIDnew": 4, "Course": "CSC1015F", "Percent": 39, "type_": "grade" },
+    { "RegAcadYear": 2016, "anonIDnew": 4, "Course": "CSC1015F", "Percent": 54, "type_": "grade" }
 
-    // grades
-    { "RegAcadYear": 2016, "anonIDnew": 2448646, "Course": "CSC1015F", "Percent": "F", "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448647, "Course": "CSC1015F", "Percent": "DPR", "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448648, "Course": "CSC1015F", "Percent": "INC", "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448649, "Course": "CSC1015F", "Percent": "UF", "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448650, "Course": "CSC1015F", "Percent": "UP", "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448651, "Course": "CSC1015F", "Percent": 99, "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448652, "Course": "CSC1015F", "Percent": "OS", "type_": "grade" }
 ];
 const docs3Way = [
-    // benchmarks
-    { "anonIDnew": 2448646, "Eng Grd12 Fin Rslt": 82, "Math Grd12 Fin Rslt": 94, "Mth Lit Grd12 Fin Rslt": "", "Adv Mth Grd12 Fin Rslt": "", "Phy Sci Grd12 Fin Rslt": 96, "NBT AL Score": 64, "NBT QL Score": 72, "NBT Math Score": 86, "RegAcadYear": 2016, "type_": "benchmark" },
-
-    // events
-    { "event_date": "2016-04-15T07:53:19.000Z", "event_id": 281, "uct_id": 2448649, "site_key": 20627, "type_": "event" },
-
-    // grades
-    { "RegAcadYear": 2016, "anonIDnew": 2448646, "Course": "CSC1015F", "Percent": "F", "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448647, "Course": "CSC1015F", "Percent": "DPR", "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448648, "Course": "CSC1015F", "Percent": "INC", "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448649, "Course": "CSC1015F", "Percent": "UF", "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448650, "Course": "CSC1015F", "Percent": "UP", "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448651, "Course": "CSC1015F", "Percent": 99, "type_": "grade" },
-    { "RegAcadYear": 2014, "anonIDnew": 2448652, "Course": "CSC1015F", "Percent": "OS", "type_": "grade" }
-]
+    { "anonIDnew": 1, "Eng Grd12 Fin Rslt": 84, "Math Grd12 Fin Rslt": 88, "Mth Lit Grd12 Fin Rslt": "", "Adv Mth Grd12 Fin Rslt": "", "Phy Sci Grd12 Fin Rslt": 94, "NBT AL Score": 80, "NBT QL Score": 76, "NBT Math Score": 89, "RegAcadYear": 2016, "type_": "benchmark" },
+    { "event_date": "2016-02-18T15:12:00.000Z", "event_id": 281, "uct_id": 1, "site_key": 50680, "type_": "event" },
+    { "event_date": "2016-10-18T15:12:00.000Z", "event_id": 281, "uct_id": 1, "site_key": 27933, "type_": "event" },
+    { "RegAcadYear": 2016, "anonIDnew": 1, "Course": "CSC1015F", "Percent": 70, "type_": "grade" },
+    { "anonIDnew": 2, "Eng Grd12 Fin Rslt": 76, "Math Grd12 Fin Rslt": 78, "Mth Lit Grd12 Fin Rslt": "", "Adv Mth Grd12 Fin Rslt": "", "Phy Sci Grd12 Fin Rslt": 76, "NBT AL Score": 75, "NBT QL Score": 58, "NBT Math Score": 61, "RegAcadYear": 2016, "type_": "benchmark" },
+    { "event_date": "2016-09-18T15:12:00.000Z", "event_id": 281, "uct_id": 2, "site_key": 27933, "type_": "event" },
+    { "event_date": "2016-05-18T15:12:00.000Z", "event_id": 281, "uct_id": 2, "site_key": 50680, "type_": "event" },
+    { "event_date": "2016-05-19T15:12:00.000Z", "event_id": 281, "uct_id": 2, "site_key": 27933, "type_": "event" },
+    { "RegAcadYear": 2016, "anonIDnew": 2, "Course": "CSC1015F", "Percent": 55, "type_": "grade" },
+    { "anonIDnew": 3, "Eng Grd12 Fin Rslt": 75, "Math Grd12 Fin Rslt": 78, "Mth Lit Grd12 Fin Rslt": "", "Adv Mth Grd12 Fin Rslt": "", "Phy Sci Grd12 Fin Rslt": 84, "NBT AL Score": 0, "NBT QL Score": 0, "NBT Math Score": 0, "RegAcadYear": 2015, "type_": "benchmark" },
+    { "event_date": "2016-04-18T15:12:00.000Z", "event_id": 281, "uct_id": 3, "site_key": 50680, "type_": "event" },
+    { "event_date": "2016-04-18T15:12:00.000Z", "event_id": 281, "uct_id": 3, "site_key": 27933, "type_": "event" },
+    { "event_date": "2016-05-18T15:12:00.000Z", "event_id": 281, "uct_id": 3, "site_key": 27933, "type_": "event" },
+    { "event_date": "2016-06-18T15:12:00.000Z", "event_id": 281, "uct_id": 3, "site_key": 31585, "type_": "event" },
+    { "anonIDnew": 4, "Eng Grd12 Fin Rslt": 82, "Math Grd12 Fin Rslt": 85, "Mth Lit Grd12 Fin Rslt": "", "Adv Mth Grd12 Fin Rslt": "", "Phy Sci Grd12 Fin Rslt": 94, "NBT AL Score": 73, "NBT QL Score": 71, "NBT Math Score": 86, "RegAcadYear": 2015, "type_": "benchmark" },
+    { "event_date": "2016-11-18T15:12:00.000Z", "event_id": 281, "uct_id": 4, "site_key": 31585, "type_": "event" },
+    { "RegAcadYear": 2016, "anonIDnew": 4, "Course": "CSC1015F", "Percent": 54, "type_": "grade" }
+];
 
 /**
  * Runtime evaluation loads functions into the maps and list objects
