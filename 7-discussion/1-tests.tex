@@ -1,5 +1,5 @@
 \section{Testing}
-To assert the accuracy of the results in the context of the source data, unit tests were used during the programming of the nETL application, along with an analysis of a small sample of the data to test accuracy of the output CSV. Unit tests for nETL are written using the open source JavaScript \textit{Mocha} testing framework \cite{mochaTest}, the code of which is included in the appendix at \ref{unit-tests}.
+To assert the accuracy of the results in the context of the source data, unit tests were used for testing of the nETL application components as well as the Map and List functions. In addition, a small sample of the data was processed equivalently to the analysis procedures as described above for manually testing the the accuracy of the output CSV (and ensure that the unit tests themselves are working as expected). Unit tests are written using the open source JavaScript \textit{Mocha} testing framework \cite{mochaTest}, the code of which is included in the appendix at \ref{unit-tests}.
 
 \subsection{nETL Unit Tests}
 The basic premise of the ETL process is that the lines are extracted from CSVs and loaded into CouchDB reliably. Assertions are used to ensure that each nETL module (the extraction module, the transformation modules, and the loading module) perform as expected. No integration tests are performed except by manually checking that the test data is loaded into CouchDB in the anticipated format - which is indeed the case.
@@ -10,12 +10,20 @@ The process of converting text lines to objects requires extensive test coverage
 
 Tests that demonstrate correctness of nETL's CouchDB-loading module (Appendix \ref{COUCHDB-tests}) consist of a single unit test that inserts 3 documents into CouchDB via the the \_bulk\_docs API, with the assertion that a 201 HTTP response is returned in a promise.
 
-\subsection{Map \& List Function tests}
-These tests are discussed in terms of sample CSV files for each data entity with the aim of emulating as many cases that the ETL and CouchDB functions need to handle as possible. The CSV files used for these tests are the same as used as examples for the data previously in Figure \ref{fig-sample-csv-files} containing fabricated-but-true-to-form data for redacted StudentIDs: 1, 2, 3, 4, and 5. The Benchmark CSV contains a single row for each ID, the Events CSV contains several rows for each ID, and the Grades CSV has either one or two rows per ID. The StudentID of 5 is included as a means of testing the filtering process and shouldn't be included in any of the results.
+\subsection{Map \& List Function Tests}
+Unit testing the Map and List function code is a more involved, complicated process than testing the nETL components since the Map and List functions as structured for usage by the python-couchapp tool don't conform to valid JavaScript syntax and additionally invoke other functions provided by the CouchDB runtime environment. Unit testing these functions required loading List/Map function code as strings from their respective files and inserting the strings into the testing runtime environment via runtime evaluation (using the \mintinline{javascript}{eval(`var mapFn = ${mapFnStr}; var lstFn = ${lstFnStr};`)}). Function stubs for the \mintinline{javascript}{emit()}, \mintinline{javascript}{provides()}, \mintinline{javascript}{getRow()}, and \mintinline{javascript}{send()} CouchDB execution environment functions were authored - including a complicated generator-subroutine to mimic the contract of the \mintinline{javascript}{getRow()} function. CouchDB-equivalent JSON documents were used as test data, although unlike in CouchDB, the documents were ordered according to how they would be output via the Map function (to ensure the List function received the documents in the correct order). Code for these unit tests is included in Appendix \ref{Map-List-tests}. These tests assert that:
 
-With reference to the source CSV files it is shown the logic of the Map function is correct, and the the List function's logic is also correct when processing index output and performing the join. As shown in the view-output of the 2-way and 3-way join in Figure \ref{fig-test-map-output},
+\begin{itemize}
+    \item todo: writeup what is in the tests
+\end{itemize}
 
-As shown in the List function output for the 2-way and 3-way join in Figure \ref{fig-test-list-output}...
+
+\subsection{Manual Testing}
+Manually testing ensures that the process works as expected on a qualitative basis with reference to the CSVs discussed previously and shown in Figure \ref{fig-sample-csv-files}. These files consist of adjusted data to make for good test cases; for example: the ID fields contain fabricated integers instead of the longer anonymized ID integers, and some of the fields' values not used in this study are redacted to ``txt''. IDs used are ``1'', ``2'', ``3'', ``4'' and ``5'', the last ID of which is included as a means of testing that filtering works as expected (results should never contain an ID of ``5''). The Benchmark CSV contains a single row for each ID, the Events CSV contains several rows for each ID, and the Grades CSV has either one or two rows per ID.
+
+Based on these source CSV files the MapReduce output (i.e. the CouchDB view) consists of ... as shown in Figure \ref{fig-test-map-output}. nETL processing and Map function output is determined to be correct since ...
+
+List function output of these views is shown in Figure \ref{fig-test-list-output}. Output of the List function (i.e. the joined datasets) is determined to be correct since, as expected, ...
 
 \newpage
 \input{7-discussion/figures/fig-test-map-output}
