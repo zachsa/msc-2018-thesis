@@ -1,23 +1,25 @@
 \begin{figure}[H]
-  \begin{minted}{text}
-// A
+  \centering
+  \begin{mdframed}[rightline=true,leftline=true]
+    \begin{minted}{text}
+/* A: Output of the Map function */
 {["key"]: [1,1,0]} // (_id: x)
 {["key"]: [3,1,3]} // (_id: y)
 {["key2"]: [2,2,2]} // (_id: z)
 
-// B
+/* B: Grouping the Map function output by key */
 {["key"]: [[1,1,0],[3,1,3]]}
 {["ke2"]: [[2,2,2]]}
 
-// C
+/* C: Invoked reduce function with arguments */
 reduce([["key", "x"], ["key", "y"]], [[1,1,0],[3,1,3]], false)
 reduce([["key2", "z"]], [[2,2,2]], false)
 
-// D
+/* D: Reduce function treatment of arguments */
 {["key"]: [aggregate([1,3]), aggregate([1,1]),  aggregate([0,3])]}
 {["key2"]: [aggregate([2]), aggregate([2]),  aggregate([2])]}
 
-// E
+/* E: Reduce function output */
 {
   ["key"]: [
     {"sum":4,"count":2,"min":1,"max":3,"sumsqr":10},
@@ -29,6 +31,7 @@ reduce([["key2", "z"]], [[2,2,2]], false)
   ]
 }
     \end{minted}
-  \caption[\textit{\_stats} function contract]{\textbf{Figure \ref{fig-stats-reduce-fn}: Reduce function contract.} (A): Output of the map function. [``key''] is the key for which a value is emitted (in this case, they key is a compound key but with only one index). The value in this case is a tuple of [x, y, z]. (B): Results from the Map function are grouped by a common key, with values grouped into a list - in this case a list of lists since the value output of the map function is a list. (C): The signature with which the reduce function is called with corresponding arguments. (D): The \textit{\_stats} function then further groups values by corresponding indexes and aggregates these values. (E): The result of the \textit{\_stats} function aggregation.}
+  \end{mdframed}
+  \caption[\_stats function contract]{\textbf{Figure \ref{fig-stats-reduce-fn}: Contract for built-in \_stats reduce function.} (A): Output of the map function. [``key''] is the key for which a value is emitted (in this case, they key is a compound key but with only one index). The value in this case is a tuple of [x, y, z]. (B): Results from the Map function are grouped by a common key, with values grouped into a list - in this case a list of lists since the value output of the map function is a list. (C): The signature with which the reduce function is called with corresponding arguments. (D): The \_stats function then further groups values by corresponding indexes and aggregates these values. (E): The result of the \_stats function aggregation.}
   \label{fig-stats-reduce-fn}
 \end{figure}

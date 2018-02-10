@@ -1,0 +1,31 @@
+\begin{figure}[H]
+  \centering
+  \begin{mdframed}[rightline=true,leftline=true]
+    \begin{minted}{text}
+/* A: Output of the Map function */
+{["key"]: 7} // (_id: x)
+{["key"]: [3,1,3]} // (_id: y)
+{["key2"]: [2,2,2]} // (_id: z)
+
+/* B: Grouping the Map function output by key */
+{["key"]: [7,[3,1,3]]}
+{["ke2"]: [[2,2,2]]}
+
+/* C: Invoked reduce function with arguments */
+reduce([["key", "x"], ["key", "y"]], [7,[3,1,3]], false)
+reduce([["key2", "z"]], [[2,2,2]], false)
+
+/* D: Reduce function treatment of arguments */
+{["key"]: [sum([7,3]), sum([1,1]),  sum([0,3])]}
+{["key2"]: [sum([2]), sum([2]),  sum([2])]}
+
+/* E: Reduce function output */
+{
+  ["key"]: [10, 1, 3],
+  ["key2"]: [2,2,2]
+}
+    \end{minted}
+  \end{mdframed}
+  \caption[\_sum function contract]{\textbf{Figure \ref{fig-sum-reduce-fn}: Contract for built-in \_sum reduce function.} (A): Output of the map function. [``key''] is the key for which a value is emitted (in this case, they key is a compound key but with only one index). The value in this case is a tuple of [x, y, z]. (B): Results from the Map function are grouped by a common key, with values grouped into a list - in this case a list of lists since the value output of the map function is a list in some cases. (C): The signature with which the reduce function is called with corresponding arguments (only shown for rereduce = false). (D): The \_sum function then further groups values by corresponding indexes. (E): The output of the \_sun function for this example.}
+  \label{fig-sum-reduce-fn}
+\end{figure}
