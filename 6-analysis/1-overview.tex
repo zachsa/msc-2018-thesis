@@ -12,6 +12,8 @@ In terms of defining MapReduce tasks, the map function is always user-defined, w
 
 During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{performance-analysis}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
 
+\input{6-analysis/figures/workflow}
+
 \section{MapReduce Approach}
 Initial attempts at joining the three entities - Grades with Benchmarks, and then Grades with Benchmarks with Events were attempted directly via MapReduce (the custom Map and \_stats reduce function). This approach involved specifying the map function to always output a value of the same format for all three entities. This format is a tuple of 11 indexes - [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; each of the 11 indexes correlate to a specific output attribute. In other words, i = 0 (indexes in JavaScript start at 0) correlates to Grade \%, i = 1,2,3,4,etc. correlated to the percents for Benchmark data, and the last 2 indexes (i = 9, i = 10) indicate an event occurrence (from the Event data) in either the first semester (i[9] = 1, i[10] = 0) or the second semester (i[9] = 0, i[10] = 1).
 
@@ -31,4 +33,4 @@ With ordered output, and Event data already aggregated via the reduce function, 
 
 Part of the MapReduce logic includes a normalization of percentage fields, which may occur either as number or symbol (A, B, C, D, etc) values. Normalization is performed by a sub-routine defined within the Map function body. Table \ref{tbl-grades-normalize} shows the logic used to translate grade symbols to percentages, and Table \ref{tbl-benchmarks-normalize} shows the same logic for the Benchmarks data.
 
-TODO: activity diagram showing the sub-routing logic.
+\input{6-analysis/figures/reduce-example}
