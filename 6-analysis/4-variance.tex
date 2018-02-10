@@ -1,4 +1,32 @@
 \section{Benchmark Variance}
-A \nth{3} analysis is done on the Benchmark data to assess the variances of each of the benchmarks evaluated. To achieve this, a single nETL task is run to load a database with Benchmarks data for all students who attended CSC1015F in either 2014, 2015, or 2016 (or attended the course multiple times). The JSON used for configuring nETL to load data from the \texttt{Benchmarks (2014 - 2016).csv} file into CouchDB is included in the appendix at \ref{netl-task-6-config}.
+A \nth{3} analysis is done on the Benchmark data to assess the variances of each of the benchmarks evaluated. To achieve this, a single nETL task is run to load a database with Benchmarks data for all students who attended CSC1015F in either 2014, 2015, or 2016 (or attended the course multiple times). The JSON used for configuring nETL to load data from the \texttt{Benchmarks (2014 - 2016).csv} file into CouchDB is included in the appendix at \ref{netl-task-6-config}, which is identical to the configuration of the Task 1 nETL process (except that a different database is used).
 
-To achieve this, two nETL tasks were run to extract the CSV data (the ``Grades.CSV'' and ``Benchmarks.CSV'' files) and load rows from these CSV files into CouchDB as documents of type ``grade'' and ``benchmark'' respectively. The JSON configuration file in which both these tasks are defined is included in the appendix at \ref{netl-tasks-1-2-config}. Following loading the data from the CSVs into CouchDB, a Map function is used to produce an index of the CouchDB documents sorted by Student ID, with the guarantee that for every unique student id documents are ordered by type; demographic documents are sorted before Grade documents for for any given student. Knowing the sorted order of documents via the view-index allows for performing the join on data-retrieval. For this analysis, retrieval (and joining) is performed via a CouchDB List function (discussed below), with the output in CSV format.
+Following loading of the data from the CSV into CouchDB, a Map function is used to produce an index of the CouchDB documents sorted by Student ID. Only the single value (Student ID) is used for the key since the Map function only outputs a single document type no joining is required - in fact, since the results of this analysis is the coefficient of variation for each used benchmark, a List function is not required at all. Instead the coefficient of variation of each benchmark analyzed is read directly from the MapReduce output (i.e. the view-index).
+
+\subsection{Map Function}
+The map function for this analysis is included in the appendix (see \ref{variance-map-function}). Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{fig-map-fn-diagram}. ...
+
+That is, on Map function execution the ``type\_'' attribute is checked. If the document is a line of the Grades entity, then the key [Student ID, Course, year] is emitted along with a single number for the value - the percent achieved for the course. If the document is a line of the Benchmarks entity, then the key [student ID, 0, 0] is emitted along with an ordered list of 8 values corresponding to values for the fields in the Benchmarks.CSV file:
+
+\begin{itemize}
+    \item Gr12 English \%
+    \item Gr12 science \%
+    \item Gr12 Math \%
+    \item Gr 12 Math Lit \%
+    \item Gr12 Adv Math \%
+    \item NBT AL \%
+    \item NBT QL \%
+    \item NBT Math \%
+\end{itemize}
+
+Normalization of the percentage fields (i.e. ``Percent'' for the Grades entity and the test results in the Benchmarks entity) is done via a nested function within the Map function and according to the logic as discussed in that tables previously. No reduce function is used to achieve this 2-way join. This is because, theoretically, a student should only have a single set of Benchmark results and should only achieve a single grade per course per year. As such there is no need to aggregate output from the Map function (which is done via reduction) before performing the document join via the List function.
+
+\input{6-analysis/figures/fig-2-way-join-map-function}
+
+\subsection{List Function}
+
+\input{6-analysis/figures/fig-2-way-join-list-function}
+
+\subsection{Output}
+A sample of the resultant joined dataset is shown in Figure \ref{fig-2-way-csv-output}
+\input{6-analysis/figures/fig-2-way-csv-output}
