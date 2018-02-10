@@ -1,0 +1,68 @@
+\subsection{Task 6}
+\label{netl-task-6-config}
+\begin{minted}{text}
+[{
+    "ID": "Task 6",
+    "Extraction": {
+        "Name": "FLATFILE",
+        "path": "C:/MSc/Data/Benchmarks/Benchmarks (2014 - 2016).csv",
+        "skipHeaderRows": 1,
+        "bufferSize": 65536,
+        "batchSize": 10000,
+        "startFrom": 0,
+        "afterTaskRunCBs": []
+    },
+    "Transformations": [{
+            "Name": "TEXT_LINE_TO_OBJ",
+            "attributeNames": "anonIDnew, Career, Citizenship Residency, SA School, Eng Grd12 Fin Rslt, Math Grd12 Fin Rslt, Mth Lit Grd12 Fin Rslt, Adv Mth Grd12 Fin Rslt, Phy Sci Grd12 Fin Rslt, NBT AL Score, NBT QL Score, NBT Math Score, RegAcadYear",
+            "delimiter": ",",
+            "textQualifier": "\"",
+            "escapeChar": "\\",
+            "afterTaskRunCBs": []
+        },
+        {
+            "Name": "FILTER",
+            "filterOn": {
+                "Career": ["UGRD", "First Year", "Second Year", "Third Year"],
+                "Citizenship Residency": ["SA Citizen", "Permanent Resident", "C", "P"],
+                "anonIDnew": ["List of StudentIDs of students who attended CSC1015F in 2014, 2015, or 2016"]
+            },
+            "afterTaskRunCBs": []
+        },
+        {
+            "Name": "CREATE_OBJ_FIELD",
+            "newAttributes": [
+                ["type_", "benchmark"]
+            ],
+            "afterTaskRunCBs": []
+        },
+        {
+            "Name": "WHITELIST",
+            "allowedAttributes": [
+                "type_",
+                "anonIDnew",
+                "Eng Grd12 Fin Rslt",
+                "Math Grd12 Fin Rslt",
+                "Mth Lit Grd12 Fin Rslt",
+                "Adv Mth Grd12 Fin Rslt",
+                "Phy Sci Grd12 Fin Rslt",
+                "NBT AL Score",
+                "NBT QL Score",
+                "NBT Math Score",
+                "RegAcadYear"
+            ],
+            "afterTaskRunCBs": []
+        }
+    ],
+    "Load": {
+        "Name": "COUCHDB",
+        "username": "admin",
+        "password": "password",
+        "server": "localhost",
+        "port": 5984,
+        "ssl": false,
+        "database": "variance",
+        "afterTaskRunCBs": []
+    }
+}]
+\end{minted}
