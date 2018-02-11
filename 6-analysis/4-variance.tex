@@ -4,29 +4,9 @@ A \nth{3} analysis is done on the Benchmark data to assess the variances of each
 Following loading of the data from the CSV into CouchDB, a Map function is used to produce an index of the CouchDB documents sorted by Student ID. Only the single value (Student ID) is used for the key since the Map function only outputs a single document type no joining is required - in fact, since the results of this analysis is the coefficient of variation for each used benchmark, a List function is not required at all. Instead the coefficient of variation of each benchmark analyzed is read directly from the MapReduce output (i.e. the view-index).
 
 \subsection{Map Function}
-The map function for this analysis is included in the appendix (see \ref{variance-map-function}). Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{fig-map-fn-diagram}. ...
+The map function for this analysis is included in the appendix (see \ref{variance-map-function}). Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{fig-variance-map-function}. On Map function execution the ``type\_'' attribute is checked. If the document is not of type ``benchmark'', Map function execution is terminated, otherwise benchmarks are retrieved from the document, averages of combined benchmarks are calculated, and a tuple of the form \mintinline{text}{[StudentId: [benchmarks]]} is output by the Map function.
 
-That is, on Map function execution the ``type\_'' attribute is checked. If the document is a line of the Grades entity, then the key [Student ID, Course, year] is emitted along with a single number for the value - the percent achieved for the course. If the document is a line of the Benchmarks entity, then the key [student ID, 0, 0] is emitted along with an ordered list of 8 values corresponding to values for the fields in the Benchmarks.CSV file:
+Similarly to other Map function processing of benchmark documents, a normalization of grade symbols to percentages is performed via a nested function within the Map function, and according to the logic as discussed previously and shown in in Table \ref{tbl-benchmarks-normalize}. However, Unlike with previous analyses, integer-based calculations are performed in the JavaScript code during Map function execution. All numbers in JavaScript are 64-bit Floating Point following the IEEE 754 standard \cite{floatingPoint}, with observed peculiarities when working with rational numbers with decimal points as a result. Due to the nature of how floating point arithmetic differs from base-10 arithmetic, rounding errors such as the example $0.1 + 0.2 = 0.30000000000000004$ need to be dealt with (or at least quantified). In this project the problem is sidestepped due to it's complicated nature \cite{Goldberg1991}, and an open source \nth{3}-party library (\texttt{decimal.js} \cite{decimaljs}) is used for handling arithmetic in the Map function instead. CouchDB supports the commonJS specification for module loading of JavaScript libraries in the context of Map function execution \cite{commonJsMapFn}.
 
-\begin{itemize}
-    \item Gr12 English \%
-    \item Gr12 science \%
-    \item Gr12 Math \%
-    \item Gr 12 Math Lit \%
-    \item Gr12 Adv Math \%
-    \item NBT AL \%
-    \item NBT QL \%
-    \item NBT Math \%
-\end{itemize}
 
-Normalization of the percentage fields (i.e. ``Percent'' for the Grades entity and the test results in the Benchmarks entity) is done via a nested function within the Map function and according to the logic as discussed in that tables previously. No reduce function is used to achieve this 2-way join. This is because, theoretically, a student should only have a single set of Benchmark results and should only achieve a single grade per course per year. As such there is no need to aggregate output from the Map function (which is done via reduction) before performing the document join via the List function.
-
-\input{6-analysis/figures/fig-2-way-join-map-function}
-
-\subsection{List Function}
-
-\input{6-analysis/figures/fig-2-way-join-list-function}
-
-\subsection{Output}
-A sample of the resultant joined dataset is shown in Figure \ref{fig-2-way-csv-output}
-\input{6-analysis/figures/fig-2-way-csv-output}
+\input{6-analysis/figures/fig-variance-map-function}

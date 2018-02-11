@@ -1,0 +1,35 @@
+\label{couchdb-design-doc-sample}
+\begin{minted}{text}
+{
+    "_id": "_design/sample",
+    "_rev": "xxxxx",
+    "language": "javascript",
+    "views": {
+        "view1": {
+            "map": "function(doc) { ... }",
+            "reduce": "function(keys, values, rereduce) { ... }"
+        },
+        "view2": {
+            "map": "function(doc) { ... }",
+            "reduce": "_stats"            
+        }
+    },
+    "shows": {
+        "show1": "function(doc, req) { ... }",
+        "show2": "function(doc, req) { ... }"
+    },
+    "lists": {
+        "listFunc1": "function(head, req) { ... };",
+        "listFunc2": "function(head, req) { ... };"
+    },
+    "updates": {
+        "update1": "function(doc, req) { ... }",
+        "update2": "function(doc, req) { ... }"
+    },
+    "filters": {
+        "filter1": "function(doc, req) { ... }",
+        "filter2": "function(doc, req) { ... }"
+    },
+    "validate_doc_update": "function(newDoc, oldDoc, userCtx, secObj) { ... }"
+}
+\end{minted}
