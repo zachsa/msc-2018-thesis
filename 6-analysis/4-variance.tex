@@ -8,5 +8,7 @@ The map function for this analysis is included in the appendix (see \ref{varianc
 
 Similarly to other Map function processing of benchmark documents, a normalization of grade symbols to percentages is performed via a nested function within the Map function, and according to the logic as discussed previously and shown in in Table \ref{tbl-benchmarks-normalize}. However, unlike with previous analyses, integer-based calculations are performed in the JavaScript code during Map function execution. All numbers in JavaScript are 64-bit Floating Point following the IEEE 754 standard \cite{floatingPoint}. As such, working with rational numbers with decimal points results in peculiarities compared to expectations of how base-10 arithmetic works. A typical example is demonstrated by the sum: ``$0.1 + 0.2 = 0.30000000000000004$''. Quantifying the margin for these errors and handling these cases correctly is difficult \cite{Goldberg1991}, so an open-source library (\texttt{decimal.js} \cite{decimaljs}) is used to handle integer division in the Map function. (CouchDB supports the commonJS specification for module loading of JavaScript libraries in the context of Map function execution \cite{commonJsMapFn}.)
 
-
 \input{6-analysis/figures/fig-variance-map-function}
+
+\subsection{List Function}
+The list function is used to retrieve the variance and Standard Deviation of each of the benchmarks as tested for correlation against course results.
