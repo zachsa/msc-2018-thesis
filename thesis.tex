@@ -1,19 +1,25 @@
 % Document layout
 \documentclass[
-    a4paper
-]{report}
+    a4paper,
+    12pt
+]{extreport}
+\usepackage[left=3cm, right=2.5cm, top=2.5cm, bottom=2.5cm, bindingoffset=1cm]{geometry}
 \usepackage{blindtext}
 \usepackage[utf8]{inputenc}
 \usepackage{etoolbox}
+\makeatletter
+\patchcmd{\@makechapterhead}{\vspace*{50\p@}}{}{}{}% Removes space above \chapter head
+\patchcmd{\@makeschapterhead}{\vspace*{50\p@}}{}{}{}% Removes space above \chapter* head
+\makeatother
 
 \setcounter{tocdepth}{4}
 \setcounter{secnumdepth}{2}
 \usepackage{parskip}
-\usepackage[margin=1.25in]{geometry}
+
 \usepackage{setspace}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
-\setstretch{1.3}
+\setstretch{1.5}
 \setlength{\parindent}{0em}
 % \setlength{\parskip}{1em}
 

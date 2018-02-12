@@ -1,70 +1,10 @@
 Working with data exports requires an ETL (Extraction, Transformation, and Loading) process, in which information stored in tabular form in the CSV files is loaded into computer memory, transformed into JSON-structured objects, and then inserted into CouchDB. Once persisted, data interactions in terms of producing analyses becomes a flexible and agile process with room for creative insight since the cumbersome work of extracting and transforming data into a suitable format for querying does not have to to repeated
 
-Extraction is fairly straightforward; a variable is created in memory to reference the row of the CSV that contains table headers (usually the first row of the CSV). This row is then split by a column delimiter into a tuple of the form [val 1, val 2, val 3, etc]. Then all the remaining rows of the CSV are iteratively loaded into memory in turn, and split into tuples according to a column delimiter. The result of this is iteratively producing a tuple of the same length and form as the header tuple ([val 1, val 2, val 3, etc]) for every row of data. Each row of data can then be manipulated to with each value in the row tuple corresponding to a value in the header tuple at the same index. By grouping the values of the header and row tuple by index, it is easy to convert CSV rows into unordered collections of key:value pairs corresponding to JSON format as specified in the RFC \cite{rfc7159}. An example of how each entity (as discussed previously in \autoref{chapter:data}) can be represented as object structure is shown in Table \ref{tbl-json-examples}.
+Extraction is fairly straightforward; a variable is created in memory to reference the row of the CSV that contains table headers (usually the first row of the CSV). This row is then split by a column delimiter into a tuple of the form [val 1, val 2, val 3, etc]. Then all the remaining rows of the CSV are iteratively loaded into memory in turn, and split into tuples according to a column delimiter. The result of this is iteratively producing a tuple of the same length and form as the header tuple ([val 1, val 2, val 3, etc]) for every row of data. Each row of data can then be manipulated to with each value in the row tuple corresponding to a value in the header tuple at the same index. By grouping the values of the header and row tuple by index, it is easy to convert CSV rows into unordered collections of key:value pairs corresponding to JSON format as specified in the RFC \cite{rfc7159}. An example of how each entity (as discussed previously in \autoref{chapter:data}) can be represented as object structure is shown in Figures \ref{fig-benchmarks-json-sample}, \ref{fig-grades-json-sample}, and \ref{fig-events-json-sample}.
 
-
-\begin{table}[H]
-  \textbf{Table \ref{tbl-json-examples}}\par\medskip\par\medskip
-  \caption{JSON representation of data entities}
-  \label{tbl-json-examples}
-  \begin{tabular}{>{\centering\arraybackslash}p{\dimexpr 0.4\linewidth-2\tabcolsep}>{\centering\arraybackslash}m{\dimexpr 0.6\linewidth-2\tabcolsep}}
-    \toprule
-    \mC{c}{Entity} & \mC{c}{JSON representation} \\
-    \midrule
-    Sakai Event    &
-    \begin{verbatim}
-            {
-              "_id": "000e569ee321b915bae59fe62e0051e3",
-              "_rev": "1-7112afce121087818c33ebfd0fd7fed7",
-              "event_date": "2016-04-17T14:04:20.000Z",
-              "event_id": 281,
-              "uct_id": 3018438,
-              "site_key": 2297,
-              "type_": "vulaEvent"
-            }        
-        \end{verbatim}
-    \\
-    Sakai Grade    &
-    \begin{verbatim}
-            {
-              "_id": "7530f4eed7e6bc3ef0d99a53be8ba9a2",
-              "_rev": "8-232d0cf39728d41b4c5935f12469209d",
-              "RegAcadYear": 2016,
-              "RegTerm": 1161,
-              "anonIDnew": 1,
-              "RegCareer": "UGRD",
-              "Degree": "QHB002",
-              "Course": "PHI1010S",
-              "CourseSuffix": "S",
-              "Percent": "55",
-              "CourseID": 109157,
-              "Dept": "PHI",
-              "type_": "courseGrade"
-            }        
-        \end{verbatim}
-    \\
-    FU Entity      &
-    \begin{verbatim}
-            {
-              "_id": "6587aa5b36bba2a70aeba96d06f05d2b",
-              "_rev": "1-8c7d395e046e452442907e3388c74b41",
-              "anonIDnew": 3103212,
-              "Eng Grd12 Fin Rslt": 58,
-              "Math Grd12 Fin Rslt": 73,
-              "Mth Lit Grd12 Fin Rslt": "",
-              "Adv Mth Grd12 Fin Rslt": "",
-              "Phy Sci Grd12 Fin Rslt": 67,
-              "NBT AL Score": 53,
-              "NBT QL Score": 43,
-              "NBT Math Score": 60,
-              "RegAcadYear": 2016,
-              "type_": "demographic"
-            }
-        \end{verbatim}
-    \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\input{5-etl/figures/fig-benchmarks-json-sample}
+\input{5-etl/figures/fig-grades-json-sample}
+\input{5-etl/figures/fig-events-json-sample}
 
 Further transformations can then be applied to the entity-objects before being loaded into CouchDB, completing a sequential processing of a single row of CSV data via first extracting information, transforming information, and loading information into the destination (ETL).
 
@@ -96,55 +36,4 @@ The ETL process is described in terms of coding requirements in pseudo code in F
 
 Due to the ever-increasing complexity of the code being used for ETL, the codebase was formalized and structured as a component-based ETL engine that performed ETL tasks based on independent and external configuration objects. These tasks comprise sequential piping of output from one component to input of another component. By providing input/output data contracts, components can be strung together in any order, allowing for versatile and configurable ETL pipelines. By implementing the components as user-configurable, external processes to the ETL engine, specific logic required to process specific information is greatly decoupled from the logic required to extract, transform and load information as a series of high level tasks. The resultant software to achieve this task is implemented in JavaScript (node.js), and is called \textit{nETL} (node.js ETL).
 
-% lstlisting for maths inclusion: Should I analysis the algorithm? $f(x)=ax^2+bx+c$
-\begin{figure}[H]
-  \centering
-  \begin{mdframed}
-    \centering
-    \begin{verbatim}
-// Extract the headers of the CSV file, and keep reference in memory throughout ETL process
-file = loadFile('path')
-headers = getFirstCsvRow(file)
-headers = splitByColumnDelimiter() // ([val 1, val 2, val 3, etc])
-
-// Helper function convert CSV lines to objects
-function getObjectsFromCSV(file, pStart, pEnd) {
-    fileBuffer = file(pStart, pEnd)
-    rows = fileBuffer.splitIntoRows() // [row1, row2, row3, etc]
-    objects = []
-    for (j = 1; j <= rows.length; j++) {
-        row = row[j].splitByColDelim() // [val1, val2, val3, etc]
-        object = {}
-        for (k = 1; k <= row.length; k++) {
-            key = headers[k]
-            val = row[k]
-            object[key] = val
-        }
-        object = whitelistObject(object)
-        object = whitelistObjectFields(object)
-        object = addTypeField(object)
-
-        objects.push(object)
-    }
-    return objects
-}
-
-// Do ET & L
-batchSize = 65000
-pointerStart = startOfNonHeaderRow()
-for (i = pointerStart; i <= file.length; i += batchSize) {
-    pointerStart = i
-    pointerEnd = i + batchSize
-    objects = getObjectsFromCSV(file, pointerStart, pointerEnd)
-    insertToCouchDB(objects)
-}
-
-// Handle remaining part of file
-pointerEnd = fileSize
-objects = getObjectsFromCSV(file, pointerStart, pointerEnd)
-insertToCouchDB(objects)
-        \end{verbatim}
-  \end{mdframed}
-  \caption[Row to object transformation]{\textbf{Figure \ref{row-object-transformation}: Algorithm to transform CSV rows to object.}}
-  \label{row-object-transformation}
-\end{figure}
+\input{5-etl/figures/fig-netl-logic}

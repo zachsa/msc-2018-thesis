@@ -1,0 +1,52 @@
+
+\begin{figure}[H]
+    \centering
+    \begin{mdframed}
+        \centering
+        \begin{minted}{text}
+// Extract the headers of the CSV file, and keep reference in memory throughout ETL process
+file = loadFile('path')
+headers = getFirstCsvRow(file)
+headers = splitByColumnDelimiter() // ([val 1, val 2, val 3, etc])
+
+// Helper function convert CSV lines to objects
+function getObjectsFromCSV(file, pStart, pEnd) {
+    fileBuffer = file(pStart, pEnd)
+    rows = fileBuffer.splitIntoRows() // [row1, row2, row3, etc]
+    objects = []
+    for (j = 1; j <= rows.length; j++) {
+        row = row[j].splitByColDelim() // [val1, val2, val3, etc]
+        object = {}
+        for (k = 1; k <= row.length; k++) {
+            key = headers[k]
+            val = row[k]
+            object[key] = val
+        }
+        object = whitelistObject(object)
+        object = whitelistObjectFields(object)
+        object = addTypeField(object)
+
+        objects.push(object)
+    }
+    return objects
+}
+
+// Do ET & L
+batchSize = 65000
+pointerStart = startOfNonHeaderRow()
+for (i = pointerStart; i <= file.length; i += batchSize) {
+    pointerStart = i
+    pointerEnd = i + batchSize
+    objects = getObjectsFromCSV(file, pointerStart, pointerEnd)
+    insertToCouchDB(objects)
+}
+
+// Handle remaining part of file
+pointerEnd = fileSize
+objects = getObjectsFromCSV(file, pointerStart, pointerEnd)
+insertToCouchDB(objects)
+        \end{minted}
+    \end{mdframed}
+    \caption[Row to object transformation]{\textbf{Figure \ref{row-object-transformation}: Algorithm to transform CSV rows to object.}}
+    \label{row-object-transformation}
+\end{figure}
