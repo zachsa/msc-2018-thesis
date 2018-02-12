@@ -1,9 +1,8 @@
-\begin{figure}[H]
+\begin{sidewaysfigure}
     \centering
-    \begin{mdframed}[rightline=true,leftline=true]
+    \begin{mdframed}[rightline=false,leftline=false,topline=false]
         \centering
         \begin{BVerbatim}
-
 +------+---------+----------+-------+----------+----------+----------+--------------+--------------+--------+--------+---------+------+------+
 | Year |   ID    |  Course  | Grade | Gr12 Eng | Gr12 Sci | Gr12 Mth | Gr12 Mth Lit | Gr12 Mth Adv | NBT AL | NBT QL | NBT Mth |  S1  |  S2  |
 +------+---------+----------+-------+----------+----------+----------+--------------+--------------+--------+--------+---------+------+------+
@@ -25,9 +24,8 @@
 | 2016 | 2951308 | CSC1015F |    30 |       80 |        0 |       71 |            0 |            0 |     70 |     62 |      54 |  130 |   50 |
 | 2016 | 2951954 | CSC1015F |    42 |        0 |        0 |        0 |            0 |            0 |     78 |     86 |      57 |  309 |   58 |
 +------+---------+----------+-------+----------+----------+----------+--------------+--------------+--------+--------+---------+------+------+
-
         \end{BVerbatim}
     \end{mdframed}
     \caption[Sample of 3-way CSV output]{\textbf{Figure \ref{fig-3-way-csv-output}: Sample of the 3-way join output CSV.} List function output is a CSV download with the schema as represented in this figure. The full CSV has 586 rows (including a header row). Since only a single year of data was analyzed, there are no repeated StudentIDs in the dataset.}
     \label{fig-3-way-csv-output}
-\end{figure}
+\end{sidewaysfigure}
