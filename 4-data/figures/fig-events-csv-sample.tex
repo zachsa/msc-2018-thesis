@@ -1,0 +1,27 @@
+\begin{figure}[H]
+  \centering
+  \begin{mdframed}
+    \centering
+\begin{BVerbatim}
+
++------------------+----------+--------+----------+-----+
+|    event_date    | event_id | uct_id | site_key | ref |
++------------------+----------+--------+----------+-----+
+| 2/18/2016 17:12  |      281 |      1 |    50680 | txt |
+| 10/18/2016 17:12 |      281 |      1 |    27933 | txt |
+| 5/18/2016 17:12  |      281 |      2 |    50680 | txt |
+| 5/19/2016 17:12  |      281 |      2 |    27933 | txt |
+| 9/18/2016 17:12  |      281 |      2 |    27933 | txt |
+| 4/18/2016 17:12  |      281 |      3 |    50680 | txt |
+| 4/18/2016 17:12  |      281 |      3 |    27933 | txt |
+| 5/18/2016 17:12  |      281 |      3 |    27933 | txt |
+| 6/18/2016 17:12  |      281 |      3 |    31585 | txt |
+| 11/18/2016 17:12 |      281 |      4 |    31585 | txt |
+| 11/18/2016 17:12 |      281 |      5 |    31585 | txt |
++------------------+----------+--------+----------+-----+
+
+\end{BVerbatim}
+  \end{mdframed}
+  \caption[Raw Events CSV Sample]{\textbf{Figure \ref{fig-events-csv-sample}: Sample of Events CSVs used in the ETL process.} A header row has been added to this sample for readability purposes, but the nETL application loaded a CSV without this header row. The ``ref'' values have been shortened to ``txt'' since these values are long and unused in the analysis. Also, although the Events CSV shows event\_ids of only 281, the CSV used in the ETL process contains many values for this field.}
+  \label{fig-events-csv-sample}
+\end{figure}

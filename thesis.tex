@@ -1,33 +1,67 @@
-% Document layout
+% Document
 \documentclass[
     a4paper,
     12pt
 ]{extreport}
-\usepackage[left=3cm, right=2.5cm, top=2.5cm, bottom=2.5cm, bindingoffset=1cm]{geometry}
-\usepackage{blindtext}
-\usepackage[utf8]{inputenc}
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd{\@makechapterhead}{\vspace*{50\p@}}{}{}{}% Removes space above \chapter head
-\patchcmd{\@makeschapterhead}{\vspace*{50\p@}}{}{}{}% Removes space above \chapter* head
-\makeatother
-
-\setcounter{tocdepth}{4}
-\setcounter{secnumdepth}{2}
-\usepackage{parskip}
-
+\usepackage[
+    left=3cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm,
+    bindingoffset=1cm
+]{geometry}
+\usepackage[utf8]{inputenc} % Encoding (I think)
+\usepackage{etoolbox} % Patching other packages (I think)
+\usepackage{parskip} % Line spacing
 \usepackage{setspace}
-\usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
-\setstretch{1.5}
-\setlength{\parindent}{0em}
-% \setlength{\parskip}{1em}
-
+\usepackage{hyperref}
 \usepackage[toc,page]{appendix}
 \usepackage[super,negative]{nth}
+\usepackage{amssymb}
+\usepackage{pifont}
+\usepackage{enumitem}
 
-% Hyperlinks
-\usepackage{hyperref}
+% Figures and tables
+\usepackage{mdframed}
+\usepackage[font=scriptsize,skip=2pt]{caption}
+\usepackage{subcaption}
+
+% Figures
+\usepackage{pdfpages}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[many]{tcolorbox}
+\usepackage{fancyvrb}
+\usepackage{rotating}
+\usepackage[outputdir=./_build]{minted}
+
+% Tables
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+
+% Bibliography
+\usepackage{natbib}
+\usepackage{bibentry}
+
+% Remove spacing above \chapter head
+\makeatletter
+\patchcmd{\@makechapterhead}{\vspace*{50\p@}}{}{}{}
+\patchcmd{\@makeschapterhead}{\vspace*{50\p@}}{}{}{}
+\makeatother
+
+% Set TOC numbering depth
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{2}
+
+% Set font defaults
+\setstretch{1.5}
+\setlength{\parindent}{0em}
+
+% Set hyperref defaults
 \hypersetup{
     colorlinks,
     citecolor=black,
@@ -36,53 +70,31 @@
     urlcolor=black
 }
 
-% Graphics
-\usepackage{pdfpages}
-\usepackage{graphicx}
-\usepackage{xcolor}
-\usepackage[many]{tcolorbox}
-\usepackage{etoolbox}
-\usepackage{fancyvrb}
-
-% Fonts
-\usepackage{amssymb}
-\usepackage{pifont}
-
-% Lists
-\usepackage{enumitem}
-\setlist{nosep} % or \setlist{noitemsep} to leave space around whole list
-
-% Tables & figures
-\usepackage{listings}
-\lstset{
-    basicstyle=\fontsize{11}{13}\selectfont\ttfamily,
-    mathescape
+% Set BVerbatim defaults
+\fvset{
+    fontsize=\fontsize{9}{13},
+    baseline=c
 }
 
-\usepackage{multirow}
-\usepackage{array}
-\usepackage{mdframed}
-\usepackage{booktabs}
-\usepackage{tabularx}
-\newcolumntype{Y}{>{\centering\arraybackslash}X}
-\newcommand*{\mC}[2]{\multicolumn{1}{#1}{#2}}
-\usepackage{subcaption}
-\usepackage{threeparttable}
-\usepackage{etoolbox}
+% Set list spacing
+\setlist{nosep}
+
+% Change 'Bibliography' to 'References'
 \makeatletter
-\patchcmd{\@verbatim}
-  {\verbatim@font}
-  {\verbatim@font\tiny}
-  {}{}
+\def\thebibliography#1{\chapter*{References\@mkboth
+  {REFERENCES}{REFERENCES}}\list
+  {[\arabic{enumi}]}{\settowidth\labelwidth{[#1]}\leftmargin\labelwidth
+\advance\leftmargin\labelsep
+\usecounter{enumi}}
+\def\newblock{\hskip .11em plus .33em minus .07em}
+\sloppy\clubpenalty4000\widowpenalty4000
+\sfcode`\.=1000\relax}
 \makeatother
-\usepackage[font=scriptsize,skip=2pt]{caption}
-\captionsetup[table]{
-    labelfont=bf,
-    textfont=normalfont,
-    singlelinecheck=off,
-    justification=raggedright,
-    labelformat=empty
-}
+
+% Add Table column type (centered)
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+% Setup captions for figures
 \captionsetup[figure]{
     labelformat=empty,
     labelfont=bf,
@@ -90,38 +102,29 @@
     singlelinecheck=off,
     justification=justified
 }
-\usepackage{listings}
-\lstset{
-  basicstyle=\tiny,
-  breaklines=true
-  }
 
-% Inline-code
-\usepackage[outputdir=./_build]{minted}
-\definecolor{dhscodebg}{rgb}{0.9,0.9,0.92}
+% Setup captions for tables
+\captionsetup[table]{
+    labelfont=bf,
+    textfont=normalfont,
+    singlelinecheck=off,
+    justification=raggedright,
+    labelformat=empty
+}
+
+% Set Minted environment
 \setminted{
     breaksymbolleft=,
-    fontsize=\scriptsize,
+    fontsize=\fontsize{9}{13},
     baselinestretch=1.1,
-    % bgcolor=dhscodebg,
-    % rulecolor=\color{gray!40},
-    % framesep=\fboxsep,
-    % frame=single,
-    % framesep=10pt
-    % framerule=2pt,
     xleftmargin=2.5em,
     linenos,
     breaklines,
     tabsize=4
 }
-% \usemintedstyle{tango}
-
-% Bibliography
-\usepackage{natbib}
-\usepackage{bibentry}
-\nobibliography*
 
 % Custom commands
+\newcommand*{\mC}[2]{\multicolumn{1}{#1}{#2}}
 \newcommand{\q}[1]{``#1''}
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
@@ -146,6 +149,10 @@
 
 %  TOC
 \tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
 \newpage
 
 % Content
@@ -212,11 +219,6 @@
     \input{appendix/logs}
     \chapter{Slack Conversations}
     \input{appendix/slack}
-    \newpage
-    \listoffigures
-    \newpage
-    \listoftables
-    \newpage
 \end{appendices}
 
 % Close docuemnt

@@ -6,10 +6,13 @@ With special thanks to Jane Hendry (UCT's CIO) and Stephen Marquard (the Learnin
     \item \textit{Events}: Student interactions with the Sakai platform, measured as browser interactions. This is was also provided by Stephen Marquard
 \end{itemize}
 
-All three datasets were received as CSV exports with student IDs anonymized prior to receiving them thanks to Associate Professor, Sonia Berman and Stephen Marquard. Anonymization was consistent across all three datasets, preserving the association of particular students with correct Benchmarks, Grades and Events. Some Excel manipulation on the files was required on the Grades and Benchmarks CSVs (discussed below). Figure \ref{fig-sample-csv-files} shows a sample of each CSV type as used in the analysis.
+All three datasets were received as CSV exports with student IDs anonymized prior to receiving them thanks to Associate Professor, Sonia Berman and Stephen Marquard. Anonymization was consistent across all three datasets, preserving the association of particular students with correct Benchmarks, Grades and Events. Some Excel manipulation on the files was required on the Grades and Benchmarks CSVs (discussed below).
 
 \section{Grades}
-CSV exports received for Grade data for the years 2014, 2015 and 2016 are consistent across all three years in terms of the fields and the ordering of these fields - the only structural difference is that the 2014 CSV is tab-delimited instead of comma delimited. Using Microsoft Excel the three files were combined into a single CSV, which is described in Table \ref{tbl-data-grades}; all the fields included in the CSV exports are included in the combined CSV that is used as a the data source for this project's analysis.
+CSV exports received for Grade data for the years 2014, 2015 and 2016 are consistent across all three years in terms of the fields and the ordering of these fields - the only structural difference is that the 2014 CSV is tab-delimited instead of comma delimited. Using Microsoft Excel the three files were combined into a single CSV, which is described in Table \ref{tbl-data-grades}; all the fields included in the CSV exports are included in the combined CSV that is used as a the data source for this project's analysis. A sample of this CSV file is shown in Figure \ref{fig-grades-csv-sample}.
+
+\input{4-data/tables/grades}
+\input{4-data/figures/fig-grades-csv-sample}
 
 \section{Benchmarks}
 CSV exports received for Benchmark contain data for the years 2014, 2015 and 2016. The fields in these CSVs are not consistent across all three years; certain fields are capitalized differently, fields are ordered differently from year to year. Additionally, fields are included to show UCT academic performance for years subsequent to each student's registration. For example, Benchmark data from 2014 includes academic performance for the years 2015/2016, and the 2015 Benchmark data includes academic performance for the year 2016 - resulting in many repeating fields.
@@ -22,18 +25,13 @@ CouchDB is an excellent tool for normalizing schemas, since user defined map fun
     \item Removing data not considered ethical to work with - race, gender, etc.
 \end{itemize}
 
-The normalized Benchmark data comprises a single CSV containing an anonymized list of students that enrolled at UCT in 2014, 2015, and 2016 and the benchmark results of these students. A description of this CSV is shown in Table \ref{tbl-data-benchmarks} in terms of field names, a description of these fields and each field's data type.
+The normalized Benchmark data comprises a single CSV containing an anonymized list of students that enrolled at UCT in 2014, 2015, and 2016 and the benchmark results of these students. A description of this CSV is shown in Table \ref{tbl-data-benchmarks} in terms of field names, a description of these fields and each field's data type. A sample of this CSV file is shown in Figure \ref{fig-benchmarks-csv-sample}.
+
+\input{4-data/tables/benchmarks}
+\input{4-data/figures/fig-benchmarks-csv-sample}
 
 \section{Events}
-The CSV export received for Events data is for 2016, with a description of the fields shown in \ref{tbl-data-events}. The Events CSV export cannot be opened using Microsoft Excel due to it's large size (\textgreater 5GB) and was processed using nETL. This CSV contains no header rows, and information on the headers had to be obtained separately. A small sample of the CSV was taken using a BASH terminal - the \mintinline{bash}{head -n 100 <file.csv>} will show the first 100 lines of a CSV.
+The CSV export received for Events data is for 2016, with a description of the fields shown in \ref{tbl-data-events}. The Events CSV export cannot be opened using Microsoft Excel due to it's large size (\textgreater 5GB) and was processed using nETL. This CSV contains no header rows, and information on the headers had to be obtained separately. A small sample of the CSV was taken using a BASH terminal - the \mintinline{bash}{head -n 100 <file.csv>} will show the first 100 lines of a CSV. A sample of this CSV file is shown in Figure \ref{fig-events-csv-sample}.
 
-\newpage
-\input{4-data/figures/fig-sample-csv-files}
-
-\newpage
-\input{4-data/tables/grades}
-
-\newpage
-\input{4-data/tables/benchmarks}
-\vspace{80px}
 \input{4-data/tables/events}
+\input{4-data/figures/fig-events-csv-sample}

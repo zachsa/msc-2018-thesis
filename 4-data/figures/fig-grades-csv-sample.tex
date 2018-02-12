@@ -1,0 +1,34 @@
+\begin{sidewaysfigure}
+  \centering
+  \begin{mdframed}[topline=false,rightline=false,leftline=false]
+    \centering
+\begin{BVerbatim}
++--------+-------------+---------+----+------------+-----------+--------+-------------+---------+----------+----------+--------+--------------+--
+| DnldDt | RegAcadYear | RegTerm | ID | RegProgram | RegCareer | Degree | DegreeDescr | Subject | Catalog. |  Course  | Suffix |   Session    |
++--------+-------------+---------+----+------------+-----------+--------+-------------+---------+----------+----------+--------+--------------+--
+| txt    |        2016 |    1161 |  1 | CB003      | UGRD      | QCB007 | txt         | MAM     | 1000W    | MAM1000W | W      | Full Year    |
+| txt    |        2016 |    1161 |  1 | CB003      | UGRD      | QCB007 | txt         | CSC     | 1015F    | CSC1015F | F      | Semester One |
+| txt    |        2016 |    1161 |  2 | CB004      | UGRD      | QCB002 | txt         | CSC     | 1015F    | CSC1015F | F      | Semester One |
+| txt    |        2016 |    1161 |  3 | EB022      | UGRD      | QEB028 | txt         | EEE     | 2036S    | EEE2036S | S      | Semester Two |
+| txt    |        2015 |    1151 |  3 | EB022      | UGRD      | EB28   | txt         | CSC     | 1015F    | CSC1015F | F      | Semester One |
+| txt    |        2016 |    1161 |  4 | CB004      | UGRD      | QCB002 | txt         | CSC     | 1015F    | CSC1015F | F      | Semester One |
+| txt    |        2015 |    1151 |  4 | CB003      | UGRD      | CB07   | txt         | CSC     | 1015F    | CSC1015F | F      | Semester One |
+| txt    |        2015 |    1151 |  5 | CB003      | UGRD      | CB07   | txt         | CSC     | 1015F    | CSC1015F | F      | Semester One |
++--------+-------------+---------+----+------------+-----------+--------+-------------+---------+----------+----------+--------+--------------+--
+--+---------+--------+------------+----------+------------+-----------+---------+------+--------------+-----------+-----------+------+----------+
+  | Percent | Symbol | UnitsTaken | CourseID | CourseDesc | CourseCrr | Faculty | Dept | MaxCrseUnits | CrseCount | CrseLevel | CESM | Sub-CESM |
+--+---------+--------+------------+----------+------------+-----------+---------+------+--------------+-----------+-----------+------+----------+
+  |      71 | 2+     |         36 |   107088 | txt        | UGRD      | SCI     | MAM  |           36 |         1 |        41 | 1501 |        1 |
+  |      70 | 2+     |         18 |   103034 | txt        | UGRD      | SCI     | CSC  |           18 |       0.5 |        41 |  606 |        6 |
+  |      55 | 3      |         18 |   103034 | txt        | UGRD      | SCI     | CSC  |           18 |       0.5 |        41 |  606 |        6 |
+  |      63 | 2-     |         12 |     1642 | txt        | UGRD      | EBE     | EEE  |           12 |         1 |        42 |  809 |        9 |
+  |      77 | 1      |         18 |   103034 | txt        | UGRD      | SCI     | CSC  |           18 |       0.5 |        41 |  606 |        6 |
+  |      54 | 3      |         18 |   103034 | txt        | UGRD      | SCI     | CSC  |           18 |       0.5 |        41 |  606 |        6 |
+  |      39 | F      |         18 |   103034 | txt        | UGRD      | SCI     | CSC  |           18 |       0.5 |        41 |  606 |        6 |
+  |      39 | F      |         18 |   103034 | txt        | UGRD      | SCI     | CSC  |           18 |       0.5 |        41 |  606 |        6 |
+--+---------+--------+------------+----------+------------+-----------+---------+------+--------------+-----------+-----------+------+----------+
+\end{BVerbatim}
+  \end{mdframed}
+  \caption[Raw Grades CSV Sample]{\textbf{Figure \ref{fig-grades-csv-sample}: Sample of \texttt{Grades (2014 - 2016).CSV} file used for the ETL process, after processing via Microsoft Excel.} Header names have been shortened in some cases for layout-related reasons, and some values have been redacted to ``txt'' for the same reason.}
+  \label{fig-grades-csv-sample}
+\end{sidewaysfigure}
