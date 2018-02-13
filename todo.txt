@@ -1,3 +1,5 @@
 1. include additional info in chapter 2
 2. citations
 3. Variance
+4. change benchmarks to 'admissions'
+5. data types should be lower cased

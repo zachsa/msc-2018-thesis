@@ -1,23 +1,25 @@
-With special thanks to Jane Hendry (UCT's CIO) and Stephen Marquard (the Learning Technologies Coordinator from the Center for Innovation in Learning and Teaching at UCT), student data was made available encompassing UCT entrance assessments, course grades, and LMS (Sakai) interactions. This data was received as three separate datasets that are classified in terms of this project as listed below:
+With special thanks to data owners Jane Hendry (UCT's CIO) and Stephen Marquard (the Learning Technologies Coordinator from the Center for Innovation in Learning and Teaching at UCT), student data was made available encompassing UCT entrance assessments, course grades, and LMS (Learning Management Software) - Sakai \cite{xxx} - interactions. This data was received as three separate datasets that are classified in terms of this project as listed below:
 
 \begin{itemize}
-    \item \textit{Grades}: Student course results provided by Jane Hendry
-    \item \textit{Benchmarks}: Student matric results and admission-acceptance test results provided by Jane Hendry
-    \item \textit{Events}: Student interactions with the Sakai platform, measured as browser interactions. This is was also provided by Stephen Marquard
+    \item \textit{grades}: UCT course results
+    \item \textit{benchmarks}: Student matric results and national benchmark test results
+    \item \textit{events}: Student interactions with the Sakai platform, measured as browser interactions
 \end{itemize}
 
-All three datasets were received as CSV exports with student IDs anonymized prior to receiving them thanks to Associate Professor, Sonia Berman and Stephen Marquard. Anonymization was consistent across all three datasets, preserving the association of particular students with correct Benchmarks, Grades and Events. Some Excel manipulation on the files was required on the Grades and Benchmarks CSVs (discussed below).
+All three datasets were received as CSV exports with student IDs anonymized prior to receiving them. Anonymization was consistent across all three datasets, preserving the association of particular students with correct Benchmarks, Grades and Events. Some Excel manipulation on the files was required on the Grades and Benchmarks CSVs (discussed below).
 
 \section{Grades}
-CSV exports received for Grade data for the years 2014, 2015 and 2016 are consistent across all three years in terms of the fields and the ordering of these fields - the only structural difference is that the 2014 CSV is tab-delimited instead of comma delimited. Using Microsoft Excel the three files were combined into a single CSV, which is described in Table \ref{tbl-data-grades}; all the fields included in the CSV exports are included in the combined CSV that is used as a the data source for this project's analysis. A sample of this CSV file is shown in Figure \ref{fig-grades-csv-sample}.
+CSV exports received for grades data for the years 2014, 2015 and 2016 are consistent across all three years in terms of the fields and the ordering of these fields - the only structural difference is that the 2014 CSV is tab-delimited instead of comma delimited. Using Microsoft Excel the three files were combined into a single CSV, which is described in Table \ref{tbl-data-grades}; all the data in the combined CSV is used in this project. A sample of this CSV file is shown in Figure \ref{fig-grades-csv-sample}.
 
 \input{3-data/tables/grades}
 \input{3-data/figures/fig-grades-csv-sample}
 
 \section{Benchmarks}
-CSV exports received for Benchmark contain data for the years 2014, 2015 and 2016. The fields in these CSVs are not consistent across all three years; certain fields are capitalized differently, fields are ordered differently from year to year. Additionally, fields are included to show UCT academic performance for years subsequent to each student's registration. For example, Benchmark data from 2014 includes academic performance for the years 2015/2016, and the 2015 Benchmark data includes academic performance for the year 2016 - resulting in many repeating fields.
+CSV exports received for benchmarks contain data for the 2014, 2015 and 2016 student cohorts. The fields in these CSVs are not consistent across all three years; certain fields are capitalized differently, fields are ordered differently from year to year. Additionally, fields are included to show UCT academic performance for years subsequent to each student's registration. For example, benchmarks data from 2014 includes academic performance for the years 2015/2016, and the 2015 benchmarks data includes academic performance for the year 2016 - resulting in many repeating fields and variable row lengths.
 
-CouchDB is an excellent tool for normalizing schemas, since user defined map functions can query every document with unique logic according schema version and output a normalized document representation. But although CouchDB is lenient in terms of data structure when modeling data (JSON documents are semi-structured), some structuring beyond a 'visual' structure is still required. As such, the Benchmark data as received in CSV form could be broadly classified as 'unstructured'; Microsoft Excel was used to normalize the Benchmark data across all three years, since this tool provides a means for processing data where structure relies on visual organization. In order to take advantage of CouchDB as a means of `flattening' inconsistent schema's, different CSV exports to as received would be required from the system housing the Benchmark and other demographic data. Steps taking during the normalization process are listed here:
+CouchDB is an excellent tool for normalizing schemas, since user defined map functions can query every document with unique logic according to schema version and output a normalized document representation. But although CouchDB is lenient in terms of data structure when modeling data (JSON documents are semi-structured), some structuring beyond a 'visual' structure is still required. As such, the Benchmark data as received in CSV form could be broadly classified as 'unstructured'. Microsoft Excel was used to normalize the Benchmark data across all three years (Excel is an excellent tool for working with data structured visually).
+
+In order to take advantage of CouchDB as a means of `flattening' inconsistent schemas, different CSV exports compared to the ones received would be required from the system housing the Benchmark and other demographic data. CouchDB doesn't allow for duplicated keys in JSON documents; duplicated keys don't actually cause errors, but one of the duplicate keys is discarded (theoretically at random since keys are not ordered according to the JSON specification). Although it's possible to process CSVs with inconsistent formatting such as these, there is little incentive or reason to do so since every rule has to be manually specified and the logic could never be reused. CSVs are normalized in Excel according to the logic:
 
 \begin{itemize}
     \item Adjusting fields to be spelled the same, normalizing whitespace, and making capitalization consistent for fields with the same name
@@ -31,7 +33,7 @@ The normalized Benchmark data comprises a single CSV containing an anonymized li
 \input{3-data/figures/fig-benchmarks-csv-sample}
 
 \section{Events}
-The CSV export received for Events data is for 2016, with a description of the fields shown in \ref{tbl-data-events}. The Events CSV export cannot be opened using Microsoft Excel due to its large size (\textgreater 5GB) and was processed using nETL. This CSV contains no header rows, and information on the headers had to be obtained separately. A small sample of the CSV was taken using a BASH terminal - the \mintinline{bash}{head -n 100 <file.csv>} will show the first 100 lines of a CSV. A sample of this CSV file is shown in Figure \ref{fig-events-csv-sample}.
+The CSV export received for Events data is for 2016, with a description of the fields shown in  Table \ref{tbl-data-events}. The Events CSV export cannot be opened using Microsoft Excel due to its large size (\textgreater 5GB). This CSV contains no header rows, and information on the headers had to be obtained separately. A small sample of the CSV was taken using a BASH terminal - the \mintinline{bash}{head -n 100 <file.csv>} will show the first 100 lines of a CSV. A sample of this CSV file is shown in Figure \ref{fig-events-csv-sample}.
 
 \input{3-data/tables/events}
 \input{3-data/figures/fig-events-csv-sample}
