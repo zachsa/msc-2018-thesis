@@ -12,12 +12,12 @@ In terms of defining MapReduce tasks, the map function is always user-defined, w
 
 During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{performance-analysis}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
 
-\input{6-analysis/figures/workflow}
+\input{5-analysis/figures/workflow}
 
 \section{MapReduce Approach}
 Initial attempts at joining the three entities - Grades with Benchmarks, and then Grades with Benchmarks with Events were attempted directly via MapReduce (the custom Map and \_stats reduce function). This approach involved specifying the map function to always output a value of the same format for all three entities. This format is a tuple of 11 indexes - [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; each of the 11 indexes correlate to a specific output attribute. In other words, i = 0 (indexes in JavaScript start at 0) correlates to Grade \%, i = 1,2,3,4,etc. correlated to the percents for Benchmark data, and the last 2 indexes (i = 9, i = 10) indicate an event occurrence (from the Event data) in either the first semester (i[9] = 1, i[10] = 0) or the second semester (i[9] = 0, i[10] = 1).
 
-During index calculation, CouchDB then iterates through every database document, passing each document to the Map function. This Map function instantiates the output tuple ([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) on every execution, and then depending on the value of the `type\_' attribute of the document it's processing (this attribute is added to every document prior to insertion to CouchDB), the map function alters the tuple at certain indexes before returning and adding the key:value set to the view index currently being built.
+During index calculation, CouchDB then iterates through every database document, passing each document to the Map function. This Map function instantiates the output tuple ([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) on every execution, and then depending on the value of the `type\_' attribute of the document it is processing (this attribute is added to every document prior to insertion to CouchDB), the map function alters the tuple at certain indexes before returning and adding the key:value set to the view index currently being built.
 
 To further explain, if the document being processed by the map function is a ‘grade’ document, then the map function adjusts the value tuple to emit the grade percent – i.e. [percent, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]. Or if the document is of type ‘demographic’, the map function changes the values at indexes 2 through 9 and emits the value: [0, x, x, x, x, x, x, x, x, 0, 0]. If the document is of type ‘event’, then the map function alters the value at indexes 9 and 10. i.e. [0, 0, 0, 0, 0, 0, 0, 0, s1Event, s2Event] (s1Event is 1 for first semester event, or 0 for second semester, etc.).
 
@@ -33,4 +33,4 @@ With ordered output, and Event data already aggregated via the reduce function, 
 
 Part of the MapReduce logic includes a normalization of percentage fields, which may occur either as number or symbol (A, B, C, D, etc) values. Normalization is performed by a sub-routine defined within the Map function body. Table \ref{tbl-grades-normalize} shows the logic used to translate grade symbols to percentages, and Table \ref{tbl-benchmarks-normalize} shows the same logic for the Benchmarks data.
 
-\input{6-analysis/figures/reduce-example}
+\input{5-analysis/figures/reduce-example}

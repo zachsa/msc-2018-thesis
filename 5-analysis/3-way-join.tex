@@ -35,7 +35,7 @@ The map function for this analysis is included in the appendix (see \ref{3-way-j
 
 Using the \_sum reduce function, an aggregation is done across all documents with the same key; this means that per a student, an aggregation is performed on a single Grade document, a single Benchmark document, and many Events documents in which the S1 and S2 variables are summed to form the tuple [sum of S1, sum of S2]. Because of the key output of each type of entity, the resulting view-index is ordered by StudentID; for each StudentID documents are ordered by the second index in the key output (course), which means that Benchmarks and Events entities are sorted to be before grades for a student; and sorting via the 3rd index of each key results in benchmark data always being sorted to be before Events documents. As such, during view-index retrieval it can be taken as given that for a single student ID, first documents of type Benchmark will be retrieved, followed by documents of type Event, followed by documents of type Grade.
 
-\input{6-analysis/figures/fig-3-way-join-map-function}
+\input{5-analysis/figures/fig-3-way-join-map-function}
 
 \subsection{List Function}
 The List function is invoked via an HTTP request to the URI: \texttt{https://localhost:5984/msc /\_design/3-way-join/\_list/3-way-join-list/3-way-join-view?reduce=true}. On execution the list function executes the ``provides'' function, in which output type of ``CSV'' (plain text) is specified as as download file. List function logic as shown in Figure \ref{fig-3-way-join-list-function} is executed in the callback passed as a parameter to the ``provides'' function.
@@ -48,8 +48,8 @@ As as result of the MapReduce function, for every StudentID, exactly one ``bench
 
 Conceptually, sending ``currentLine'' involves a call to a helper function provided within the execution context of CouchDB List functions - the ``send'' function. This function is wrapped within a subroutine (a function nested within the callback) that first checks that the currentLine variable contains data from the Grades and Benchmarks and Events entity, and then sends a comma-delimited string along a stay-alive network request - this is handled automatically by the HTTP client, which in the case of this project is simply the Google Chrome browser. From a user's perspective, it appears that a file is simply being downloaded; the rate at which the file downloads is equal to the rate at which the loop data is output by the send function. The download completes on completion of the List function. Code for the loop function is included in the appendix at \ref{3-way-join-list-function}.
 
-\input{6-analysis/figures/fig-3-way-join-list-function}
+\input{5-analysis/figures/fig-3-way-join-list-function}
 
 \subsection{Output}
 A sample of the resultant joined dataset is shown in Figure \ref{fig-3-way-csv-output}
-\input{6-analysis/figures/fig-3-way-csv-output}
+\input{5-analysis/figures/fig-3-way-csv-output}

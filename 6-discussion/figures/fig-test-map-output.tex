@@ -2,11 +2,7 @@
     \centering
     \begin{mdframed}[rightline=false,leftline=false]
         \begin{minted}{text}
-/**
- * Two-way Join
- * API Adress:
- * http://localhost:5984/test/_design/two-way-join/_view/2-way-join.csv?include_docs=false
- */
+/* Two-way Join */
 {"total_rows":9,"offset":0,"rows":[
     {"id":"<uuid>","key":[1,0,0],"value":[84,94,88,0,0,80,76,89]},
     {"id":"<uuid>","key":[1,"CSC1015F",2016],"value":70},
@@ -19,12 +15,7 @@
     {"id":"<uuid>","key":[4,"CSC1015F",2016],"value":54}
 ]}
 
-/**
- * Three-way Join
- * API Adress:
- * http://localhost:5984/test/_design/three-way-join/_view/3-way-join.csv?group=true&reduce=true
- * (include_docs is not valid when reduce=true)
- */
+/* Three-way Join */
 {"rows":[
     {"key":[1,0,0],"value":[84,94,88,0,0,80,76,89]},
     {"key":[1,0,2016],"value":[1,1]},
@@ -40,6 +31,6 @@
 ]}
         \end{minted}
     \end{mdframed}
-    \caption[CouchDB map output]{\textbf{Figure \ref{fig-test-map-output}: CouchDB map output.}}
+    \caption[CouchDB map output]{\textbf{Figure \ref{fig-test-map-output}: CouchDB map output.}. Two way join API: \texttt{http://localhost:5984/test/\_design/two-way-join/\_view/2-way-join.csv?include\_docs=false}. Three-way join API \texttt{http://localhost:5984/test/\_design/three-way-join/\_view/3-way-join.csv?group=true\&reduce=true}. (include\_docs is not valid when reduce=true)}
     \label{fig-test-map-output}
 \end{figure}

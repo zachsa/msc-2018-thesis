@@ -1,14 +1,9 @@
-\begin{figure}[H]
+\begin{sidewaysfigure}
     \centering
-    \begin{mdframed}[rightline=false,leftline=false]
+    \begin{mdframed}[rightline=false,leftline=false,topline=false]
         \centering
-        \begin{BVerbatim}[fontsize=\tiny]
-
-/**
-* 2-way-join
-* API Address:
-* http://localhost:5984/test/_design/two-way-join/_list/2-way-join/2-way-join.csv
-*/
+        \begin{BVerbatim}
+/* 2-way-join */
 +------+----+----------+--------+----------+----------+----------+--------------+--------------+--------+--------+---------+
 | Year | ID |  Course  | Course | Gr12 Eng | Gr12 Sci | Gr12 Mth | Gr12 Mth Lit | Gr12 Mth Adv | NBT AL | NBT QL | NBT Mth |
 +------+----+----------+--------+----------+----------+----------+--------------+--------------+--------+--------+---------+
@@ -19,11 +14,7 @@
 | 2016 |  4 | CSC1015F |     54 |       82 |       94 |       85 |            0 |            0 |     73 |     71 |      86 |
 +------+----+----------+--------+----------+----------+----------+--------------+--------------+--------+--------+---------+
 
-/**
-* 3-way-join
-* API Address:
-* http://localhost:5984/test/_design/three-way-join/_list/3-way-join/3-way-join.csv?group=true&reduce=true
-*/
+/* 3-way-join */
 +------+----+----------+-------+----------+----------+----------+--------------+--------------+--------+--------+---------+-------+-------+
 | Year | ID |  Course  | Grade | Gr12 Eng | Gr12 Sci | Gr12 Mth | Gr12 Mth Lit | Gr12 Mth Adv | NBT AL | NBT QL | NBT Mth | Ev S1 | Ev S2 |
 +------+----+----------+-------+----------+----------+----------+--------------+--------------+--------+--------+---------+-------+-------+
@@ -31,9 +22,8 @@
 | 2016 |  2 | CSC1015F |    55 |       76 |       76 |       78 |            0 |            0 |     75 |     58 |      61 |     2 |     1 |
 | 2016 |  4 | CSC1015F |    54 |       82 |       94 |       85 |            0 |            0 |     73 |     71 |      86 |     0 |     1 |
 +------+----+----------+-------+----------+----------+----------+--------------+--------------+--------+--------+---------+-------+-------+
-
         \end{BVerbatim}
     \end{mdframed}
-    \caption[CouchDB List output]{\textbf{Figure \ref{fig-test-list-output}: List output of CouchDB test data.}}
+    \caption[CouchDB List output]{\textbf{Figure \ref{fig-test-list-output}: List output of CouchDB test data.} The two-way join output is achieved via the URI \texttt{http://localhost:5984/test/\_design/two-way-join/\_list/2-way-join/2-way-join.csv}. The three-way join output is achieved via the URI \texttt{http://localhost:5984/test/\_design/three-way-join/\_list/3-way-join/3-way-join.csv?group=true\&reduce=true}}
     \label{fig-test-list-output}
-\end{figure}
+\end{sidewaysfigure}

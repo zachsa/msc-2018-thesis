@@ -9,7 +9,7 @@
     top=2.5cm,
     bottom=2.5cm,
     bindingoffset=1cm
-]{geometry}
+]{geometry} % Better margin control
 \usepackage[utf8]{inputenc} % Encoding (I think)
 \usepackage{etoolbox} % Patching other packages (I think)
 \usepackage{parskip} % Line spacing
@@ -145,7 +145,7 @@
 
 % Abstract
 \begin{abstract}
-    \input{1-abstract/abstract}
+    \input{abstract/abstract}
 \end{abstract}
 \newpage
 
@@ -159,48 +159,48 @@
 
 % Content
 \chapter{Introduction}
-\input{2-introduction/introduction}
+\input{1-introduction/introduction}
 
 \chapter{Background}
-\input{3-background/0-overview}
-\input{3-background/1-map-reduce}
-\input{3-background/2-couchdb}
-\input{3-background/3-couchdb-api}
-\input{3-background/4-edm}
+\input{2-background/0-overview}
+\input{2-background/1-map-reduce}
+\input{2-background/2-couchdb}
+\input{2-background/3-couchdb-api}
+\input{2-background/4-edm}
 
 \chapter{Data}
 \label{chapter:data}
-\input{4-data/0-overview}
+\input{3-data/0-overview}
 
 \chapter{ETL}
-\input{5-etl/0-overview}
-\input{5-etl/1-design}
-\input{5-etl/2-setup}
+\input{4-etl/0-overview}
+\input{4-etl/1-design}
+\input{4-etl/2-setup}
 
 \chapter{Analysis}
-\input{6-analysis/1-overview}
-\input{6-analysis/2-way-join}
-\input{6-analysis/3-way-join}
-\input{6-analysis/4-variance}
+\input{5-analysis/1-overview}
+\input{5-analysis/2-way-join}
+\input{5-analysis/3-way-join}
+\input{5-analysis/4-variance}
 
 % Tables
-\input{6-analysis/tables/performance-analysis}
-\input{6-analysis/tables/tbl-grades-normalize}
-\input{6-analysis/tables/tbl-benchmarks-normalize}
+\input{5-analysis/tables/performance-analysis}
+\input{5-analysis/tables/tbl-grades-normalize}
+\input{5-analysis/tables/tbl-benchmarks-normalize}
 
 \chapter{Discussion}
-\input{7-discussion/0-overview}
-\input{7-discussion/1-tests}
-\input{7-discussion/2-results}
+\input{6-discussion/0-overview}
+\input{6-discussion/1-tests}
+\input{6-discussion/2-results}
 
 % Figures
-\input{7-discussion/figures/fig-delta-rank}
-\input{7-discussion/tables/tbl-correlation-variance}
+\input{6-discussion/figures/fig-delta-rank}
+\input{6-discussion/tables/tbl-correlation-variance}
 
 \chapter{Conclusion}
-\input{8-conclusion/1-summary}
-\input{8-conclusion/2-future_work}
-\input{8-conclusion/3-acknowledgments}
+\input{7-conclusion/1-summary}
+\input{7-conclusion/2-future_work}
+\input{7-conclusion/3-acknowledgments}
 \newpage
 
 % Bibliogrpahy

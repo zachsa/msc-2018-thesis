@@ -2,9 +2,9 @@ Working with data exports requires an ETL (Extraction, Transformation, and Loadi
 
 Extraction is fairly straightforward; a variable is created in memory to reference the row of the CSV that contains table headers (usually the first row of the CSV). This row is then split by a column delimiter into a tuple of the form [val 1, val 2, val 3, etc]. Then all the remaining rows of the CSV are iteratively loaded into memory in turn, and split into tuples according to a column delimiter. The result of this is iteratively producing a tuple of the same length and form as the header tuple ([val 1, val 2, val 3, etc]) for every row of data. Each row of data can then be manipulated to with each value in the row tuple corresponding to a value in the header tuple at the same index. By grouping the values of the header and row tuple by index, it is easy to convert CSV rows into unordered collections of key:value pairs corresponding to JSON format as specified in the RFC \cite{rfc7159}. An example of how each entity (as discussed previously in \autoref{chapter:data}) can be represented as object structure is shown in Figures \ref{fig-benchmarks-json-sample}, \ref{fig-grades-json-sample}, and \ref{fig-events-json-sample}.
 
-\input{5-etl/figures/fig-benchmarks-json-sample}
-\input{5-etl/figures/fig-grades-json-sample}
-\input{5-etl/figures/fig-events-json-sample}
+\input{4-etl/figures/fig-benchmarks-json-sample}
+\input{4-etl/figures/fig-grades-json-sample}
+\input{4-etl/figures/fig-events-json-sample}
 
 Further transformations can then be applied to the entity-objects before being loaded into CouchDB, completing a sequential processing of a single row of CSV data via first extracting information, transforming information, and loading information into the destination (ETL).
 
@@ -36,4 +36,4 @@ The ETL process is described in terms of coding requirements in pseudo code in F
 
 Due to the ever-increasing complexity of the code being used for ETL, the codebase was formalized and structured as a component-based ETL engine that performed ETL tasks based on independent and external configuration objects. These tasks comprise sequential piping of output from one component to input of another component. By providing input/output data contracts, components can be strung together in any order, allowing for versatile and configurable ETL pipelines. By implementing the components as user-configurable, external processes to the ETL engine, specific logic required to process specific information is greatly decoupled from the logic required to extract, transform and load information as a series of high level tasks. The resultant software to achieve this task is implemented in JavaScript (node.js), and is called \textit{nETL} (node.js ETL).
 
-\input{5-etl/figures/fig-netl-logic}
+\input{4-etl/figures/fig-netl-logic}

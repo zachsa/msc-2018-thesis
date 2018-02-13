@@ -1,0 +1,38 @@
+\begin{figure}[H]
+  \centering
+  \begin{mdframed}[rightline=true,leftline=true]
+    \begin{minted}{text}
+/* A: Map output*/
+{["key"]: [1,1,0]} // (_id: x)
+{["key"]: [3,1,3]} // (_id: y)
+{["key2"]: [2,2,2]} // (_id: z)
+
+/* B: Map output grouped by key */
+{["key"]: [[1,1,0],[3,1,3]]}
+{["ke2"]: [[2,2,2]]}
+
+/* C: Map output passed to _stats function as input */
+reduce([key:id tuples], [values groupted by key], rereduce)
+reduce([["key", "x"], ["key", "y"]], [[1,1,0],[3,1,3]], false)
+reduce([["key2", "z"]], [[2,2,2]], false)
+
+/* D: Logical treatment of values argument (arg 2) during reduction */
+{["key"]: [aggregate([1,3]), aggregate([1,1]),  aggregate([0,3])]}
+{["key2"]: [aggregate([2]), aggregate([2]),  aggregate([2])]}
+
+/* E: Reduce output (group = true) */
+{
+  ["key"]: [
+    {"sum":4,"count":2,"min":1,"max":3,"sumsqr":10},
+    {"sum":2,"count":2,"min":1,"max":1,"sumsqr":2},
+    {"sum":3,"count":2,"min":0,"max":3,"sumsqr":9}
+  ],
+  ["key2"]: [
+    {"sum":2,"count":1,"min":2,"max":2,"sumsqr":4}
+  ]
+}
+    \end{minted}
+  \end{mdframed}
+  \caption[\_stats Reduce Function Logic]{\textbf{Figure \ref{fig-stats-reduce-fn}: Logical description of the \_stats Reduce function contract shown as a step-based series of transformations from input (map function output) to output.}}
+  \label{fig-stats-reduce-fn}
+\end{figure}
