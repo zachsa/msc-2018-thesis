@@ -1,0 +1,61 @@
+\section{Implementation}
+Extraction is fairly straightforward; a variable is created in memory to reference the row of the CSV that contains table headers (usually the first row of the CSV). This row is then split by a column delimiter into a tuple of the form [val 1, val 2, val 3, etc]. Then all the remaining rows of the CSV are iteratively loaded into memory in turn, and split into tuples according to a column delimiter. The result of this is iteratively producing a tuple of the same length and form as the header tuple ([val 1, val 2, val 3, etc]) for every row of data. Each row of data can then be manipulated with each value in the row tuple corresponding to a value in the header tuple at the same index. By grouping the values of the header and row tuple by index, it is easy to convert CSV rows into unordered collections of key:value pairs corresponding to JSON format as specified in the RFC \cite{rfc7159}. An example of how each entity (as discussed previously in \autoref{chapter:data}) can be represented is shown in Figures \ref{fig-benchmarks-json-sample}, \ref{fig-grades-json-sample}, and \ref{fig-events-json-sample}.
+
+\input{4-etl/figures/fig-benchmarks-json-sample}
+\input{4-etl/figures/fig-grades-json-sample}
+\input{4-etl/figures/fig-events-json-sample}
+
+Further transformations can then be applied to the entity-objects before being loaded into CouchDB, completing a sequential processing of a single row of CSV data via first extracting information, transforming information, and loading information into the destination (ETL).
+
+In addition to the transformation from CSV rows to objects, specific transformations of the objects are required prior to loading the data to CouchDB. Required transformations used to produce the final results in this project are listed here:
+
+\begin{itemize}
+  \item Filtering (both by whitelisting objects and whitelisting object fields) to reduce CouchDBs footprint and reduce indexing computational cost
+  \item Adding a `type' attribute to each object for entity classification of objects within CouchDB
+\end{itemize}
+
+The transformations allow for fine-grained control over the CouchDB data store, which is useful in terms of performance assessment of very specific database interactions, and improving performance generally by easing the workload of CouchDB (and also reducing complexity involved in indexing CouchDB).
+
+To optimize the ETL process, instead of processing CSVs line-by-line, CSV lines are batched and processed several thousand at a time via the HTTP POST \_bulk\_docs endpoint. This approach also greatly reduces the number of network requests to CouchDB required to complete loading of all CSV data (which could be expensive if done on a different computer to the CouchDB database software). Batching is also done during CSV file reading to reduce IO overhead since fewer disk reads are required as the percentage of data retrieved per disk read (the batch) increases.
+
+The ETL process is described in pseudocode in Figure \ref{row-object-transformation}, but in terms of implementation, the reality of coding the ETL process is more complicated than is depicted for several reasons:
+
+\begin{itemize}
+  \item CSVs can have variable (but still valid) formatting in terms of row delimiters, column delimiters, text qualifiers, character encoding, etc.
+  \item Some CSVs don't include a header row, so headers need to be injected into the process during runtime
+  \item Real code is substantially longer than psuedocode in general, due to edge cases and the like
+  \item Generic handling of CSV sources and CouchDB database destinations (as opposed to custom logic per CSV / destination) requires configurable extraction, transformation and loading logic (configuration based behaviour specification)
+  \item Generic handling of many different types of transformations that were used during project development but not for the final result (increasing the complexity of the case base):
+        \begin{itemize}
+          \item Anonymizing object values
+          \item Text transformations of values
+          \item Transformation from objects back to lines (for CSV output)
+          \item Transformation from csv strings to SQL insert strings
+        \end{itemize}
+  \item During project development, alternatives to CouchDB as load-destinations were required including CSV files and SQL Server - as such the code required much adjustment for these cases.
+\end{itemize}
+
+\input{4-etl/figures/fig-netl-logic}
+
+
+\subsection{Application Module}
+The \texttt{taskManager} object is created on startup by invoking the \texttt{Application} constructor once on app startup (it is a singleton). The resultant object is reference by the main application and made available to the CLI user via closure as is typical when using the JavaScript module patterns. This patterns involves execution of a function and returning references to variables scoped within the function. Since these references remain after function execution the JavaScript garbage collector ignores them. But since they are scoped to the original function call they are private to the referenced return object (JavaScript-esque namespacing). An example of the Application module, instantiation of the taskManager singleton and the \textit{TaskManager} constructor itself is included in the appendix (see \ref{netl-application-module} and \ref{netl-taskmanager-constructor}).
+
+Since IO in JavaScript is asynchronous, batching either needs to be run sequentially (batches are processed one after the other), or by carefully managing asynchronous execution of batches. Batches extracted asynchronously and concurrently would quickly overwhelm the network capabilities of any computer since thousands of network requests would be queued and most would fail. The easier way to handle state in this case is to serialize processing of batches. As such, nETL is implemented to execute tasks concurrently and asynchronously (asynchronous execution in JavaScript is not truly parallel), and batches of data for a single task serially.
+
+Such an implementation is achieved using JavaScript generators - a means of quickly implementing arbitrary iterators, including iterators over generated iterators \cite{mozillaGenerators} - as a means of serializing iterations over the data source. Once a user directs the application to run a task by the appropriate CLI command with the path to a task configuration specified as an argument, the taskManager object invokes a generator function to return an iterator over the specified data source via the specified \textit{Extraction} operation. This generator function is included in the appendix for reference (See \ref{netl-batch-generator}).
+
+With batch generation serialized, processing each batch via specified E, T and L modules (as per task configuration) is straightforward; first the batch is iterated over, with all transformations applied sequentially to each item. Then the batch is loaded (at once) into the data destination as defined by the task configuration. Because the load operation is allowed to be asynchronous, it is necessary to await the result of the load operation before extracting the next batch. This is done via implementing extraction, transformation, load iteration recursively, with a callback passed to the Load module to re-execute the iterating function on a successful load (the callback is called on resolution of a JavaScript promise in this case). This recursive iterator is included in the appendix (see \ref{netl-recursive-iterator}). All the code snippets included are stripped down and don't include error handling or other code superfluous to the core logic.
+
+\subsection{Extraction, Transformation, Load Modules}
+On Module invocation, the contract for E, T, and L operations is that Module execution returns an object with two properties - ``name'': the identifier as used by the application engine to invoke the correct E, T, or L operations during task execution, and the property ``exe'': a pointer to the function that the application engine actually invokes. Closure over the ``exe'' and configuration properties mean that the modules are only evaluated once per task execution (a task may involve calling a transformation function millions of times - once for each item extracted from a CSV), so this is necessarily quite efficient. An example of code defining a module and loading that module into the application is included in the appendix (see \ref{netl-module-loading}).
+
+A list of modules as written for, and used in this project is included in the appendix (see \ref{netl-modules}). Except for the FLATFILE extraction module, they consist of minimal amounts of code with simple logic. The FLATFILE module (see \ref{netl-extract-flatfile} in the appendix) uses a JavaScript generator as a means of serializing CSV line-extraction in regards to the rest of the ETL process. The generator creates an iterator over CSV file content as specified by an open source library available on Github \cite{bower16}.
+
+The most important transformation applied to extracted CSV lines - i.e. the conversion of CSV data into objects, uses the TEXT\_LINE\_TO\_OBJ Module (see \ref{netl-trans-text-line-to-obj} in the Appendix). This module makes use of a free CSV parsing library \cite{csvParse} to handle the intricately complex (and necessarily variable) process of properly delimiting CSV content.
+
+nETL allows for configurable transformations to be applied to each extracted entity-object. In particular, every object needs the property `type\_' appended to it. The CREATE\_OBJ\_FIELD \textit{nETL} module was composed for this task, the code of which is available in the appendix (\ref{netl-trans-create-obj-field}). Aside from appending additional properties to objects, transformation modules were written for filtering entire objects via whitelisting and filtering object properties via whitelisting.
+
+The FILTER module allows users to configure a list of keys, and for each key, a list of values that objects are whitelisted on. The code for this module is available in the appendix at \ref{netl-trans-filter}. Distinct from the FILTER module is the WHITELIST module, as shown in the appendix at \ref{netl-trans-whitelist}. This module allows users to configure a list of keys that are whitelisted per object, i.e. the FILTER module filters entire objects, and the WHITELIST module filters properties of an object.
+
+Loading data to CouchDB involves a straight forward network request. On the request response a callback as passed to the module is executed to continue the ETL iteration. Due to the cleaner API, Load modules are specifically required to return a promise as part of their contract. The Load Module as used to load data into CouchDB for this project is shown in the appendix (see \ref{netl-load-couchdb}). Network requests make use of the well-known, open-source node.js library ``request'' \cite{request-lib}.

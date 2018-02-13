@@ -3,3 +3,6 @@
 3. Variance
 4. change benchmarks to 'admissions'
 5. data types should be lower cased
+6. Change pseudo code to psuedocode
+7. search and assess \textit brackets
+8. captions
