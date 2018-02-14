@@ -45,8 +45,9 @@
 \usepackage{tabularx}
 \usepackage{threeparttable}
 
-% Bibliography
+% Bibliography: https://tex.stackexchange.com/questions/128810/bibliography-with-only-initials-of-names
 \usepackage[
+    giveninits=true,
     style=numeric-comp,
     backend=biber
 ]{biblatex}
@@ -176,8 +177,6 @@
 \paragraph{MSc thesis}
 \cite{chandar2010}
 
-
-\paragraph{Other}
 \nocite{*}
 
 % Bibliogrpahy
