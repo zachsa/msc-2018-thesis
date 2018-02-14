@@ -1,19 +1,19 @@
 \section{Testing}
-To assert the accuracy of the results in the context of the source data, unit tests were used for testing of the nETL application components as well as the Map and List functions. In addition, a small sample of the data was processed equivalently to the analysis procedures as described above for manually testing the the accuracy of the output CSV (and ensure that the unit tests themselves are working as expected). Unit tests are written using the open source JavaScript \textit{Mocha} testing framework \cite{mochaTest}, the code of which is included in the appendix at \ref{unit-tests}.
+To check the accuracy of the results in the context of the source data, unit tests were used for testing of the nETL application components as well as the Map and List functions. In addition, a small sample of the data was processed equivalently to the analysis procedures as described above for manually testing the the accuracy of the output CSV (and ensure that the unit tests themselves are working as expected). Unit tests are written using the open source JavaScript \textit{Mocha} testing framework \cite{mochaTest}, the code of which is included in the appendix at \ref{unit-tests}.
 
 \subsection{nETL Unit Tests}
 The basic premise of the ETL process is that the lines are extracted from CSVs and loaded into CouchDB reliably. Assertions are used to ensure that each nETL module (the extraction module, the transformation modules, and the loading module) perform as expected. No integration tests are performed except by manually checking that the test data is loaded into CouchDB in the anticipated format - which is indeed the case.
 
 Tests relating to CSV-line extraction (Appendix \ref{FLATFILE-tests}) assert that all lines from the CSV are extracted iteratively and not all loaded into memory at once, and that all lines are extracted from CSVs.
 
-The process of converting text lines to objects requires extensive test coverage due to the nature since many of the fields contain ASCII characters used for demarcating value separation in CSVs (for example, the comma). Tests ensure that CSVs are treated according to the RFC 4180 spec and treat qualifiers correctly, hat the columns line up correctly with the headers, that values are handled correctly, and that lines are correctly transformed into JavaScript objects (Appendix \ref{TEXT_LINE_TO_OBJ-tests}). In terms of filtering lines, unit tests (Appendix \ref{FILTER-tests}) ensure that objects may be filtered for individual values for up to multiple attributes, that objects can be filtered any number of values on any number of attributes, and that filtering is done on an all-or-nothing-basis (objects either meet all filter requirements or are returned as ``null''). Unit tests (Appendices \ref{CREATE_OBJECT_FIELD-tests} and \ref{WHITELIST-tests}) assert that creation and whitelisting of attributes works as expected,
+The process of converting text lines to objects requires extensive test coverage due to the nature since many of the fields contain ASCII characters used for demarcating value separation in CSVs (for example, the comma). Tests ensure that CSVs are treated according to the RFC 4180 specification; qualifiers are handled correctly, columns line up correctly with the headers, values are handled correctly, and lines are correctly transformed into JavaScript objects (Appendix \ref{TEXT_LINE_TO_OBJ-tests}). In terms of filtering lines, unit tests (Appendix \ref{FILTER-tests}) ensure that objects may be filtered for individual values for up to multiple attributes, that objects can be filtered any number of values on any number of attributes, and that filtering is done on an all-or-nothing-basis (objects either meet all filter requirements or are returned as ``null''). Unit tests (Appendices \ref{CREATE_OBJECT_FIELD-tests} and \ref{WHITELIST-tests}) assert that creation and whitelisting of attributes works as expected,
 
-Tests that demonstrate correctness of nETL's CouchDB-loading module (Appendix \ref{COUCHDB-tests}) consist of a single unit test that inserts 3 documents into CouchDB via the the \_bulk\_docs API, with the assertion that a 201 HTTP response is returned in a promise.
+Tests that demonstrate correctness of nETL's CouchDB-loading module (Appendix \ref{COUCHDB-tests}) consist of a single unit test that inserts 3 documents into CouchDB using the the \_bulk\_docs API via a single API call, ensuring that the database exists, that permissions are correct, that network connectivity is available, etc.
 
 \subsection{Manual Map \&List Function Tests}
-Manually testing ensures that the process works as expected on a qualitative basis with reference to the CSVs discussed previously and shown in Figure \ref{fig-sample-csv-files}. The data in these files is accurate in terms of form, but is adjusted to make for good test cases; for example: the ID fields contain fabricated integers instead of the longer anonymized ID integers, and some of the fields' values not used in this study are redacted to ``txt''. IDs used are ``1'', ``2'', ``3'', ``4'' and ``5'', the last ID of which is included as a means of testing that filtering works as expected (results should never contain an ID of ``5''). The Benchmark CSV contains a single row for each ID, the Events CSV contains several rows for each ID, and the Grades CSV has either one or two rows per ID. A test analysis is run corresponding to each of the processes described in Chapter \ref{chapter-analysis}; i.e. each test involves its own nETL process and its own database. All tests used a database called ``test'', which was recreated for each test run. nETL configurations files for the test runs are included in the appendix at \ref{netl-tasks-test-1} (2-way join tests) and \ref{netl-tasks-test-2} (3-way join tests).
+Manually testing each of the processes described in Chapter \ref{chapter-analysis} was done using small dummy datasets with just 5 IDs. nETL tasks required to conduct these tests are shown in the Appendix \ref{netl-tasks-test-1} and \ref{netl-tasks-test-2}. The map and list functions used in these tests are the same as used in the analysis.
 
-Based on these source CSV files the MapReduce output as shown in Figure \ref{fig-test-map-output} (i.e. the CouchDB view output) is as expected with the assertions:
+Based on these source CSV files the MapReduce output as shown in Figure \ref{fig-test-map-output} (i.e. the CouchDB view output) was as expected:
 
 \begin{itemize}
   \item Two-way Join
@@ -21,18 +21,18 @@ Based on these source CSV files the MapReduce output as shown in Figure \ref{fig
           \item Document output is ordered key[0], then[1], then key[2] - For every student output of benchmark data is followed by that student's grade data
           \item Multiple results from the same course are output in order, ordered by course registration date.
           \item Value output for the Grade documents is a single number, and output for the Benchmark document is an array of 8 numbers (that correspond to the CSV input)
-          \item No documents appear that should be filtered out (i.e. the ID of 5, and non-CSC1015 course grades)
+          \item No documents appear that should be filtered out
           \item Output contains the correct number of documents
         \end{itemize}
   \item Three-way Join
         \begin{itemize}
           \item Event counts are correct, and the output format is correct for semester 1 and semester 2 for each student
-          \item Document ordering is correct for each student (Demographic output, followed by Event output, followed by Grade(s) output)
+          \item Document ordering is correct for each student (benchmarks output, followed by events output, followed by \textit{grades} output)
           \item Grade documents from years other than 2016 are not included in the output
         \end{itemize}
 \end{itemize}
 
-List function output of these views is shown in Figure \ref{fig-test-list-output} and shows that data across both entity types (for the 2-way join) and all three entity types (for the 3-way join) are joined correctly. One particular case worth testing is that when MapReduce output includes benchmarks and event counts, but no grade documents for a student, the List output does not include that student. This case often occurs when a student took CSC1015F in a year other than 2016, and that students event data includes usage for courses other than CSC1015F in 2016.
+List function output of these views is shown in Figure \ref{fig-test-list-output} and shows that data across both entity types (for the 2-way join) and all three entity types (for the 3-way join) are joined correctly. One particular case worth testing is that when MapReduce output includes benchmarks and event counts, but no grade documents for a student, the List output does not include that student. This case often occurs when a student's took CSC1015F in a year other than 2016, and that students event data includes usage for courses other than CSC1015F in 2016.
 
 \newpage
 \input{6-discussion/figures/fig-test-map-output}

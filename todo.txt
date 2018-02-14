@@ -1,8 +1,10 @@
 1. include additional info in chapter 2
-2. citations
 3. Variance
 4. change benchmarks to 'admissions'
 5. data types should be lower cased
-6. Change pseudo code to psuedocode
 7. search and assess \textit brackets
-8. captions
+8. captions moved to body, and just bold left
+9. replace \texttt with \textit{}
+10. Map/map List/list capitalization
+
+Sonia section:

@@ -21,7 +21,7 @@
 \usepackage{pifont}
 \usepackage{enumitem}
 \usepackage{url}
-\usepackage{breakurl}
+% \usepackage{breakurl}
 \usepackage[breaklinks]{hyperref}
 
 % Figures and tables
@@ -47,9 +47,13 @@
 
 % Bibliography
 \usepackage[
+    giveninits=true,
     style=numeric-comp,
     backend=biber
 ]{biblatex}
+
+% Othe stuff
+\usepackage{csquotes}
 
 % Remove spacing above \chapter head
 \makeatletter

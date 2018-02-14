@@ -1,52 +1,52 @@
 \section{3-Way Join}
 Building on the correlation analysis between course grades and benchmarks for CSC1015F, additional information concerning each student's Sakai usage is taken into account. Along with the ``Grades.CSV'' and ``Benchmarks.CSV'' files, a 3rd CSV ``Events.CSV'' is loaded into CouchDB via the nETL application. Since a single student may be associated with many rows in the Event data (sometimes even thousands of rows), a reduce function is used within the MapReduce job to aggregate the Events rows into a single document that is a count of Sakai presence events for first and second semester, with the output of this aggregation (and also the documents for the Grade and Benchmark entities) saved as a view, again, sorted by StudentID. Similarly to the 2-Way analysis of CSC1015F Grade/Benchmarks correlation, a CouchDB List function is used for retrieving data from the view index and performing the 3-way join.
 
-In other words, this analysis addresses the question of whether making more frequent use of the Sakai platform is shown to increase course performance for CSC1015F, as well as looking at the correlation between benchmarking scores and LMS usage. However, the Events cannot be associated with particular courses for the purposes of this study since the Events data FK to course ID, is strictly relevant to the Sakai system only; the grades data has not been exported directly from the Sakai platform and the id that is referenced by Sakai events is not present in the dataset used. As such, this analysis takes into account only ``general usage'' of the Sakai LMS, and not usage of Sakai for these particular courses.
+This joined data can be used to determin whether more frequent use of the Sakai platform increases course performance for CSC1015F, as well as looking at the correlation between benchmarking scores and Sakai usage. However, the Events cannot be associated with particular courses since the Events data does not contain course codes (eg. CSC1015F) and instead provides only internal Sakai-specific site keys. As such, this analysis takes into account only ``general usage'' of Sakai, and not usage of Sakai for these particular courses.
 
 \subsection{nETL Configuration}
-nETL Tasks 1 and 2 are the same as run previously for the 2-Way join, except that only course grades from 2016 are used (since the Events exports is only from 2016). The 3-Way join introduces a 3rd task - Task 5 - in which lines from the ``Events.CSV'' file are extracted, transformed and loaded into CouchDB using the nETL application. Tasks 3, 4 \& 5 as JSON configuration files are included in the appendix at \ref{netl-tasks-3-4-5-config}.
+nETL Tasks 3, 4 and 5 (as shown in Appendix \ref{netl-tasks-3-4-5-config}) are used. Compared to the tasks run to achieve the 2-way join, tasks 3 and 4 are basically the same as tasks 1 and 2 except that only course grades from 2016 are used (since the Events exports is only from 2016). The 3-Way join introduces a 3rd task - Task 5 - in which lines from the ``Events.CSV'' file are extracted, transformed and loaded into CouchDB using the nETL application.
 
 Using nETL, Task 5 execution comprises an iterative extraction of 30 000 lines at a time. Each line from each batch undergoes a series of transformations before the entire batch is loaded into CoucDB via the \textit{\_bulk\_docs} endpoint, following which, the iterative extraction continues. A list of the transformations applied to each line extract from the ``Events.CSV'' file by nETL is shown below:
 
 \subsubsection{Task 5 Transformations (Events)}
 \begin{enumerate}
-  \item A line is converted into a JavaScript object (which relates directly to the JSON format of CouchDB documents) with the fields:
-        \begin{itemize}
-          \item event\_date
-          \item event\_id
-          \item uct\_id
-          \item site\_key
-          \item ref
-        \end{itemize}
-  \item Lines are filtered on the ``uct\_id'' and ``event\_id'' fields; only events with an event type of ``presence'' (event\_id = 282) for students enrolled in CSC1015F in 2016 are considered.
-  \item An attribute (``type\_'') is then added to each line (that weren't removed in filtering step), and given the value ``event'' to identify each object as a line of the Event entity type.
-  \item Line attributes are whitelisted. The resultant lines each have the the following attributes:
-        \begin{itemize}
-          \item type\_
-          \item event\_date
-          \item event\_id
-          \item uct\_id
-          \item site\_key
-        \end{itemize}
+    \item A line is converted into a JavaScript object (which relates directly to the JSON format of CouchDB documents) with the fields:
+          \begin{itemize}
+              \item event\_date
+              \item event\_id
+              \item uct\_id
+              \item site\_key
+              \item ref
+          \end{itemize}
+    \item Lines are filtered on the ``uct\_id'' and ``event\_id'' fields; only events with an event type of ``presence'' (event\_id = 282) for students enrolled in CSC1015F in 2016 are considered.
+    \item An attribute (``type\_'') is then added and given the value ``event'' to identify each object as a line of the Event entity type.
+    \item Attributes are whitelisted. The resultant documents each have the the following attributes:
+          \begin{itemize}
+              \item type\_
+              \item event\_date
+              \item event\_id
+              \item uct\_id
+              \item site\_key
+          \end{itemize}
 \end{enumerate}
 
 \subsection{MapReduce Functions}
-The map function for this analysis is included in the appendix (see \ref{3-way-join-map-function}). Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{fig-3-way-join-map-function}. Logical handling of the Grade and Benchmark entities is discussed previously.If the document is a line of the Events entity then the date of the event is categorized as either having occurred in semester 1 or semester 2. A key of [Student ID, 0, Year] is emitted along with the value (a 2-index tuple) of [S1, S2]. The S1, and S2 variables are 0 by default, and depending on the date of the presence event, one of these variables is altered to be `1'.
+The map function for this analysis is included in the appendix (see \ref{3-way-join-map-function}). Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{fig-3-way-join-map-function}. Logical handling of the Grade and Benchmark entities is discussed previously.If the document is a line of the Events entity then the date of the event is categorized as either having occurred in semester 1 or semester 2. A key of [Student ID, 0, Year] is emitted along with the tuple [S1, S2]. The S1, and S2 (semester) variables are 0 by default, and depending on the date of the presence event, one of these variables is altered to be `1'.
 
-Using the \_sum reduce function, an aggregation is done across all documents with the same key; this means that per a student, an aggregation is performed on a single Grade document, a single Benchmark document, and many Events documents in which the S1 and S2 variables are summed to form the tuple [sum of S1, sum of S2]. Because of the key output of each type of entity, the resulting view-index is ordered by StudentID; for each StudentID documents are ordered by the second index in the key output (course), which means that Benchmarks and Events entities are sorted to be before grades for a student; and sorting via the 3rd index of each key results in benchmark data always being sorted to be before Events documents. As such, during view-index retrieval it can be taken as given that for a single student ID, first documents of type Benchmark will be retrieved, followed by documents of type Event, followed by documents of type Grade.
+Using the \_sum reduce function, an aggregation is done across all documents with the same key; this means that per a student, an aggregation is performed on a single Grade document, a single Benchmark document, and many Events documents in which the S1 and S2 variables are summed to form the tuple [sum of S1, sum of S2]. The key emitted for each type of entity is designed so that the view-index is ordered by StudentID. Within each StudentID documents are ordered by the second key (course), which means that Benchmarks and Events entities are sorted to be before grades for a student; and the \nth{3} component of each key results in benchmark data always being before Events documents. As such, during view-index retrieval it can be taken as given that for a single student ID, first documents of type Benchmark will be retrieved, followed by documents of type Event, followed by documents of type Grade.
 
 \input{5-analysis/figures/fig-3-way-join-map-function}
 
 \subsection{List Function}
-The List function is invoked via an HTTP request to the URI: \texttt{https://localhost:5984/msc /\_design/3-way-join/\_list/3-way-join-list/3-way-join-view?reduce=true}. On execution the list function executes the ``provides'' function, in which output type of ``CSV'' (plain text) is specified as as download file. List function logic as shown in Figure \ref{fig-3-way-join-list-function} is executed in the callback passed as a parameter to the ``provides'' function.
+The List function is invoked via an HTTP request to the URI: \url{https://localhost:5984/msc/\_design/3-way-join/\_list/3-way-join-list/3-way-join-view?reduce=true}. On execution the list function executes the ``provides'' function, in which output type of ``CSV'' (plain text) is specified as as download file. List function logic as shown in Figure \ref{fig-3-way-join-list-function} is executed in the callback passed as a parameter to the ``provides'' function.
 
-On initial invocation and within the body of the callback, the variables `currentStudent', `currentYear', and `currentLine' are set to null. Following this an iteration over the index is initiated within a while loop with the loop invariant the result of a call to the ``getRow'' function. While the loop invariant remains true (i.e. so long as the ``getRow'' function returns a row and not `false', which occurs after the last row has been retrieved from the index), a row - a reduced result - is processed (in the URI the parameter ``reduce'' is set to true, so ONLY reduced output is retrieved from the view). Similarly to List function logic for the 2-way join, after the loop invariant becomes false the last line is still in memory and is sent if necessary.
+On initial invocation and within the body of the callback, the variables `currentStudent', `currentYear', and `currentLine' are set to null. Following this an iteration over the index is initiated with the loop control the result of a call to \mintinline{text}{getRow()} function. \mintinline{text}{getRow()} returns a row - a reduced result; in the URI the parameter ``reduce'' is set to true, so ONLY reduced output is retrieved from the view (technically, for any data sets that are not extremely small reduced output is actually the result of \textit{rereduction}). Similarly to List function logic for the 2-way join, after the loop invariant becomes false the last line is still in memory and is sent if necessary.
 
 For every result retrieved from the reduce output , the StudentID of the row being processed is checked and compared to the StudentID of the previous row. If the current StudentID is not the same as the previous StudentID, a line of the CSV is emitted before the row is processed. Then, the type of result being processed is checked (either the document is of type ``benchmark'', ``event'' or ``grade''), and depending on the type different values are stored in a variable called ``currentLine''. For every StudentID, all types of documents are processed in turn (first the benchmark documents, then the event documents, then the grade documents) before being emitted. This allows the join to be performed via sequentially adding to the ``currentLine'' variable for a single student.
 
-As as result of the MapReduce function, for every StudentID, exactly one ``benchmark'' result and one ``event'' document is processed. But a student can have several ``grade'' documents if the course was repeated in subsequent years. To catch this case, when processing documents of type ``grade'' within the switch statement, a further check is done to see if the attribute `year' of the current row has already been processed and is different from a preceding row. If so, the ``currentLine'' is emitted and the fields relating to grade documents are reset, and then repopulated with values from the current row (``currentLine'' itself is not reset). For every Event row processed both the first and second semester event count are exported to the CSV despite that only the first semester events are used, since there is negligible performance cost in terms of processing time or storage space and so there is little incentive to discard good data.
+As as result of the MapReduce function, for every StudentID, exactly one ``benchmark'' result 0 or more events and one grade is processed. For every Event row processed both the first and second semester event count are exported to the CSV despite that only the first semester events are used, since there is negligible performance cost in terms of processing time or storage space and so there is little incentive to discard good data.
 
-Conceptually, sending ``currentLine'' involves a call to a helper function provided within the execution context of CouchDB List functions - the ``send'' function. This function is wrapped within a subroutine (a function nested within the callback) that first checks that the currentLine variable contains data from the Grades and Benchmarks and Events entity, and then sends a comma-delimited string along a stay-alive network request - this is handled automatically by the HTTP client, which in the case of this project is simply the Google Chrome browser. From a user's perspective, it appears that a file is simply being downloaded; the rate at which the file downloads is equal to the rate at which the loop data is output by the send function. The download completes on completion of the List function. Code for the loop function is included in the appendix at \ref{3-way-join-list-function}.
+Sending \mintinline{text}{currentLine} is done similarly to the 2-way join except that the subroutine first checks that the currentLine variable contains data from the Grades and Benchmarks and Events entities. Code for the loop function is included in the appendix at \ref{3-way-join-list-function}.
 
 \input{5-analysis/figures/fig-3-way-join-list-function}
 
