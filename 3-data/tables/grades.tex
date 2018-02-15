@@ -5,39 +5,40 @@
         \label{tbl-data-grades}
         \begin{tabularx}{\textwidth}{>{\hsize=0.8\hsize}X>{\hsize=0.6\hsize}X>{\hsize=1.6\hsize}X}
             \toprule
-            \mC{c}{Field Name} & \mC{c}{Data type} & \mC{c}{Description}                                  \\
+            \mC{c}{Field Name} & \mC{c}{Data type} & \mC{c}{Description}                              \\
             \midrule
-            DownloadedDate     & date              & Excel date format                                    \\
-            RegAcadYear        & number            & Year                                                 \\
-            RegTerm            & number            & Integer ID                                           \\
-            anonIDnew          & number            & Anonymized student number\tnote{\textsuperscript{1}} \\
-            RegProgram         & string            & Program abbreviation                                 \\
-            RegCareer          & string            & Academic level                                       \\
-            Degree             & string            & Degree code                                          \\
-            DegreeDescr        & string            & Degree title                                         \\
-            Subject            & string            & Three letter abbreviation                            \\
-            Catalog.           & string            & Catalog sub-component (number and session)           \\
-            Course             & string            & Full course code description                         \\
-            CourseSuffix       & string            & Course session identifier                            \\
-            Session            & string            & Session name..                                       \\
-            Percent            & string            & Grade achieved by student                            \\
-            Symbol             & string            & Symbol achieved by student                           \\
-            UnitsTaken         & number            & Total units taken by student?                        \\
-            CourseID           & number            & Numerical course Identifier                          \\
-            CourseDescr        & string            & Description of course                                \\
-            CourseCareer       & string            & Academic level of course                             \\
-            Faculty            & string            & Course faculty                                       \\
-            Dept               & string            & Faculty department                                   \\
-            MaximumCrseUnits   & number            & ??                                                   \\
-            CourseCount        & number            & ??                                                   \\
-            CourseLevel        & number            & ??                                                   \\
-            CESM               & number            & ??                                                   \\
-            Sub-CESM           & number            & ??                                                   \\
+            DownloadedDate     & date              & Excel date format                                \\
+            RegAcadYear        & number            & Year                                             \\
+            RegTerm            & number            & Integer ID                                       \\
+            anonIDnew          & number            & Student number\tnote{\textsuperscript{1}}        \\
+            RegProgram         & string            & Program abbreviation                             \\
+            RegCareer          & string            & Academic level                                   \\
+            Degree             & string            & Degree code                                      \\
+            DegreeDescr        & string            & Degree title                                     \\
+            Subject            & string            & Three letter abbreviation                        \\
+            Catalog.           & string            & Catalog sub-component\tnote{\textsuperscript{2}} \\
+            Course             & string            & Full course code description                     \\
+            CourseSuffix       & string            & Course session identifier                        \\
+            Session            & string            & Session name                                     \\
+            Percent            & string            & Grade achieved by student                        \\
+            Symbol             & string            & Symbol achieved by student                       \\
+            UnitsTaken         & number            & Total units taken by student                     \\
+            CourseID           & number            & Numerical course Identifier                      \\
+            CourseDescr        & string            & Description of course                            \\
+            CourseCareer       & string            & Academic level of course                         \\
+            Faculty            & string            & Course faculty                                   \\
+            Dept               & string            & Faculty department                               \\
+            MaximumCrseUnits   & number            & N/A                                              \\
+            CourseCount        & number            & N/A                                              \\
+            CourseLevel        & number            & N/A                                              \\
+            CESM               & number            & N/A                                              \\
+            Sub-CESM           & number            & N/A                                              \\
             \bottomrule
         \end{tabularx}
         \scriptsize
         \begin{tablenotes}
             \item[\textsuperscript{1}]Anonymization was performed by Associate Professor Sonia Berman
+            \item[\textsuperscript{2}]Course number and session identifier
         \end{tablenotes}
     \end{threeparttable}
 \end{table}
