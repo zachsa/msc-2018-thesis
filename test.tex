@@ -135,52 +135,22 @@
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
 
+\usepackage{amsmath}
+\usepackage{mathtools}
+
+
+
 % Document
 \begin{document}
 
-\paragraph{Honours Project}
-\cite{casper2017}
-
-\paragraph{P.Comm}
-\cite{slack7Nov}
-\cite{slack2Nov}
-
-\paragraph{Proceedings}
-\cite{cap}
-
-\paragraph{RFC specs}
-\cite{rfc7159}
-
-\paragraph{IEEE}
-\cite{floatingPoint}
-
-\paragraph{Articles}
-\cite{google2010}
-\cite{bakerEdMiningSummary}
-\cite{Dimitris}
-
-\paragraph{Online (wiki)}
-\cite{hadoopPower:2017}
-
-\paragraph{Online}
-\cite{mozillaGenerators}
-
-\paragraph{Google Groups online}
-\cite{googleCon2017}
-
-\paragraph{Open Source Code code}
-\cite{csvParse}
-
-\paragraph{Book}
-\cite{mining2011}
-
-\paragraph{MSc thesis}
-\cite{chandar2010}
-
-\nocite{*}
-
-% Bibliogrpahy
-\printbibliography[title=References]
+\begin{spreadlines}{20pt}
+    \begin{gather}
+        \intertext{Variance:}
+        (\sigma_{\overline{x}})^{2} = \frac{sumsqr}{count-1} - (\frac{sum}{count})^{2}\\
+        \intertext{Standard Deviation:}
+        \sigma_{\overline{x}} = \sqrt{\frac{sumsqr}{count-1} - (\frac{sum}{count})^{2}}
+    \end{gather}
+\end{spreadlines}
 
 % Close docuemnt
 \end{document}

@@ -8,4 +8,21 @@
 10. Map/map List/list capitalization
 11. move tables into sensible locations
 
-Sonia section:
+Hi Zach
+
+So I left work lunchtime today as I’ve come down with a bug - just missed printing draft 8.
+
+Having something “submit-able” on Monday will be tight but I think is possible.  Besides what you have written below, I think the Abstract, Intro and Conclusion also need to “market” it better than at present. Basically to say that the aim was to look at joins in CouchDB because its MapReduce is so different from other systems. And that you happened to use UCT data, but the results of the joins were not the focus of the work.
+
+If I were the examiner I would feel that you have done enough work to warrant either a Pass or a Revise-and-resubmit, and not a fail, but one can never be sure if others will think the same.  I do find some things odd like doing some filtering in nETL and some in the map function, and doing some stuff in Excel instead of nETL, and that type of thing.
+
+But I understand you want to take the chance of a Revise and Resubmit if you handin now, rather than registering, even tho it would be that much better with another term’s work.
+
+So tomorrow I’ll print draft 8 when I get to work and will look at changes to the Intro, Abstract and Conclusion. 
+
+So please don’t edit those 3 parts tomorrow, and if your latest copy has any changes to those 3 parts please send to me again.
+
+I think you should finalise chapter 6 first, and then write up whatever work you have done on variances.
+
+That seem doable?
+Sonia
