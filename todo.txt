@@ -6,5 +6,6 @@
 8. captions moved to body, and just bold left
 9. replace \texttt with \textit{}
 10. Map/map List/list capitalization
+11. move tables into sensible locations
 
 Sonia section:

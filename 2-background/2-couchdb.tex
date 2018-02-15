@@ -24,11 +24,11 @@ Because of the potential for inconsistency, CouchDB seeks to provide a 'relaxed'
 Despite moving away from the relational model as provided by RDBMSs, the concept of 'entities' is usually still highly relevant in many NoSQL databases; these database can, as such, be grouped into two categories \cite{fowlerAggregate}:
 
 \begin{itemize}
-    \item \textit{aggregate orientated} stores that model data similarly to the relational model but with isolated entity boundaries and
-    \item \textit{aggregate ignorant} stores where the concept of entities is fundamentally different (e.g. a graph database such as Neo4J \cite{xxx} where the entities are edges and nodes)
+    \item \textit{aggregate-orientated} stores that model data similarly to the relational model but with isolated entity boundaries and
+    \item \textit{aggregate-ignorant} stores where the concept of entities is fundamentally different (e.g. a graph database such as Neo4J \cite{sadalage2012} where the entities are edges and nodes)
 \end{itemize}
 
-The vast majority of databases operate within a domain where data is (for the most part) entity-driven. As \cite{GANESHCHANDRA201513} points out there are hundreds of NoSQL data stores and a comprehensive categorization of such products is not sensible, but familiar examples within the family of \textit{aggregate orientated} NoSQL databases include key-value stores such such as Amazon's Dynamo \cite{xxx}, column based stores such as Apache's Cassandra \cite{xxx} or HBase \cite{xxx} (as part of the Hadoop ecosystem), and document stores such as CouchDB or Mongo \cite{xxx}.
+The vast majority of databases operate within a domain where data is (for the most part) entity-driven. As \cite{GANESHCHANDRA201513} points out there are hundreds of NoSQL data stores and a comprehensive categorization of such products is not sensible, but familiar examples within the family of \textit{aggregate orientated} NoSQL databases include key-value stores such such as Amazon's Dynamo \cite{sadalage2012}, column based stores such as Apache's Cassandra \cite{sadalage2012} or HBase \cite{sadalage2012} (as part of the Hadoop ecosystem), and document stores such as CouchDB or Mongo \cite{sadalage2012}.
 
 Although NoSQL databases are said to be \textit{schema-less}, \cite{ATZENI2016} points out that this is not the case; instead NoSQL databases allow for inconsistent schema representation across different entity instances due to the nature of how entities are aggregated. Such flexibility is at the heart of document stores such as CouchDB and Mongo where loose-schema modeling is one of the properties that makes such technologies suitable for large systems that generate data from inconsistent sources.
 
