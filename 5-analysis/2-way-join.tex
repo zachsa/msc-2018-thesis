@@ -84,7 +84,7 @@ The ETL processing of Benchmark data involves an iterative approach of first rea
 \end{enumerate}
 
 \subsection{Map Function}
-The map function for this analysis is included in the appendix (see \ref{2-way-join-map-function}). Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{2-way-join-map-fn-diagram}. That is, on Map function execution the ``type\_'' attribute is checked. If the document is a line of the Grades entity, then the key [Student ID, Course, year] is emitted along with a single number for the value - the percent achieved for the course. If the document is a line of the Benchmarks entity, then the key [student ID, 0, 0] is emitted along with an ordered list of 8 values corresponding to values for the fields in the Benchmarks.CSV file:
+The map function for this analysis is included in the appendix (see \ref{2-way-join-map-function}). Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{fig-2-way-join-map-function}. That is, on Map function execution the ``type\_'' attribute is checked. If the document is a line of the Grades entity, then the key [Student ID, Course, year] is emitted along with a single number for the value - the percent achieved for the course. If the document is a line of the Benchmarks entity, then the key [student ID, 0, 0] is emitted along with an ordered list of 8 values corresponding to values for the fields in the Benchmarks.CSV file:
 
 \begin{itemize}
   \item Gr12 English \%
