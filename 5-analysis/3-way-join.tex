@@ -10,24 +10,24 @@ Using nETL, Task 5 execution comprises an iterative extraction of 30 000 lines a
 
 \subsubsection{Task 5 Transformations (Events)}
 \begin{enumerate}
-    \item A line is converted into a JavaScript object (which relates directly to the JSON format of CouchDB documents) with the fields:
-          \begin{itemize}
-              \item event\_date
-              \item event\_id
-              \item uct\_id
-              \item site\_key
-              \item ref
-          \end{itemize}
-    \item Lines are filtered on the ``uct\_id'' and ``event\_id'' fields; only events with an event type of ``presence'' (event\_id = 282) for students enrolled in CSC1015F in 2016 are considered.
-    \item An attribute (``type\_'') is then added and given the value ``event'' to identify each object as a line of the Event entity type.
-    \item Attributes are whitelisted. The resultant documents each have the the following attributes:
-          \begin{itemize}
-              \item type\_
-              \item event\_date
-              \item event\_id
-              \item uct\_id
-              \item site\_key
-          \end{itemize}
+  \item A line is converted into a JavaScript object (which relates directly to the JSON format of CouchDB documents) with the fields:
+        \begin{itemize}
+          \item event\_date
+          \item event\_id
+          \item uct\_id
+          \item site\_key
+          \item ref
+        \end{itemize}
+  \item Lines are filtered on the ``uct\_id'' and ``event\_id'' fields; only events with an event type of ``presence'' (event\_id = 282) for students enrolled in CSC1015F in 2016 are considered.
+  \item An attribute (``type\_'') is then added and given the value ``event'' to identify each object as a line of the Event entity type.
+  \item Attributes are whitelisted. The resultant documents each have the the following attributes:
+        \begin{itemize}
+          \item type\_
+          \item event\_date
+          \item event\_id
+          \item uct\_id
+          \item site\_key
+        \end{itemize}
 \end{enumerate}
 
 \subsection{MapReduce Functions}
@@ -51,5 +51,5 @@ Sending \mintinline{text}{currentLine} is done similarly to the 2-way join excep
 \input{5-analysis/figures/fig-3-way-join-list-function}
 
 \subsection{Output}
-A sample of the resultant joined dataset is shown in Figure \ref{fig-3-way-csv-output}
+A sample of the resultant joined dataset is shown in Figure \ref{fig-3-way-csv-output}; the full CSV has 586 rows (including a header row). Since only a single year of data was analyzed, there are no repeated StudentIDs in the dataset as a student can only register for a course once per year.
 \input{5-analysis/figures/fig-3-way-csv-output}
