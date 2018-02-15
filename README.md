@@ -1,8 +1,7 @@
 # README #
+Written and built using LaTeXTools - so there are some configurations that are specifc to the original environment; specifically regarding the Minted (code highlighting) package.
+https://github.com/SublimeText/LaTeXTools
 
-### Good links ###
-
-* Tables: % https://tex.stackexchange.com/questions/192656/alignment-in-tabularx-environment
 
 ### How do I get set up? ###
 
