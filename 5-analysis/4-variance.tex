@@ -1,8 +1,15 @@
 \section{Benchmark Variance}
 A \nth{3} analysis is done on the Benchmark data to assess the variances of each of the benchmarks evaluated. To achieve this, a single nETL task is run to load a database with Benchmarks data for all students who attended CSC1015F in either 2014, 2015, or 2016 (or attended the course multiple times). The JSON used for configuring nETL to load data from \textit{Benchmarks (2014 - 2016).csv} into CouchDB is included in Appendix \ref{netl-task-6-config}, which is identical to the \textit{Task 1} configuration, except that a different database is used.
 
-Data in CouchDB is mapped to an index ordered by a single value (\textit{Student ID}), and not a compound key as used in previous analyses. The index consists as a list of \mintinline{text}{[StudentID:[b1, b2, b3, b4, etc.]]} key:value pairs where \mintinline{text}{b} stands for ``benchmark''. All the benchmarks shown in Table \ref{tbl-correlation-variance} are included in the index either as a direct emission of values from the \textit{benchmarks} documents, or as aggregations (averages) of individual benchmark scores. Index values are reduced using the \_stats function without grouping to find the aggregated result of all students' admission benchmarks. In other works, a single row of reduced output is retrieved from the index via the address \url{http://127.0.0.1:5984/variance/_design/variance/_view/variance.csv?reduce=true&group=false}. This output is shown in Figure \ref{fig-variance-reduce-output}
+Data in CouchDB is mapped to an index ordered by a single value (\textit{Student ID}), and not a compound key as used in previous analyses. The index consists as a list of \mintinline{text}{[StudentID:[b1, b2, b3, b4, etc.]]} key:value pairs where \mintinline{text}{b} stands for ``benchmark''. All the benchmarks shown in Table \ref{tbl-correlation-variance} are included in the index either as a direct emission of values from the \textit{benchmarks} documents, or as aggregations (averages) of individual benchmark scores.
 
+Index values are reduced using the \_stats function without grouping to find the aggregated result of all students' admission benchmarks. In other works, a single row of reduced output is retrieved from the index via the address \url{http://127.0.0.1:5984/variance/_design/variance/_view/variance.csv?reduce=true&group=false} as shown in Figure \ref{fig-variance-reduce-output}. This row consists of a tuple of objects. Each object comprises a set of numerical descriptions of a single admission benchmark - that is, each admissions benchmark is described in terms of the sum of all students scores for that particular admissions benchmark, the count of how many students are included in the sum, the worst (min) and best (max) scores achieved for each test (or average of tests) by a student, and the sum of squares of each students scores.
+
+Using the reduce output, standard deviation (using the sample variance) of scores for each admissions benchmark via the formula:
+
+todo:
+
+\input{5-analysis/figures/fig-variance-reduce-output}
 
 
 in fact, since the results of this analysis is the coefficient of variation for each used benchmark, a List function is not required at all. Instead the coefficient of variation of each benchmark analyzed is read directly from the MapReduce output (i.e. the view-index).
