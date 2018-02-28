@@ -345,3 +345,69 @@ oh ok. so per an execution of a map function, if i emit the variable 'key' sever
 
 rnewson (IRC) APP [11:58 AM]
 https://github.com/apache/couchdb/blob/master/share/server/views.js
+
+
+\section{February 28 2018}
+\label{slack-28-feb}
+zach [9:14 AM]
+Hi all. quick question: is it possible to retrieve documents from a view/database during Map function execution?
+
+jan [9:36 AM]
+@zach a map function is passed a doc, that's all you get
+
+zach [9:39 AM]
+It looks like I can't have this `var http = require("http");` in a map function?
+from the log it looks like it's trying to require http from `views/lib/`.
+
+zach [10:04 AM]
+My understanding is that `require('http')` should be allowed by the couchjs engine, but that during map function require defaults to look in `views/lib/`. Is there a way that I can change this?
+
+jan [10:45 AM]
+Map functions can't have side effects
+That means they have a fixed input and produce fixed output
+They can't make http or file or any other outside requests.
+and the couchjs engine isn't Node.js, so you'd have to bring your own http, but even that won't work because there is no networking in pure JS
+
+...
+
+jan [12:32 PM]
+@zach what you want you need to do outside of CouchDB
+you can’t build a JOIN into the map function
+
+zach [12:32 PM]
+ok. thanks
+not even with the v8 query engine?
+
+jan [12:32 PM]
+no
+
+garren [12:33 PM]
+THere is no v8 query engine (edited)
+
+jan [12:33 PM]
+it is the way CouchDB needs map functions to behave
+it is not about the capabilities of the JS engine
+@garren he meant this experiment https://github.com/iriscouch/couchjs
+
+
+...
+
+zach [12:47 PM]
+just out of interest, what is the reason for experimenting with a v8 implementation, and why wasn't it adopted?
+
+jan [1:09 PM]
+@zach we couldn’t get isolation solid
+
+zach [1:10 PM]
+thank you - i don't understand that really. what do you mean?
+
+jan [1:11 PM]
+CouchDB needs a pure JS execution environment. Node.js adds many APIs
+we need to make sure that map code doesn’t have access to the network or the filesystem
+
+zach [1:11 PM]
+ah. coz that would be terrible :confused:
+
+jan [1:11 PM]
+exactly
+like map functions opening database files and overwriting things
