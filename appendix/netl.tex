@@ -2,7 +2,6 @@
 \subsection{Sequential Batch Iterator}
 \label{netl-batch-generator}
 \begin{minted}{text}
-const extraction;
 const batches = (function*() {
     var finished = false;
     while (!finished) {
@@ -15,7 +14,6 @@ const batches = (function*() {
             };
             data.push(datum.value);
         };
-        log.info("Task : " + key + " : Batch extracted : Batch size : " + data.length);
         yield data;
     };
 })();
@@ -56,39 +54,22 @@ TaskManager.prototype.newTask = function(task) { /* ... */ };
 })();
 \end{minted}
 
-
 \subsection{Recursive ETL Iteration}
-\label{netl-recursive-iterator}
+\label{netl-task-iterator}
 \begin{minted}{text}
-const batches; // Assigned elsewhere
-const transformations; // Assigned elsewhere
-const load; // Assigned elsewhere
-(function doEtlTask(self) {
-    var payload = [];
-
-    // Extract next batch
-    batch = batches.next();
-    if (!batch.done) {
-        batch = batch.value;
-        self.tasks[key]._itemsExtracted += batch.length;
-        
-        // Do transformations on each batch item
-        batch.forEach(function(item) {
-            transformations.forEach(function(t) {
-                item = t.transform(item);
-            });
-            if (item && item !== {}) payload.push(item);
+while (!batch.done) {
+    values = batch.value;
+    payload = await values.reduce(async(previousResults, item) => {
+        const results = await previousResults;
+        await asyncForEach(transformations, async(t) => {
+            item = await t.transform.call(t, item);
         });
-
-        // Load to destination
-        load.batch(payload)
-            .then(function(msg) {
-                doEtlTask(self);
-            });
-    } else {
-        // .. Handle end of task execution
-    };
-})(this); // Bound to TaskManager instance context
+        if (item !== {} && item) results.push(item);
+        return results;
+    }, []);
+    loadResult = await load.batch(payload);
+    batch = batches.next();
+};
 \end{minted}
 
 \section{nETL Modules}
@@ -99,14 +80,19 @@ const load; // Assigned elsewhere
 \begin{minted}{text}
 // Load the module into memory
 memoryObject[userModule.name] = userModule.exe;
+
 // Invoke the module's closure
 var loadedModule = memoryObject[userModule.Name].call(userModule);
+
 // Genrate batch from extraction module
 var batch = loadedModule.getNext()
+
 // Do transformations on batch
 batch = loadedModule.transform(batch);
+
 // Load transformed batch
 load.batch(batch).then(function(msg) {}).catch(function(msg) {});
+
 // An example userModule (an extraction module)
 userModule = (function() {
     function exe(configurationObj) {
@@ -127,21 +113,8 @@ userModule = (function() {
 \subsubsection{FLATFILE}
 \label{netl-extract-flatfile}
 \begin{minted}{text}
-'use strict';
 const fs = require('fs');
 const path = require('path');
-/**
- * Configuration example
- * "Extraction": {
- *     "Name": "FLATFILE",
- *     "path": "....csv",
- *     "skipHeaderRows": 1,
- *     "bufferSize": 65536,
- *     "batchSize": 10000,
- *     "startFrom": 0,
- *     "afterTaskRunCBs": []
- * }
- */
 function FLATFILE() {
     const options = this;
     const skipItems = options.skipHeaderRows || 0;
@@ -241,10 +214,6 @@ function FLATFILE() {
         getNext: getNext
     };
 };
-module.exports = {
-    name: "FLATFILE",
-    exe: FLATFILE
-};
 \end{minted}
 
 % Loads
@@ -253,21 +222,7 @@ module.exports = {
 \subsubsection{COUCHDB}
 \label{netl-load-couchdb}
 \begin{minted}{text}
-'use strict';
 const request = require('request');
-/**
- * Configuration example:
- * "Load": {
- *     "Name": "COUCHDB",
- *     "username": "admin",
- *     "password": "password",
- *     "server": "localhost",
- *     "port": 5984,
- *     "ssl": false,
- *     "database": "msc",
- *     "afterTaskRunCBs": []
- * }
- */
 function COUCHDB() {
     const options = this;
     const username = options.username || null;
@@ -309,10 +264,6 @@ function COUCHDB() {
         batch: batch
     };
 };
-module.exports = {
-    name: 'COUCHDB',
-    exe: COUCHDB
-};
 \end{minted}
 
 % Transformations
@@ -320,24 +271,9 @@ module.exports = {
 \subsubsection{TEXT\_LINE\_TO\_OBJ}
 \label{netl-trans-text-line-to-obj}
 \begin{minted}{text}
-'use strict';
 const Readable = require('stream').Readable;
 const csvParser = require('csv-parse/lib/sync');
-
-
-/**
- * Using RFC 4180 CSV definition
- * Configuration example:
- * {
- *     "Name": "TEXT_LINE_TO_OBJ",
- *     "attributeNames": "<list of CSV headers>",
- *     "delimiter": ",",
- *     "textQualifier": "\"",
- *     "escapeChar": "\\",
- *     "afterTaskRunCBs": []
- * }
- */
-function TEXT_LINE_TO_OBJ() {
+async function TEXT_LINE_TO_OBJ() {
     const t = this;
     const parseOptions = {
         auto_parse: true,
@@ -360,135 +296,235 @@ function TEXT_LINE_TO_OBJ() {
     const keys = csvParser(t.attributeNames, parseOptions)[0];
 
     function transform(line) {
-        var values = csvParser(line, parseOptions)[0];
-        var obj = Object.create(null);
-        keys.forEach(function(el, i, arr) {
-            obj[el] = values[i];
+        return new Promise(function(resolve, reject) {
+            setImmediate(() => {
+                try {
+                    var values = csvParser(line, parseOptions)[0];
+                    var obj = Object.create(null);
+                    keys.forEach(function(el, i, arr) {
+                        obj[el] = values[i];
+                    });
+                    return resolve(obj);
+                } catch (error) {
+                    return reject(new Error("TEXT_LINE_TO_OBJ:\n" + error));
+                };
+            });
         });
-        return obj;
     };
 
-    return {
-        transform: transform
-    };
-};
-
-module.exports = {
-    name: 'TEXT_LINE_TO_OBJ',
-    exe: TEXT_LINE_TO_OBJ
+    return new Promise(async(resolve, reject) => {
+        setImmediate(() => {
+            try {
+                return resolve({
+                    transform: transform
+                });
+            } catch (error) {
+                return reject(new Error("Unable to load transformation module"));
+            };
+        });
+    });
 };
 \end{minted}
 
 \subsubsection{FILTER}
-\label{netl-trans-filter}
+\label{netl-trans-filter-obj}
 \begin{minted}{text}
-'use strict';
-/**
- * Configuration looks like this:
- * filterOn: {"key1"; [<list of allowed values>], "key2": [...], ...}
- * filtering can either be done on objects or arrays since
- * arrays 'keys' are treated as indexes
- */
-function FILTER() {
+async function FILTER_OBJ() {
     const t = this;
     const filterOn = t.filterOn;
 
     function transform(obj) {
-        var includeThisObj = true;
-        Object.keys(filterOn).forEach(function(key) {
-            if (filterOn[key].indexOf(obj[key]) < 0) {
-                includeThisObj = false;
-            }
+        return new Promise(function(resolve, reject) {
+            setImmediate(() => {
+                try {
+                    var includeThisObj = true;
+                    Object.keys(filterOn).forEach(function(key) {
+                        if (filterOn[key].indexOf(obj[key]) < 0) {
+                            includeThisObj = false;
+                        };
+                    });
+                    const result = (includeThisObj) ? obj : null;
+                    return resolve(result);
+                } catch (error) {
+                    reject(new Error("FILTER_OBJ: " + error.stack));
+                };
+            });
         });
-        if (includeThisObj) return obj;
     };
 
-    return {
-        transform: transform
-    };
-};
-
-module.exports = {
-    name: 'FILTER',
-    exe: FILTER
+    return new Promise(async(resolve, reject) => {
+        setImmediate(() => {
+            try {
+                return resolve({
+                    transform: transform
+                });
+            } catch (error) {
+                return reject(new Error("Unable to load transformation module"));
+            };
+        });
+    });
 };
 \end{minted}
 
-\subsubsection{WHITELIST}
-\label{netl-trans-whitelist}
+\subsubsection{FILTER (DYNAMIC)}
+\label{netl-trans-filter-obj-dynamic}
 \begin{minted}{text}
-'use strict';
-/**
- * Configuration example:
- * {
- *   "Name": "WHITELIST",
- *   "allowedAttributes": [
- *       "type_", "RegAcadYear", "anonIDnew", "Course", "Percent"
- *   ],
- *   "afterTaskRunCBs": []
- * } 
- */
-function WHITELIST() {
+const request = require('request');
+async function DYNAMIC_FILTER_OBJ() {
+    const t = this;
+    const filterType = this["Filter-type"];
+    const useCache = this["Use-cache"];
+    var cachedFilters;
+    const uri = this.uri;
+    const FilterOn = this.FilterOn
+
+    async function fetchFromCouchView() {
+        return new Promise((resolve, reject) => {
+            request(uri, function(err, res, body) {
+                try {
+                    const filters = {};
+                    const json = JSON.parse(body);
+                    const rows = json.rows;
+                    if (!rows) throw new Error("No items found in dynamic filter transformation");
+                    rows.forEach(function(row) {
+                        const val = row.value;
+                        FilterOn.forEach(function(key) {
+                            filters[key] = filters[key] || [];
+                            if (val[key] && filters[key].indexOf(val[key] < 0)) filters[key].push(val[key]);
+                        });
+                    });
+                    return resolve(filters);
+                } catch (error) {
+                    return reject(new Error("Error retrieving view result from CouchDB for dynamic filter"));
+                };
+            });
+        });
+    };
+
+    function transform(obj) {
+        return new Promise((resolve, reject) => {
+            try {
+                /* Catch null objects (when they have been filtered) */
+                if (!obj) resolve(null);
+
+                /* Otherwise apply filter */
+                switch (filterType) {
+                    case 'CouchDB-view':
+                        var includeObj = false;
+                        Object.keys(cachedFilters).forEach((filter) => {
+                            const allowedVals = cachedFilters[filter];
+                            var objKeyVal = obj[filter];
+                            if (allowedVals.indexOf(objKeyVal) >= 0) includeObj = true;
+                        });
+                        const result = (includeObj) ? obj : null;
+                        return resolve(result);
+                        break;
+
+                    default:
+                        break;
+                };
+            } catch (error) {
+                reject(error);
+            };
+        });
+    };
+
+    return new Promise(async(resolve, reject) => {
+        setImmediate(async() => {
+            try {
+                cachedFilters = await fetchFromCouchView();
+                return resolve({
+                    transform: transform
+                });
+            } catch (error) {
+                return reject(new Error("Unable to load transformation module"));
+            };
+        });
+    });
+};
+\end{minted}
+
+\subsubsection{FILTER ATTRIBUTES}
+\label{netl-trans-filter-attributes}
+\begin{minted}{text}
+async function FILTER_OBJ_ATTRIBUTES() {
     const t = this;
     var allowedAttributes = t.allowedAttributes;
 
-    function transform(doc) {
-        var newDoc = {};
-        for (var attr in doc) {
-            if (!doc.hasOwnProperty(attr)) continue;
-            if (allowedAttributes.includes(attr)) newDoc[attr] = doc[attr];
-        };
-        if (Object.keys(newDoc).length !== 0) return newDoc;
+    function transform(obj) {
+        return new Promise(function(resolve, reject) {
+            setImmediate(() => {
+                try {
+                    var newDoc = {};
+                    for (var attr in obj) {
+                        if (!obj.hasOwnProperty(attr)) continue;
+                        if (allowedAttributes.includes(attr)) newDoc[attr] = obj[attr];
+                    };
+                    const result = (Object.keys(newDoc).length !== 0) ? newDoc : null;
+                    return resolve(result);
+                } catch (error) {
+                    reject(new Error("FILTER_OBJ_ATTRIBUTES: " + error.stack));
+                };
+            })
+        });
     };
 
-    return {
-        transform: transform
-    };
-};
-
-module.exports = {
-    name: 'WHITELIST',
-    exe: WHITELIST
+    return new Promise(async(resolve, reject) => {
+        setImmediate(() => {
+            try {
+                return resolve({
+                    transform: transform
+                });
+            } catch (error) {
+                return reject(new Error("Unable to load transformation module"));
+            };
+        });
+    });
 };
 \end{minted}
 
 \subsubsection{CREATE\_OBJ\_FIELD}
 \label{netl-trans-create-obj-field}
 \begin{minted}{text}
-'use strict';
-/**
- * Configuration example:
- * {
- *     "Name": "CREATE_OBJ_FIELD",
- *     "newAttributes": [
- *         ["type_", "courseGrade"]
- *     ],
- *     "afterTaskRunCBs": []
- * },
- */
-function CREATE_OBJ_FIELD() {
+async function CREATE_ATTRIBUTES_OBJ() {
     const t = this;
 
     function transform(obj) {
-        if (obj === {} || !obj) return;
-        const transformedObj = JSON.parse(JSON.stringify(obj));
-        t.newAttributes.forEach(function(attr) {
-            // Throw error if key already exists
-            if (transformedObj.hasOwnProperty(attr[0])) {
-                throw new Error("New property not allowed!");
-            }
-            transformedObj[attr[0]] = attr[1]
+        return new Promise(function(resolve, reject) {
+            setImmediate(() => {
+                try {
+                    var result;
+                    if (obj === {} || !obj) {
+                        result = null;
+                    } else {
+                        const transformedObj = JSON.parse(JSON.stringify(obj));
+                        t.newAttributes.forEach(function(attr) {
+                            // Throw error if key already exists
+                            if (transformedObj.hasOwnProperty(attr[0])) {
+                                return reject(new Error(`CREATE_ATTRIBUTES_OBJ: New property is not allowed! (${attr[0]})`));
+                            };
+                            transformedObj[attr[0]] = attr[1];
+                        });
+                        result = transformedObj;
+                    };
+                    return resolve(result);
+                } catch (error) {
+                    return reject(Error("CREATE_ATTRIBUTES_OBJ: " + error.stack));
+                };
+            });
         });
-        return transformedObj;
     };
 
-    return {
-        transform: transform
-    };
-};
-
-module.exports = {
-    name: 'CREATE_OBJ_FIELD',
-    exe: CREATE_OBJ_FIELD
+    return new Promise(async(resolve, reject) => {
+        setImmediate(() => {
+            try {
+                return resolve({
+                    transform: transform
+                });
+            } catch (error) {
+                return reject(new Error("Unable to load transformation module"));
+            };
+        });
+    });
 };
 \end{minted}
