@@ -10,9 +10,9 @@ CouchDB's MapReduce implementation is limiting in terms of performing \textit{jo
 With CouchDB's means of data retrieval seemingly crippled compared to SQL, it is necessary to keep in mind CouchDB's benefits (as discussed previously) compared to such databases to stay in good humor! In conjunction with external tools such as the nETL software, however, \textit{joins} and \textit{selections} can be implemented with relative ease. Means of implementing the following operations:
 
 \begin{itemize}
-    \item \textbf{JOINS}
-    \item \textbf{SELECTIONS}
-    \item \textbf{AGGREGATIONS}
+    \item \textbf{JOINS:} All three datasets in this project have a the StudentID field on which a join should be performed. Grade and event entities have a field for registered academic year; in this case the grade and event data need to be joined on both StudentID and RegisteredYear fields, and in turn need to be joined with Benchmark data by StudentID
+    \item \textbf{SELECTIONS:} Only a single course is analyzed - CSC1015F - benchmark and event data needs to be selected according to StudentIDs related to that course code as defined in the grade data. Such a selection is required to be dynamic. Static selections are performed on all entities according to various, allowable field values
+    \item \textbf{AGGREGATIONS:} Event data is summed per student ID. Variance and standard deviation are worked out for benchmark data, requiring aggregations.
 \end{itemize}
 
 
