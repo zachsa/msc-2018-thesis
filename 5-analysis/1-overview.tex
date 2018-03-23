@@ -7,40 +7,28 @@ CouchDB's MapReduce implementation is limiting in terms of performing \textit{jo
     \item Although basic filtering can be performed within a Map function, filters cannot be dynamic and have to be hard coded. For example, it is not possible to write a map function that filters out documents on a field for values found in other documents/indexes in the database. The context in which map and reduce functions are executed is pure JavaScript, with no means of IO to either a file system or over network requests made available \cite{slack28Feb}. Execution of Map and Reduce functions is necessarily idempotent and for this reason, and for security reasons, database state cannot be altered from a map / reduce function during index calculation
 \end{itemize}
 
-With CouchDB's means of data retrieval seemingly crippled compared to SQL, it is necessary to keep in mind CouchDB's benefits (as discussed previously) compared to such databases to stay in good humor! In conjunction with external tools such as the nETL software, however, \textit{joins} and \textit{selections} can be implemented with relative ease. Means of implementing the following operations:
+With CouchDB's means of data retrieval seemingly crippled compared to SQL, it is necessary to keep in mind CouchDB's benefits (as discussed previously) compared to such databases to stay in good humor! In conjunction with external tools such as the nETL software, however, \textit{joins} and \textit{selections} can be implemented with relative ease.
 
-\begin{itemize}
-    \item \textbf{JOINS:} All three datasets in this project have a the StudentID field on which a join should be performed. Grade and event entities have a field for registered academic year; in this case the grade and event data need to be joined on both StudentID and RegisteredYear fields, and in turn need to be joined with Benchmark data by StudentID
-    \item \textbf{SELECTIONS:} Only a single course is analyzed - CSC1015F - benchmark and event data needs to be selected according to StudentIDs related to that course code as defined in the grade data. Such a selection is required to be dynamic. Static selections are performed on all entities according to various, allowable field values
-    \item \textbf{AGGREGATIONS:} Event data is summed per student ID. Variance and standard deviation are worked out for benchmark data, requiring aggregations.
-\end{itemize}
+\section{\textit{JOINs}}
+The three datasets used in this project require joining on the StudentID field. This field appears once for every student in the benchmarks data, several times for each student in the grades data and up to thousands of times per student in the events data. Both the grade and event data contain a field for year - i.e. the year in which a grade was obtained or the year in which an event was registered. As such these two datasets require joining on both the StudentID and Year fields. Benchmark data is only collected once per student enrollment, and as such is associated with grade and event data only by StudentID. To describe the join in terms of SQL, an \textit{INNER JOIN} is performed on the grades/events data, and the resultant dataset is joined to benchmark data via a \textit{LEFT OUTER JOIN}.
 
+Initially an attempt was made at joining the three entities directly via MapReduce; the map function in this case was configured to output identical keys across the three entities for rows that require joining, and tuple as a value in which index position indicates the value-output of specific entities. With the map function output a tuple of 11 indexes instantiated with null values (actually the value `0' to represent falsy numerical values), each index (or group of indices) is reserved for a specific entity type's output and adjusted appropriately during map function execution depending on the type of document the map function is applied to (the map function executes once for every document in the database):
 
-This chapter discusses steps taken to join the three separate datasets on the StudentID field. This field appears once for every student in the benchmarks data, several times for each student in the grades data and up to thousands of times per student in the events data. The join is performed via a series of processes that together form a well-defined workflow. Workflow components include ETL done by the nETL application, data storage and management via CouchDB, MapReduce for creating sorted, aggregated views of the data store, and a List function to perform the actual document joining and data retrieval/representation.
+\begin{minted}[linenos=false]{text}
+[
+   0,                          # i = 0: a course % grade or 0
+   0, 0, 0, 0, 0, 0, 0, 0,     # 0 < i < 8: benchmark grade %s
+   0, 0                        # 8 < i > 11: event count for semester 1/2
+]
+\end{minted}
 
-The nETL and CouchDB applications are incorporated into an analysis workflow as represented in Figure \ref{fig-analysis-workflow}. CSVs are parsed by the nETL application and loaded into a CouchDB database via the CouchDB server application. An index is created from the CouchDB database, and data is retrieved directly from the index file using a List function. The index is primarily used as a means of sorting the data from the main CouchDB file; both the 2-way join and 3-way join are performed directly on the sorted index rather than in the MapReduce function. Although the MapReduce function fills the important role of aggregating entities prior to joining them (as discussed in 3-way join section), it is technically possible to join documents directly on retrieval from the main database file since both the main database file and derived indexes are structured as B+trees and can be sorted. However there are three problems with retrieving data directly from the main database file and skipping index creation:
+Depending on the value of the `type\_' attribute of the document being processed by the map function, values at relevant indices of the tuple for that particular document type are altered to represent the info in the document that should be output. If the document being processed by the map function is of \textit{type\_} ‘grade’, then the map function emits a tuple with a value at \mintinline{text}{i = 0} and 0s for all other indices: \[[\%, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\]
 
-\begin{itemize}
-    \item CouchDB database files are sorted by the ``\_id'' field, which when unspecified on document insert is initialized as a UUID. Using UUIDs as unique document identifiers allow for distributed systems in which cluster nodes can operate independently of each other without the possibility of documents being created in separate nodes with conflicting IDs. Even though not required by this project, such best practices are followed. A B+tree sorted by a UUID is not useful for document retrieval, and as such, views are required of the underlying data store for any kind of index-based querying
-    \item List functions are invoked via an HTTP GET request with the requirement of specifying a view within the URI. List functions are convenient for usage in this project as they facilitate ordered, iterative, range-based access (meaning that datum can be accessed sequentially, in isolation and in reliable order)
-    \item When aggregations of specific entities are required, retrieving data directly from these indexes is vastly easier than having to aggregate during data retrieval. As aggregation logic becomes more complicated the difficulty of such direct data retrieval increases and the benefit of using indexes increases as a result
-\end{itemize}
+If the document is of \textit{type\_} `benchmark', the map function emits a tuple with values at \mintinline{text}{0 < i < 8}: \[[0, \%, \%, \%, \%, \%, \%, \%, \%, 0, 0]\]
 
-In terms of the MapReduce tasks, each map function is coded for a specific join (or other output), but only built-in reduce functions are used. This is done because the built-in reduce functions are implemented within the main Erlang process, which offers a performance boost over custom reduce functions since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is avoided \cite{slack1Nov}. Working on a Windows machine the IO cost is apparently exaggerated due to the difference between Unix-based and Windows kernel implementations.
-
-During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{performance-analysis}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
-
-\input{5-analysis/figures/fig-analysis-workflow}
-
-\section{MapReduce Approach}
+If the document is of \textit{type\_} ‘event’, the map function emits a tuple with values at \mintinline{text}{8 < i > 11}: \[[0, 0, 0, 0, 0, 0, 0, 0, s1EventCount, s2EventCount]\]
 
 
-\section{Performing joins}
-Initial attempts at joining the three entities - Grades with Benchmarks, and then Grades with Benchmarks with Events were attempted directly via MapReduce. This approach involved specifying the map function to always output a value of the same format for all three entities. This format is a tuple of 11 indexes - [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; each of the 11 indexes correlate to a specific output attribute. In other words, i=0 contained Grade \%, i=1,2,3,4,etc. the percents for Benchmark data, and the last 2 indexes (i = 9, i = 10) indicate an event occurrence (from the Event data) in either the first semester (i[9] = 1, i[10] = 0) or the second semester (i[9] = 0, i[10] = 1).
-
-During index calculation, CouchDB iterates through every database document, passing each document to the Map function. This Map function instantiates the output tuple ([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) on every execution, and then depending on the value of the `type\_' attribute of the document (this attribute is added to every document prior to insertion to CouchDB), the map function alters the corresponding component of the tuple, before returning and adding the key:value set to the view index currently being built.
-
-To further explain, if the document being processed by the map function is a ‘grade’ document, then the map function adjusts the value tuple to emit the grade percent – i.e. [percent, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]. Or if the document is of type benchmark, the map function changes the values at indexes 1 through 8 and emits the value: [0, x, x, x, x, x, x, x, x, 0, 0]. If the document is of type ‘event’, then the map function alters the value at indexes 9 and 10. i.e. [0, 0, 0, 0, 0, 0, 0, 0, s1Event, s2Event] (s1Event is 1 for first semester event, or 0 for second semester, etc.).
 
 The reduce function (whether that is the \_stats function a used in this study or any other function) then receives a tuple of tuples (a list of the tuples output by the map function executions), as the output per key, and can perform calculations across corresponding indexes; i.e. a single key references up to 3 tuples: 1 Grade document output, 1 Benchmark document output, and 1 Event document output. By performing an aggregation across these tuples at corresponding indexes, the Grades percentage (i=0) is an aggregation of the grade as output from the Grade entity along with 0s, the Benchmark percentages are each aggregations of the Benchmark percent each along with 0s, and the Events data is an aggregation of event counts and 0s. As such, aggregation across the output tuple effectively only takes into account relevant values (since all other values are 0) and a join is achieved.
 
@@ -63,3 +51,47 @@ Although many \textit{events} documents are outputted by the map function per st
 Filtering during map function execution cannot be done dynamically - that is, map and reduce function execution is isolated with database interactions during execution not possible. This is for security reasons, as well as the complications that could occur if a database's state could be changed by a map function during that map function's execution \cite{slack28Feb}. An experiment to implement the couchjs engine using Google's V8 engine (i.e. using node.js) was abandoned due the numerous APIs that extend JavaScript beyond the specification allowing network requests, file system access, etc. etc. \cite{v8couchjs, slack28Feb} making the map and reduce execution environment (for custom reduce function) insecure - as such, the experiment was abandoned in 2013.
 
 \input{5-analysis/figures/fig-mapreduce-key-output}
+
+
+
+
+
+\section{\textit{SELECTIONS}}
+\begin{itemize}
+    \item \textbf{SELECTIONS:} Only a single course is analyzed - CSC1015F - benchmark and event data needs to be selected according to StudentIDs related to that course code as defined in the grade data. Such a selection is required to be dynamic. Static selections are performed on all entities according to various, allowable field values
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+The nETL and CouchDB applications are incorporated into an analysis workflow as represented in Figure \ref{fig-analysis-workflow}. CSVs are parsed by the nETL application and loaded into a CouchDB database via the CouchDB server application. An index is created from the CouchDB database, and data is retrieved directly from the index file using a List function. The index is primarily used as a means of sorting the data from the main CouchDB file; both the 2-way join and 3-way join are performed directly on the sorted index rather than in the MapReduce function. Although the MapReduce function fills the important role of aggregating entities prior to joining them (as discussed in 3-way join section), it is technically possible to join documents directly on retrieval from the main database file since both the main database file and derived indexes are structured as B+trees and can be sorted. However there are three problems with retrieving data directly from the main database file and skipping index creation:
+
+\begin{itemize}
+    \item CouchDB database files are sorted by the ``\_id'' field, which when unspecified on document insert is initialized as a UUID. Using UUIDs as unique document identifiers allow for distributed systems in which cluster nodes can operate independently of each other without the possibility of documents being created in separate nodes with conflicting IDs. Even though not required by this project, such best practices are followed. A B+tree sorted by a UUID is not useful for document retrieval, and as such, views are required of the underlying data store for any kind of index-based querying
+    \item List functions are invoked via an HTTP GET request with the requirement of specifying a view within the URI. List functions are convenient for usage in this project as they facilitate ordered, iterative, range-based access (meaning that datum can be accessed sequentially, in isolation and in reliable order)
+    \item When aggregations of specific entities are required, retrieving data directly from these indexes is vastly easier than having to aggregate during data retrieval. As aggregation logic becomes more complicated the difficulty of such direct data retrieval increases and the benefit of using indexes increases as a result
+\end{itemize}
+
+In terms of the MapReduce tasks, each map function is coded for a specific join (or other output), but only built-in reduce functions are used. This is done because the built-in reduce functions are implemented within the main Erlang process, which offers a performance boost over custom reduce functions since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is avoided \cite{slack1Nov}. Working on a Windows machine the IO cost is apparently exaggerated due to the difference between Unix-based and Windows kernel implementations.
+
+During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{performance-analysis}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
+
+\input{5-analysis/figures/fig-analysis-workflow}
