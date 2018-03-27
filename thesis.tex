@@ -73,6 +73,9 @@
 \setstretch{1.5}
 \setlength{\parindent}{0em}
 
+% Make footnotes low on page
+\usepackage[bottom]{footmisc}
+
 % Set hyperref defaults
 \hypersetup{
     colorlinks,
@@ -88,8 +91,9 @@
     baseline=c
 }
 
-% Set list spacing
+% Set list spacing and label type
 \setlist{nosep}
+\setlist[itemize,2]{label={\textbullet}}
 
 % Add Table column type (centered)
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
@@ -190,11 +194,11 @@
 \input{4-etl/2-implementation}
 \input{4-etl/3-setup}
 
-\chapter{Analysis Methodology}
+\chapter{Analysis}
 \input{5-analysis/1-overview}
-\input{5-analysis/2-way-join}
-\input{5-analysis/3-way-join}
-\input{5-analysis/4-variance}
+\input{5-analysis/2-benchmark-variance}
+\input{5-analysis/3-benchmark-grade-correlation}
+\input{5-analysis/4-sakai-rank-correlation}
 
 % Tables
 \input{5-analysis/tables/performance-analysis}

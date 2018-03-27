@@ -2,7 +2,7 @@ With special thanks to data owners Jane Hendry (UCT's CIO) and Stephen Marquard 
 
 \begin{itemize}
     \item \textit{grades}: UCT course results
-    \item \textit{benchmarks}: Student matric results and national benchmark test results
+    \item \textit{admissions}: Student matric results and national benchmark test results
     \item \textit{events}: Student interactions with the Sakai platform, measured as browser interactions
 \end{itemize}
 
@@ -14,7 +14,7 @@ CSV exports received for grades data for the years 2014, 2015 and 2016 are consi
 \input{3-data/tables/grades}
 \input{3-data/figures/fig-grades-csv-sample}
 
-\section{Benchmarks}
+\section{Admissions}
 CSV exports received for benchmarks contain data for the 2014, 2015 and 2016 student cohorts. The fields in these CSVs are not consistent across all three years; certain fields are capitalized differently, fields are ordered differently from year to year. Additionally, fields are included to show UCT academic performance for years subsequent to each student's registration. For example, benchmarks data from 2014 includes academic performance for the years 2015/2016, and the 2015 benchmarks data includes academic performance for the year 2016 - resulting in many repeating fields and variable row lengths.
 
 CouchDB is an excellent tool for normalizing schemas, since user defined map functions can query every document with unique logic according to schema version and output a normalized document representation. But although CouchDB is lenient in terms of data structure when modeling data (JSON documents are semi-structured), some structuring beyond a 'visual' structure is still required. As such, the Benchmark data as received in CSV form could be broadly classified as 'unstructured'. Microsoft Excel was used to normalize the Benchmark data across all three years (Excel is an excellent tool for working with data structured visually).

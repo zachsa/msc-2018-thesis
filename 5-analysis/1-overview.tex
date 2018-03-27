@@ -68,12 +68,6 @@ This project requires filtering events/benchmark data by students who attended t
 \end{itemize}
 
 \section{Analysis Workflow}
-
-
-
-
-The nETL and CouchDB applications are incorporated into an analysis workflow as represented in Figure \ref{fig-analysis-workflow}. CSVs are parsed by the nETL application and loaded into a CouchDB database via requests from nETL to the CouchDB server application. An index is created from the CouchDB database, and data is retrieved directly from the index file using a List function. The index is used as a means of sorting data by student number, normalizing grade fields to numbers, and aggregating event data. Joins are then performed on the sorted index during index-access rather by the list function.
-
 Although the MapReduce function fills the important role of aggregating entities prior to joining them (as discussed in 3-way join section), it is technically possible to join documents directly on retrieval from the main database file since both the main database file and derived indexes are structured as B+trees and can be sorted. However there are three problems with retrieving data directly from the main database file and skipping index creation:
 
 \begin{itemize}
@@ -82,8 +76,14 @@ Although the MapReduce function fills the important role of aggregating entities
     \item When aggregations of specific entities are required, retrieving data directly from these indexes is vastly easier than having to aggregate during data retrieval. As aggregation logic becomes more complicated the difficulty of such direct data retrieval increases and the benefit of using indexes increases as a result
 \end{itemize}
 
-In terms of the MapReduce tasks, each map function is coded for a specific join (or other output), but only built-in reduce functions are used. This is done because the built-in reduce functions are implemented within the main Erlang process, which offers a performance boost over custom reduce functions since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is avoided; working on a Windows machine the IO cost is apparently exaggerated due to the difference between Unix-based and Windows kernel implementations \cite{slack1Nov}.
+As such, in terms of retrieving processed datasets useful for analysis, for each analysis the nETL and CouchDB applications are incorporated into an workflow represented by the following steps:
+
+\begin{itemize}
+    \item CSVs are parsed, rows filtered (selection) and data loaded into CouchDB by the nETL application
+    \item An index is created from the CouchDB database via MapReduce
+    \item Data is retrieved directly from the index file using a List function, during which time any required joining is performed
+\end{itemize}
+
+In terms of the MapReduce tasks, only built-in reduce functions are used; these functions (\_sum, \_count and \_stats) are implemented within the main Erlang process. This offers a performance boost over custom reduce functions since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is avoided. Working on a Windows machine, the IO cost is apparently exaggerated due to the difference between Unix-based and Windows kernel implementations \cite{slack1Nov}.
 
 During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{performance-analysis}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
-
-\input{5-analysis/figures/fig-analysis-workflow}
