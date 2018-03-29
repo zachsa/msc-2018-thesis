@@ -45,6 +45,8 @@ The \_stats function aggregates benchmark by describing each benchmark in terms 
 Variance and standard deviation are calculated directly from the reduced index output during data retrieval using a \textit{List} function. With reference to Figure \ref{fig-variance-reduce-output} (aggregated benchmark output), variance and standard deviation is worked out according to the following formulae: \begin{spreadlines}{15pt}
   \begin{gather*}
     \intertext{\textit{Variance:}}
+    (\sigma_{\overline{x}})^{2} = \frac{\sum{(x-\bar{x})^2}}{n-1}\\
+    \intertext{\textit{Variance in terms of reduce (\_stats) output:}}
     (\sigma_{\overline{x}})^{2} = \frac{sumsqr}{count-1} - (\frac{sum}{count})^{2}\\
     \intertext{\textit{Standard Deviation:}}
     \sigma_{\overline{x}} = \sqrt{\frac{sumsqr}{count-1} - (\frac{sum}{count})^{2}}
