@@ -12,18 +12,7 @@ Via nETL configuration, rows from the admissions data are selected for students 
 
 
 \subsection{MapReduce}
-Following loading the data from the CSVs into CouchDB, a Map function is used to produce an index of the CouchDB documents ordered by Student ID, with the guarantee that for every unique student id documents are ordered by type; the demographic document precedes the Grade documents for any given student. Knowing the order of documents via the view-index allows for performing the join on data-retrieval. Only a map function is used is required (no reduce function). Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{fig-2-way-join-map-function}. That is, on Map function execution the ``type\_'' attribute is checked. If the document is a line of the Grades entity, then the key [Student ID, Course, year] is emitted along with a single number for the value - the percent achieved for the course. If the document is a line of the Benchmarks entity, then the key [student ID, 0, 0] is emitted along with an ordered list of 8 values corresponding to the different benchmarks:
-
-\begin{itemize}
-    \item Gr12 English \%
-    \item Gr12 science \%
-    \item Gr12 Math \%
-    \item Gr 12 Math Lit \%
-    \item Gr12 Adv Math \%
-    \item NBT AL \%
-    \item NBT QL \%
-    \item NBT Math \%
-\end{itemize}
+Following loading the data from the CSVs into CouchDB, a Map function is used to produce an index of the CouchDB documents ordered by Student ID, with the guarantee that for every unique student id documents are ordered by type; the demographic document precedes the Grade documents for any given student. Knowing the order of documents via the view-index allows for performing the join on data-retrieval. Only a map function is used is required (no reduce function). Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{fig-2-way-join-map-function}. That is, on Map function execution the ``type\_'' attribute is checked. If the document is a line of the Grades entity, then the key [Student ID, Course, year] is emitted along with a single number for the value - the percent achieved for the course. If the document is a line of the Benchmarks entity, then the key [student ID, 0, 0] is emitted along with an ordered list of 8 values corresponding to each of the 19 different methods of benchmarking students.
 
 Normalization of the percentage fields (i.e. ``Percent'' for the Grades entity and the test results in the Benchmarks entity) is done via a nested function within the Map function as discussed previously (Table \ref{tbl-grades-normalize} and Table \ref{tbl-benchmarks-normalize}). No reduce function is used to achieve this 2-way join. This is because, theoretically, a student should only have a single set of Benchmark results and should only achieve a single grade per course per year. As such there is no need to aggregate output from the Map function (which is done via reduction) before performing the document join via the List function.
 
