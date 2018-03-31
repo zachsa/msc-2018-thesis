@@ -4,101 +4,25 @@ Correlation coefficients ($r$) between different admissions benchmarking methods
 \subsection{ETL}
 Using nETL, rows are extracted from the two CSV files (\textit{Admissions (2014 - 2016).csv} and \textit{Grades (2014 - 2016).csv}) independently of each other and concurrently, in batches of 5 000 and 10 000 rows respectively.
 
-Via nETL configuration, rows from the admissions data are selected for students that are South African citizens or permanents residents, and that are in undergraduate; rows from the grades data are selected for students that attended CSC1015F during their undergraduate career. A dynamic filter is applied to the admissions data to further select only students that attended CSC1015F.
+Via nETL configuration, rows from the admissions data are selected for students that are South African citizens or permanents residents, and that are undergraduates. Rows from the grades data are selected for students that attended CSC1015F during their undergraduate career. Because this information is not available in the admissions data, dynamic filter is applied to the admissions data to further select students that meet this same criteria. The CSV data represented as objects contains numerous fields that are not required, and so nETL is configured to apply an attribute-whitelisting process to both admissions and grade data. Batches of objects are serialized to JSON strings and loaded into a single CouchDB database via the \textit{\_bulk\_docs} endpoint. An example of rows from admissions and grades data serialized to JSON strings and as loaded into CouchDB is shown in Figures \ref{fig-benchmarks-json-sample} and \ref{fig-grades-json-sample} respectively.
 
-Batches of data from both CSVs is loaded into a single CouchDB database via the \textit{\_bulk\_docs} endpoint. A list of the transformations applied to each line extracted from each CSV is shown below:
+\input{5-analysis/figures/fig-benchmarks-json-sample}
+\input{5-analysis/figures/fig-grades-json-sample}
 
-\subsubsection{nETL Grades Transformations}
-\begin{enumerate}
-  \item A line is converted into a JavaScript object (which relates directly to the JSON format of CouchDB documents) with the fields:
-        \begin{itemize}
-          \item DownloadedDate
-          \item RegAcadYear
-          \item RegTerm
-          \item anonIDnew
-          \item RegProgram
-          \item RegCareer
-          \item Degree
-          \item DegreeDescr
-          \item Subject
-          \item Catalog.
-          \item Course
-          \item CourseSuffix
-          \item Session
-          \item Percent
-          \item Symbol
-          \item UnitsTaken
-          \item CourseID
-          \item CourseDescr
-          \item CourseCareer
-          \item Faculty
-          \item Dept
-          \item MaximumCrseUnits
-          \item CourseCount
-          \item CourseLevel
-          \item CESM
-          \item Sub-CESM
-        \end{itemize}
-  \item Lines (now in object form) are filtered on the ``RegCareer'' and ``Course'' fields, where grades achieved for the CSC1015F course taken by students registered as undergrads are considered. Lines that don't meet this attribute are discarded and no further transformations are applied to these line
-  \item An attribute (``type\_'') is then added to each line (that weren't removed in filtering step), and given the value ``grade'' to identify each object as a line of the Grade entity type
-  \item Document attributes are whitelisted. The resultant documents each have the the following attributes:
-        \begin{itemize}
-          \item type\_
-          \item Course
-          \item RegAcadYear
-          \item anonIDnew
-          \item Percent
-        \end{itemize}
-\end{enumerate}
 
-\subsubsection{nETL Benchmarks Transformations}
-\begin{enumerate}
-  \item A line is converted into a JavaScript object with the fields:
-        \begin{itemize}
-          \item anonIDnew
-          \item Career
-          \item Citizenship Residency
-          \item SA School
-          \item Eng Grd12 Fin Rslt
-          \item Math Grd12 Fin Rslt
-          \item Mth Lit Grd12 Fin Rslt
-          \item Adv Mth Grd12 Fin Rslt
-          \item Phy Sci Grd12 Fin Rslt
-          \item NBT AL Score
-          \item NBT QL Score
-          \item NBT Math Score
-          \item RegAcadYear
-        \end{itemize}
-  \item Lines are filtered on the ``Career'', ``Citizenship Residency'', and ``anonIDnew'' fields. Only lines for students that attended the CSC1015F course during their undergraduate career and that are either South African citizens or permanent residents are included in the result set. The list of students that attended CSC1015 is derived from the Grade data
-  \item An attribute (``type\_'') is then added to each remaining line and given the value ``benchmark'' to identify each object as a line of the Benchmark entity type
-  \item Attributes are whitelisted. The resultant documents each have the the following attributes:
-        \begin{itemize}
-          \item type\_
-          \item anonIDnew
-          \item Eng Grd12 Fin Rslt
-          \item Math Grd12 Fin Rslt
-          \item Mth Lit Grd12 Fin Rslt
-          \item Adv Mth Grd12 Fin Rslt
-          \item Phy Sci Grd12 Fin Rslt
-          \item NBT AL Score
-          \item NBT QL Score
-          \item NBT Math Score
-          \item RegAcadYear
-        \end{itemize}
-\end{enumerate}
 
 \subsection{MapReduce}
 Following loading the data from the CSVs into CouchDB, a Map function is used to produce an index of the CouchDB documents ordered by Student ID, with the guarantee that for every unique student id documents are ordered by type; the demographic document precedes the Grade documents for any given student. Knowing the order of documents via the view-index allows for performing the join on data-retrieval. Only a map function is used is required (no reduce function). Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{fig-2-way-join-map-function}. That is, on Map function execution the ``type\_'' attribute is checked. If the document is a line of the Grades entity, then the key [Student ID, Course, year] is emitted along with a single number for the value - the percent achieved for the course. If the document is a line of the Benchmarks entity, then the key [student ID, 0, 0] is emitted along with an ordered list of 8 values corresponding to the different benchmarks:
 
 \begin{itemize}
-  \item Gr12 English \%
-  \item Gr12 science \%
-  \item Gr12 Math \%
-  \item Gr 12 Math Lit \%
-  \item Gr12 Adv Math \%
-  \item NBT AL \%
-  \item NBT QL \%
-  \item NBT Math \%
+    \item Gr12 English \%
+    \item Gr12 science \%
+    \item Gr12 Math \%
+    \item Gr 12 Math Lit \%
+    \item Gr12 Adv Math \%
+    \item NBT AL \%
+    \item NBT QL \%
+    \item NBT Math \%
 \end{itemize}
 
 Normalization of the percentage fields (i.e. ``Percent'' for the Grades entity and the test results in the Benchmarks entity) is done via a nested function within the Map function as discussed previously (Table \ref{tbl-grades-normalize} and Table \ref{tbl-benchmarks-normalize}). No reduce function is used to achieve this 2-way join. This is because, theoretically, a student should only have a single set of Benchmark results and should only achieve a single grade per course per year. As such there is no need to aggregate output from the Map function (which is done via reduction) before performing the document join via the List function.
@@ -107,16 +31,16 @@ Normalization of the percentage fields (i.e. ``Percent'' for the Grades entity a
 
 \subsection{List Function: calculating correlation}
 The list function is executed via a call to CouchDB's HTTP API. For the project the URI of that function call is \url{https://localhost:5984/msc/\_design/2-way-join/\_list/2-way-join-list/ 2-way-join-view?reduce=false}. On invocation the List function opens and scans the index iteratively processing each document (i.e. iteratively processing each student; first a student's demographic document is processed, then a student's grades documents are processed). The join is performed during list function execution alongside calculation of correlation coefficients according to the formula\footnote{\textit{x}: grade \%, \textit{y}: benchmark (\textit{r} is calculated for multiple \textit{y} values)}: \begin{spreadlines}{15pt}
-  \begin{gather*}
-    \intertext{\textit{Pearson Correlation Coefficient:}}
-    r = \frac{N\sum{xy} - (\sum{x})(\sum{y})}{\sqrt{[N\sum{x^2} - (\sum{x})^2][N\sum{y^2} - (\sum{y})^2]}}
-  \end{gather*}
+    \begin{gather*}
+        \intertext{\textit{Pearson Correlation Coefficient:}}
+        r = \frac{N\sum{xy} - (\sum{x})(\sum{y})}{\sqrt{[N\sum{x^2} - (\sum{x})^2][N\sum{y^2} - (\sum{y})^2]}}
+    \end{gather*}
 \end{spreadlines}
 
 When calculating variance (as shown previously), only a single data entity was used. As such the \_stats function could be used as a means of creating aggregations for corresponding values such as \textit{sum of squares}, \textit{sum} and \textit{count}, and then variance could be worked out in reference to these aggregated values. Working out correlation cannot make use of CouchDB's \_stats reduce function, since entities are reduced separately and only final aggregations of each entity are made available on data retrieval. For example, in reference to working out the numerator in reference to correlation: \begin{spreadlines}{15pt}
-  \begin{gather*}
-    N\sum{xy} - (\sum{x})(\sum{y})
-  \end{gather*}
+    \begin{gather*}
+        N\sum{xy} - (\sum{x})(\sum{y})
+    \end{gather*}
 \end{spreadlines}
 
 Using CouchDB's \_stats function only the $\sum{x}$ and $\sum{y}$ values are accessible when joining the two entities during list function execution, and not $x$ and $y$ values (similarly, the denominator of the formula could also not be calculated from \_stats function output). As such, to work out the correlation between grades and benchmarks requires aggregations across entities during list function execution; essentially the list function is used to aggregate numerical data from disparate entities by means of joins performed iteratively per student number. To achieve this, the list function is required to work with running totals as the index (the output of the map function without using a reduce function) is iterated over.

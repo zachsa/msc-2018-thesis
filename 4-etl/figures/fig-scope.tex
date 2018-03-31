@@ -1,0 +1,32 @@
+\begin{figure}[H]
+  \centering
+  \begin{mdframed}[rightline=true,leftline=true]
+    \begin{minted}{text}
+// Global scope
+
+// Closure over the global scope
+(function() {
+    // Module-specific scope
+
+    // Closure over module-specific scope
+    function exe(configurationObj) {
+        // Task-specific scope
+
+        // Closure over task-specific scope
+        function invoke() {...};
+
+        return {
+            invoke: invoke
+        };
+    };
+
+    return {
+        name: "MODULE_NAME",
+        exe: exe
+    };
+})();
+    \end{minted}
+  \end{mdframed}
+  \caption[Module Scope via closure]{\textbf{Figure \ref{fig-scope}: Scoping via closure in JavaScript}}
+  \label{fig-scope}
+\end{figure}

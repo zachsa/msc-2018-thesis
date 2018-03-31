@@ -6,29 +6,9 @@ Using nETL, rows are extracted from the three CSV files (\textit{Admissions (201
 
 Via nETL configuration, rows from the admissions data are selected for students that are South African citizens or permanents residents, and that are in undergraduate; rows from the grades data are selected for students that attended CSC1015F during 2016 and as part of their undergraduate career; rows from the events data are selected for presence events only. Dynamic filters are configured for the admissions and events data to only include students that took the CSC1015F course.
 
-Batches of data from the CSVs is loaded into a single CouchDB database via the \textit{\_bulk\_docs} endpoint. A list of the transformations applied to each line extracted from grades / events CSV data is shown previously. The transformations applied to the events data is:
+The events data contains a field \textit{ref}, which is a long string and is not required in the analysis. As such, this string is dropped via a whitelisting process prior to serialization and loading strings into CouchDB (in batches via the \textit{\_bulk\_docs} endpoint). An example of a row from the event data serialized to a JSON string is shown in Figure \ref{fig-events-json-sample}.
 
-\subsubsection{nETL Events Transformations}
-\begin{enumerate}
-  \item A line is converted into a JavaScript object (which relates directly to the JSON format of CouchDB documents) with the fields:
-        \begin{itemize}
-          \item event\_date
-          \item event\_id
-          \item uct\_id
-          \item site\_key
-          \item ref
-        \end{itemize}
-  \item Lines are filtered on the ``uct\_id'' and ``event\_id'' fields; only events with an event type of ``presence'' (event\_id = 282) for students enrolled in CSC1015F in 2016 are considered.
-  \item An attribute (``type\_'') is then added and given the value ``event'' to identify each object as a line of the Event entity type.
-  \item Attributes are whitelisted. The resultant documents each have the the following attributes:
-        \begin{itemize}
-          \item type\_
-          \item event\_date
-          \item event\_id
-          \item uct\_id
-          \item site\_key
-        \end{itemize}
-\end{enumerate}
+\input{5-analysis/figures/fig-events-json-sample}
 
 \subsection{MapReduce}
 Since a single student may be associated with many rows in the Event data (sometimes even thousands of rows), a reduce function is used within the MapReduce job to aggregate the Events rows into a single document that is a count of Sakai presence events for first and second semester, with the output of this aggregation included in the index along with grade and benchmark data when reduce = true. The index consists of key:value pairs of student numbers associated a tuple that contains values for grades, benchmarks, and event information.
