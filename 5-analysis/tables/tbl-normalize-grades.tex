@@ -1,0 +1,39 @@
+\begin{table}[H]
+    \begin{threeparttable}
+        \textbf{Table \ref{tbl-normalize-grades}}\par\medskip\par\medskip
+        \caption{Grade results need to be treated as numbers for the purpose of this analysis, this table shows all different value types and the appropriate treatment for each. Because of the volume of data, it was not checked how many of these symbols apply to undergraduate students specifically, so these cases were handled generically}
+        \label{tbl-normalize-grades}
+        \begin{tabularx}{\textwidth}{>{\hsize=0.6\hsize}X>{\hsize=1.3\hsize}X>{\hsize=1.1\hsize}X}
+            \toprule
+            \mC{c}{Symbol} & \mC{c}{Meaning}          & \mC{c}{Handling Logic}                     \\
+            \midrule
+            49A            & Absent for supplementary & Grade used                                 \\
+            49S            & Supplementary pending    & Grade used                                 \\
+            50C            & ?                        & Grade used                                 \\
+            78             & Grade                    & Grade used                                 \\
+            AB             & Absent (fail)            & N/A                                        \\
+            ATT            & ?                        & N/A                                        \\
+            DE             & Deferred                 & N/A                                        \\
+            DPR            & Duly performed refused   & 30\% Grade used\tnote{\textsuperscript{1}} \\
+            F              & Fail                     & 40\% Grade used\tnote{\textsuperscript{2}} \\
+            GIP            & Thesis only              & N/A                                        \\
+            INC            & Incomplete (fail)        & 30\% Grade used\tnote{\textsuperscript{1}} \\
+            LOA            & Leave of absence         & N/A                                        \\
+            OS             & Outstanding              & N/A                                        \\
+            OSS            & Outstanding              & N/A                                        \\
+            PA             & Pass (thesis)            & N/A                                        \\
+            SAT            & Thesis only              & N/A                                        \\
+            UF             & Unclassified Fail        & 49\% Grade used\tnote{\textsuperscript{3}} \\
+            UNS            & Thesis only              & N/A                                        \\
+            UP             & Unclassified pass        & 45\% Grade used\tnote{\textsuperscript{4}} \\
+            \bottomrule
+        \end{tabularx}
+        \scriptsize
+        \begin{tablenotes}
+            \item[\textsuperscript{1}]30\% was applied on the estimate that these students wouldn't necessarily have completed the coursework, and that as such this is a `bad' fail
+            \item[\textsuperscript{2}]40\% was applied on the estimate that this symbol would apply to students who participated in the course but still failed
+            \item[\textsuperscript{3}]49\% was applied on the estimate that this is a `good' fail, in that the UF classification applies to borderline fails
+            \item[\textsuperscript{4}]45\% was applied on the estimate that UP is the 'worst' pass, in that from a strictly grade perspective, these students technically failed
+        \end{tablenotes}
+    \end{threeparttable}
+\end{table}

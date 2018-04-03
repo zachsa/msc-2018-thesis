@@ -82,4 +82,8 @@ As such, in terms of retrieving processed datasets useful for analysis, for each
 
 In terms of the MapReduce tasks, only built-in reduce functions are used; these functions (\_sum, \_count and \_stats) are implemented within the main Erlang process. This offers a performance boost over custom reduce functions since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is avoided. Working on a Windows machine, the IO cost is apparently exaggerated due to the difference between Unix-based and Windows kernel implementations \cite{slack1Nov}.
 
-During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{performance-analysis}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
+During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{tbl-metadata}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
+
+\input{5-analysis/tables/tbl-metadata}
+\input{5-analysis/tables/tbl-normalize-grades}
+\input{5-analysis/tables/tbl-normalize-benchmarks}
