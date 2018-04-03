@@ -5,3 +5,4 @@
 10. Map/map List/list capitalization
 11. move tables into sensible locations
 12. Finish listfn-correlation-events
+13. Move stats equations in analysis to intro
