@@ -9,6 +9,28 @@ CouchDB's MapReduce implementation is limiting in terms of performing \textit{jo
 
 With CouchDB's means of data retrieval seemingly crippled compared to SQL, it is necessary to keep in mind CouchDB's benefits (as discussed previously) compared to such databases to stay in good humor! In conjunction with external tools such as the nETL software, however, \textit{joins} and \textit{selections} can be implemented with relative ease.
 
+Although the MapReduce function fills the important role of aggregating entities prior to joining them (as discussed in 3-way join section), it is technically possible to join documents directly on retrieval from the main database file since both the main database file and derived indexes are structured as B+trees and can be sorted. However there are three problems with retrieving data directly from the main database file and skipping index creation:
+
+\begin{itemize}
+    \item CouchDB database files are sorted by the ``\_id'' field, which when unspecified on document insert is initialized as a UUID. Using UUIDs as unique document identifiers allow for distributed systems in which cluster nodes can operate independently of each other without the possibility of documents being created in separate nodes with conflicting IDs. Even though not required by this project, such best practices are followed. A B+tree sorted by a UUID is not useful for document retrieval, and as such, views are required of the underlying data store for any kind of index-based querying
+    \item List functions are invoked via an HTTP GET request with the requirement of specifying a view within the URI. List functions are convenient for usage in this project as they facilitate ordered, iterative, range-based access (meaning that datum can be accessed sequentially, in isolation and in reliable order)
+    \item When aggregations of specific entities are required, retrieving data directly from these indexes is vastly easier than having to aggregate during data retrieval. As aggregation logic becomes more complicated the difficulty of such direct data retrieval increases and the benefit of using indexes increases as a result
+\end{itemize}
+
+As such, in terms of retrieving processed datasets useful for analysis, for each analysis the nETL and CouchDB applications are incorporated into an workflow represented by the following steps:
+
+\begin{itemize}
+    \item CSVs are parsed, rows filtered (selection) and data loaded into CouchDB by the nETL application
+    \item An index is created from the CouchDB database via MapReduce
+    \item Data is retrieved directly from the index file using a List function, during which time any required joining and statistical calculations are performed
+\end{itemize}
+
+In terms of the MapReduce tasks, only built-in reduce functions are used; these functions (\_sum, \_count and \_stats) are implemented within the main Erlang process. This offers a performance boost over custom reduce functions since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is avoided. Working on a Windows machine, the IO cost is apparently exaggerated due to the difference between Unix-based and Windows kernel implementations \cite{slack1Nov}.
+
+Metrics of the different components of the system are recorded and are shown in Table \ref{tbl-metadata}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
+
+\input{5-analysis/tables/tbl-metadata}
+
 \section{Joining Data}
 The three datasets used in this project require joining on the StudentID field. This field appears once for every student in the benchmarks data, several times for each student in the grades data and up to thousands of times per student in the events data. Both the grade and event data contain a field for year - i.e. the year in which a grade was obtained or the year in which an event was registered. As such these two datasets require joining on both the StudentID and Year fields. Benchmark data is only collected once per student enrollment, and as such is associated with grade and event data only by StudentID. To describe the join in terms of SQL, an \textit{INNER JOIN} is performed on the grades/events data, and the resultant dataset is joined to benchmark data via a \textit{LEFT OUTER JOIN}.
 
@@ -63,27 +85,4 @@ To allow for dynamic filtering, and to improved index-calculation efficiency, se
 
 \input{5-analysis/figures/fig-dynamic-filter-example}
 
-\section{Analysis Workflow}
-Although the MapReduce function fills the important role of aggregating entities prior to joining them (as discussed in 3-way join section), it is technically possible to join documents directly on retrieval from the main database file since both the main database file and derived indexes are structured as B+trees and can be sorted. However there are three problems with retrieving data directly from the main database file and skipping index creation:
-
-\begin{itemize}
-    \item CouchDB database files are sorted by the ``\_id'' field, which when unspecified on document insert is initialized as a UUID. Using UUIDs as unique document identifiers allow for distributed systems in which cluster nodes can operate independently of each other without the possibility of documents being created in separate nodes with conflicting IDs. Even though not required by this project, such best practices are followed. A B+tree sorted by a UUID is not useful for document retrieval, and as such, views are required of the underlying data store for any kind of index-based querying
-    \item List functions are invoked via an HTTP GET request with the requirement of specifying a view within the URI. List functions are convenient for usage in this project as they facilitate ordered, iterative, range-based access (meaning that datum can be accessed sequentially, in isolation and in reliable order)
-    \item When aggregations of specific entities are required, retrieving data directly from these indexes is vastly easier than having to aggregate during data retrieval. As aggregation logic becomes more complicated the difficulty of such direct data retrieval increases and the benefit of using indexes increases as a result
-\end{itemize}
-
-As such, in terms of retrieving processed datasets useful for analysis, for each analysis the nETL and CouchDB applications are incorporated into an workflow represented by the following steps:
-
-\begin{itemize}
-    \item CSVs are parsed, rows filtered (selection) and data loaded into CouchDB by the nETL application
-    \item An index is created from the CouchDB database via MapReduce
-    \item Data is retrieved directly from the index file using a List function, during which time any required joining is performed
-\end{itemize}
-
-In terms of the MapReduce tasks, only built-in reduce functions are used; these functions (\_sum, \_count and \_stats) are implemented within the main Erlang process. This offers a performance boost over custom reduce functions since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is avoided. Working on a Windows machine, the IO cost is apparently exaggerated due to the difference between Unix-based and Windows kernel implementations \cite{slack1Nov}.
-
-During analysis, runtime results of the different components of the system are recorded and are shown in Table \ref{tbl-metadata}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
-
-\input{5-analysis/tables/tbl-metadata}
-\input{5-analysis/tables/tbl-normalize-grades}
-\input{5-analysis/tables/tbl-normalize-benchmarks}
+\section{Stats calculations}

@@ -1,5 +1,5 @@
 \section{Sakai Usage / \texorpdfstring{$\Delta$}{Lg} Classrank Correlation}
-Grade and event data can't be joined since the event data doesn't contain a foreign key to the grade entities. However, it is worthwhile demonstrating a means by which a correlation between Sakai usage and course; such a correlation is investigated by comparing the change in class ranking of students from course results compared to admissions benchmarking scores. This value is then tested for correlation against Sakai usage for a given year, measured by presence events.
+The correlation between CSC1015F course grades and Sakai usage is tested by investigating the correlation between the change in student's CSC1015F ranking compared to benchmarked ranking, and the count of each student's presense events (measured as logins to the Sakai system). The rationale is that the more often students log into Sakai, the more they are using it. This analysis tests if there is a correlation between greater usage of the Sakai system and improved academic performance.
 
 \subsection{ETL}
 Using nETL, rows are extracted from the three CSV files (\textit{Admissions (2014 - 2016).csv}, \textit{Grades (2014 - 2016).csv} and \textit{Events (2016).csv}) independently of each other and concurrently, in batches of 5 000, 10 000 and 30 000 rows respectively.
@@ -10,29 +10,23 @@ The events data contains a field \textit{ref}, which is a long string and is not
 
 \input{5-analysis/figures/fig-json-event}
 
-\subsection{MapReduce}
+\subsection{Index Calculation}
 Since a single student may be associated with many rows in the Event data (sometimes even thousands of rows), a reduce function is used within the MapReduce job to aggregate the Events rows into a single document that is a count of Sakai presence events for first and second semester, with the output of this aggregation included in the index along with grade and benchmark data when reduce = true. The index consists of key:value pairs of student numbers associated a tuple that contains values for grades, benchmarks, and event information.
 
-Each document passed to the map function is treated according to the logic shown in the activity diagram in Figure \ref{fig-mapfn-correlation-events}. Logical handling of the Grade and Benchmark entities is discussed previously. If the document is a line of the Events entity then the date of the event is categorized as either having occurred in semester 1 or semester 2. A key of [Student ID, 0, Year] is emitted along with the tuple [S1, S2]. The S1, and S2 (semester) variables are 0 by default, and depending on the date of the presence event, one of these variables is altered to be `1'.
+During map function execution, logical handling of the Grade and Benchmark entities is discussed previously. If the document is a line of the Events entity then the date of the event is categorized as either having occurred in semester 1 or semester 2. A key of [Student ID, 0, Year] is emitted along with the tuple [S1, S2]. The S1, and S2 (semester) variables are 0 by default, and depending on the date of the presence event, one of these variables is altered to be `1'. Logic of the map function is shown in Figure \ref{fig-mapfn-correlation-events}.
 
 Using the \_sum reduce function, an aggregation is done across all documents with the same key; this means that per a student, an aggregation is performed on a single Grade document, a single Benchmark document, and many Events documents in which the S1 and S2 variables are summed to form the tuple [sum of S1, sum of S2]. The key emitted for each type of entity is designed so that the view-index is ordered by StudentID. For each student number, documents are ordered by the second key (course), which means that Benchmarks and Events entities are sorted to be before grades for a student; and the \nth{3} component of each key results in benchmark data always being before Events documents. As such, during view-index retrieval it can be taken as given that for a single student ID, first documents of type Benchmark will be retrieved, followed by documents of type Event, followed by documents of type Grade.
 
 \input{5-analysis/figures/fig-mapfn-correlation-events}
 
-\subsection{List Function}
-The List function is invoked via an HTTP request to the URI: \url{https://localhost:5984/msc/\_design/3-way-join/\_list/3-way-join-list/3-way-join-view?reduce=true}. On execution the list function executes the ``provides'' function, in which output type of ``CSV'' (plain text) is specified as as download file. List function logic as shown in Figure \ref{fig-listfn-correlation-events} is executed in the callback passed as a parameter to the ``provides'' function.
+\subsection{Index Retrieval}
+The list function is invoked to retrieve the index with reduction and grouping set to true so that only reduced index output is retrieved; the variables `currentStudent', `currentYear', and `currentLine' are set to null.
 
-On initial invocation and within the body of the callback, the variables `currentStudent', `currentYear', and `currentLine' are set to null. Following this an iteration over the index is initiated with the loop control the result of a call to \mintinline{text}{getRow()} function. \mintinline{text}{getRow()} returns a row - a reduced result; in the URI the parameter ``reduce'' is set to true, so ONLY reduced output is retrieved from the view (technically, for any data sets that are not extremely small reduced output is actually the result of \textit{rereduction}). Similarly to List function logic for the 2-way join, after the loop invariant becomes false the last line is still in memory and is sent if necessary.
+Because the ranking of students for course grade and each benchmarking method is required, several ordered lists are kept in memory for the the duration that a single course grade is being processed (in this case CSC1015F). In other words, for each course code, and then for every result retrieved from the index, the StudentID of the row being processed is checked and compared to the StudentID of the previous row. If the current StudentID is not the same as the previous StudentID, then the join of grade, admission, and event data is performed. The joined data comprises an object with student numbers as keys and referencing sub-objects that include properties for grade and each benchmark.
 
-For every result retrieved from the reduce output , the StudentID of the row being processed is checked and compared to the StudentID of the previous row. If the current StudentID is not the same as the previous StudentID, a line of the CSV is emitted before the row is processed. Then, the type of result being processed is checked (either the document is of type ``benchmark'', ``event'' or ``grade''), and depending on the type different values are stored in a variable called ``currentLine''. For every StudentID, all types of documents are processed in turn (first the benchmark documents, then the event documents, then the grade documents) before being emitted. This allows the join to be performed via sequentially adding to the ``currentLine'' variable for a single student.
+Once all rows from all entities for a particular course are processed, the joined data is iterated over the ranking change of each student (course \% - benchmark \%) is worked out. During this iterative step, several running totals of various summations are collected. These summations are used to calculate the correlation between class rank change and Sakai usage.
 
-As as result of the MapReduce function, for every StudentID, exactly one ``benchmark'' result 0 or more events and one grade is processed. For every Event row processed both the first and second semester event count are exported to the CSV despite that only the first semester events are used, since there is negligible performance cost in terms of processing time or storage space and so there is little incentive to discard good data.
-
-Sending \mintinline{text}{currentLine} is done similarly to the 2-way join except that the subroutine first checks that the currentLine variable contains data from the Grades and Benchmarks and Events entities.
+The list function is configured to output a table of correlation coefficients for each benchmarking method as shown in Table \ref{tbl-correlation-events} (but in HTML format). List function logic is represented as an activity diagram in Figure \ref{fig-listfn-correlation-events}.
 
 \input{5-analysis/figures/fig-listfn-correlation-events}
-
-\subsection{Output}
-See \ref{tbl-correlation-events}.
-
 \input{5-analysis/tables/tbl-correlation-events}

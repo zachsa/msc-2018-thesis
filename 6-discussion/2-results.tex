@@ -7,6 +7,9 @@ Because none of the students have grades for the ``G 12 Mth Lit'' and ``G12 Mth 
 todo
 
 \section{LMS Usage}
+Because the event data doesn't contain a foreign key to the grade entities, it is only possible assess the count of presence events for all sites in relation to the CSC1015F site. This isn't particularly useful, and perhaps is the main reason that correlation is so low. However this analysis is useful in demonstrating how such a correlation can be performed using CouchDB making such an analysis somewhat worthwhile.
+
+
 There is very little correlation between change in class ranking (Benchmark ranking - Grade ranking) and a student's Sakai presence event count.
 
 Taking the NBT QL benchmark as an example (which has a comparatively high correlation with course grades compared to other benchmarks), the \( \delta \) class rank of benchmark score vs grade score is plotted against presence event count of each student in \ref{fig-delta-rank} for a visual feel of how the correlation analysis plots. The correlation between course grades (for CSC1015F) and LMS usage is relatively insignificant according to these results.

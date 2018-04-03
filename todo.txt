@@ -1,9 +1,7 @@
 1. include additional info in chapter 2
-3. Variance
 4. change benchmarks to 'admissions'
 5. data types should be lower cased
 7. search and assess \textit brackets
-8. captions moved to body, and just bold left
-9. replace \texttt with \textit{}
 10. Map/map List/list capitalization
 11. move tables into sensible locations
+12. Finish listfn-correlation-events

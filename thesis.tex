@@ -151,6 +151,17 @@
 \author{Zach Smith}
 \date{\today}
 
+% Chapters without heading
+\makeatletter
+\newcommand{\unchapter}[1]{%
+  \begingroup
+  \let\@makechapterhead\@gobble % make \@makechapterhead do nothing
+  \chapter{#1}
+  \endgroup
+}
+\makeatother
+
+
 % Document
 \begin{document}
 \emergencystretch 2em
@@ -215,18 +226,11 @@
 \printbibliography[title=References]
 
 % Appendix
-% \begin{appendices}
-%     \chapter{nETL}
-%     \input{appendix/netl}
-%     \input{appendix/netl-configurations}
-%     \chapter{CouchDB}
-%     \input{appendix/couchdb}
-%     \chapter{Unit Tests}
-%     \label{unit-tests}
-%     \input{appendix/tests}
-%     \chapter{Logs}
-%     \input{appendix/logs}
-% \end{appendices}
+\begin{appendices}
+    \unchapter{Additional Tables}
+    \input{appendix/tbl-normalize-grades}
+    \input{appendix/tbl-normalize-admissions}
+\end{appendices}
 
 % Close docuemnt
 \end{document}
