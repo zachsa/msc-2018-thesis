@@ -1,5 +1,5 @@
 \section{Testing}
-To check the accuracy of the results in the context of the source data, unit tests were used for testing of the nETL application components as well as the Map and List functions. In addition, a small sample of the data was processed equivalently to the analysis procedures as described above for manually testing the the accuracy of the output CSV (and ensure that the unit tests themselves are working as expected). Unit tests are written using the open source JavaScript \textit{Mocha} testing framework \cite{mochaTest}.
+To check the accuracy of the statistacal measurements in the context of the source data, unit tests were used for testing of the nETL application components as well as the Map and List functions. In addition, a small sample of the data was processed equivalently to the analysis procedures as described above for manually testing the the accuracy of the output CSV (and ensure that the unit tests themselves are working as expected). Unit tests are written using the open source JavaScript \textit{Mocha} testing framework \cite{mochaTest}.
 
 \subsection{nETL Unit Tests}
 The basic premise of the ETL process is that the lines are extracted from CSVs and loaded into CouchDB reliably. Assertions are used to ensure that each nETL module (the extraction module, the transformation modules, and the loading module) perform as expected. No integration tests are performed except by manually checking that the test data is loaded into CouchDB in the anticipated format - which is indeed the case.
@@ -10,7 +10,7 @@ The process of converting text lines to objects requires extensive test coverage
 
 Tests that demonstrate correctness of nETL's CouchDB-loading module consist of a single unit test that inserts 3 documents into CouchDB using the the \_bulk\_docs API via a single API call, ensuring that the database exists, that permissions are correct, that network connectivity is available, etc.
 
-\subsection{Manual Map \&List Function Tests}
+\subsection{Manual Map \& List Function Tests}
 Manually testing each of the processes described in Chapter \ref{chapter-analysis} was done using small dummy datasets with just 5 IDs. Based on this datset, the MapReduce output as shown in Figure \ref{fig-test-map-output} (i.e. the CouchDB view output) is as expected:
 
 \begin{itemize}
