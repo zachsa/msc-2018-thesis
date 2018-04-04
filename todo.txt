@@ -6,3 +6,8 @@
 11. move tables into sensible locations
 12. Finish listfn-correlation-events
 13. Move stats equations in analysis to intro
+
+
+
+
+… using student admissions data to test different methods of ‘profiling’ students – profiling is conducted via using a series of benchmarks (matric & NBT scores and combinations of these), and then the different benchmarks are assessed in how accurately they can be used to profile students coming into CSC1015F in terms of the mark they are likely to achieve.

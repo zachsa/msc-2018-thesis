@@ -1,0 +1,22 @@
+\begin{figure}[H]
+  \centering
+  \begin{mdframed}[rightline=true,leftline=true]
+    \begin{minted}{text}
+while (!batch.done) {
+    values = batch.value;
+    payload = await values.reduce(async(previousResults, item) => {
+        const results = await previousResults;
+        await asyncForEach(transformations, async(t) => {
+            item = await t.invoke.call(t, item);
+        });
+        if (item !== {} && item) results.push(item);
+        return results;
+    }, []);
+    loadResult = await load.invoke(payload);
+    batch = batches.next();
+};
+    \end{minted}
+  \end{mdframed}
+  \caption[Serializing asynchronous operations]{\textbf{Figure \ref{fig-engine}: Loop with serialized asynchronous operations}}
+  \label{fig-engine}
+\end{figure}
