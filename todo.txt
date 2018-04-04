@@ -7,7 +7,27 @@
 12. Finish listfn-correlation-events
 13. Move stats equations in analysis to intro
 
+I will fill in the blank table (netl times, couchdb footprint, etc) tomorrow by taking an everage of 3 instances of each operations
+
+
+
+Did you compare the correlations, variances and std deviations with a relational database result, or with Excel, or on a small dataset with manual calculations?
+
+
+
+How do i find sigma
+ => for every document that is processed i take an x times y value. and then I add that to the sum of all previous xy values
+
 
 
 
 … using student admissions data to test different methods of ‘profiling’ students – profiling is conducted via using a series of benchmarks (matric & NBT scores and combinations of these), and then the different benchmarks are assessed in how accurately they can be used to profile students coming into CSC1015F in terms of the mark they are likely to achieve.
+
+
+
+\section{Selecting Data}
+This section is confusing select with join, because what you are calling "dynamically" is actually "requiring a join". A pure select just applies a predicate/condition to every tuple to filter the data, and it is irrelevant where the values in that predicate come from.  The selects you wanted for your UCT data analysis happened to require a predicate with values from other data. How would select work if you were e.g. selecting all grades where course like "CSC%" (or where course like "???3????"  i.e. 3rd year courses at UCT, that type of thing)? You would use CouchDB to create an index on a "key" field i.e. on the field of the object that is likely to be queried, such as courseCode, and then CouchDB takes a lot of time to create the index but is quick to update it and quick to answer any queries with courseCode as the predicate. You should mention this here instead, so 5.2 need rewriting. What you implemented wrt join was where keys are equal, you could also say here that joins on conditions other than equality (e.g. find student math marks for those who did better in MAM1000W than in matric math) would just require coding the map and reduce accordingly (e.g. the map discards grades for other subjects in its output, and the reduce discards students where the MAM1000W mark isn't greater).
+
++ 
+
+rewrite bit about dynamic filtering with figure
