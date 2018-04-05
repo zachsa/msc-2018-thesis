@@ -3,9 +3,6 @@
 5. data types should be lower cased
 7. search and assess \textit brackets
 10. Map/map List/list capitalization
-11. move tables into sensible locations
-12. Finish listfn-correlation-events
-13. Move stats equations in analysis to intro
 
 I will fill in the blank table (netl times, couchdb footprint, etc) tomorrow by taking an everage of 3 instances of each operations
 
