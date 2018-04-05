@@ -33,7 +33,7 @@ After transforming lines (strings) into lines (objects), additional transformati
 
 \begin{itemize}
     \item \textbf{Selection-filter:} Entire objects can be whitelisted based on properties and allowed values for those properties.
-    \item \textbf{Join-selection-filter:} A list of attributes and values can be retrieved from a \nth{3} party data source (for example from a CouchDB index), and entire objects can be whitelisted based on the retrieved attributes and allowable values for those attributes. This is similar in concept to a join
+    \item \textbf{Join-selection-filter:} A list of attributes and values can be retrieved from a \nth{3} party data source (for example from a CouchDB index), and entire objects can be whitelisted based on the retrieved attributes and allowable values for those attributes. This is similar in concept to a join, although no means of actually joining documents is provided (i.e. creating attributes based on data retrieved from a \nth{3} party data source instead of applying selection - although this would be a fairly easy feature to implement).
     \item \textbf{Projection-filter:} Unneeded attributes can be removed from objects prior to loading into database/other destinations
     \item \textbf{Projection-append-attributes:} Additional attributes can be added to objects - i.e. a \textit{type\_} attribute can be added, along with a value as specified by configuration
 \end{itemize}

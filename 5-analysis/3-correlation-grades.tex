@@ -20,24 +20,17 @@ Because a student should only be represented by a single row in the admissions d
 \input{5-analysis/figures/fig-mapfn-correlation-grades}
 
 \subsection{Index Retrieval}
-The join of admissions and grade data is performed during index retrieval via a CouchDB list function.
+A list function is used for data retrieval; this function scans the index iteratively (i.e. documents for each student are processed iteratively; first a student's demographic document is processed, then a student's grades documents are processed). The 2-way join is achieved in this way; for every student number the grade and admissions data is joined, and summations of various fields of the grades and each benchmark are updated. For example, for every index key:value processed the product of \mintinline{text}{CSC1015F \% x each benchmark \%} is calculated and added to running sums kept for each benchmark.
 
-On invocation the CoucDB list function opens and scans the index iteratively processing each document (i.e. iteratively processing each student; first a student's demographic document is processed, then a student's grades documents are processed). The 2-way join is achieved in this way; for every student number the grade and admissions data is joined, and summations of various fields of the grades and each benchmark are updated. Once the iteration over student numbers is finished, the summations are used to calculate correlation coefficients for each grade/benchmarking method combination according to the formula\footnote{\textit{x}: grade \%, \textit{y}: benchmark (\textit{r} is calculated for multiple \textit{y} values)}: \begin{spreadlines}{15pt}
-    \begin{gather*}
-        \intertext{\textit{Pearson Correlation Coefficient:}}
-        r = \frac{N\sum{xy} - (\sum{x})(\sum{y})}{\sqrt{[N\sum{x^2} - (\sum{x})^2][N\sum{y^2} - (\sum{y})^2]}}
-    \end{gather*}
-\end{spreadlines}
+Once the iteration over student numbers is finished, the completed summations are used to calculate correlation coefficients for each grade/benchmarking method combination according to the Equation \ref{eq:correlation}\footnote{\textit{x}: grade \%, \textit{y}: benchmark (\textit{r} is calculated for multiple \textit{y} values)}.
 
-Although the \_stats reduce function calculates \textit{sum of squares} per dataset, this is not useful in the case where individual rows from separate entities should be joined (such as in this 2-way join). For example, in reference to working out the numerator as provided in the correlation formula: \begin{spreadlines}{15pt}
-    \begin{gather*}
-        N\sum{xy} - (\sum{x})(\sum{y})
-    \end{gather*}
-\end{spreadlines}
-
+Although the \_stats reduce function calculates \textit{sum of squares} per dataset, this is not useful in the case where individual rows from separate entities should be joined (such as in this 2-way join). For example, in reference to working out the numerator as provided in the correlation formula:
+\begin{align}
+    N\sum{xy} - (\sum{x})(\sum{y})
+\end{align}
 Using CouchDB's \_stats function only the $\sum{x}$ and $\sum{y}$ values are accessible when joining the two entities during list function execution, and not $x$ and $y$ values (similarly, the denominator of the formula could also not be calculated from \_stats function output).
 
-The list function is configured to output a table of correlation coefficients for each benchmarking method as shown in Table \ref{tbl-correlation-grades} (but in HTML format). List function logic is represented by the activity diagram in Figure \ref{fig-listfn-correlation-grades}.
+List function logic is represented as an activity diagram in Figure \ref{fig-listfn-correlation-grades}, and is configured to output a table of correlation coefficients for each benchmarking method as shown in Table \ref{tbl-correlation-grades}.
 
 \input{5-analysis/figures/fig-listfn-correlation-grades}
 \input{5-analysis/tables/tbl-correlation-grades}

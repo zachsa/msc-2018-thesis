@@ -20,13 +20,15 @@ Using the \_sum reduce function, an aggregation is done across all documents wit
 \input{5-analysis/figures/fig-mapfn-correlation-events}
 
 \subsection{Index Retrieval}
-The list function is invoked to retrieve the index with reduction and grouping set to true so that only reduced index output is retrieved; the variables `currentStudent', `currentYear', and `currentLine' are set to null.
+A list function implemented to retrieve the index with \mintinline{text}{reduce = true \& group = true} so that only reduced index output is retrieved, grouped by key.
 
-Because the ranking of students for course grade and each benchmarking method is required, several ordered lists are kept in memory for the the duration that a single course grade is being processed (in this case CSC1015F). In other words, for each course code, and then for every result retrieved from the index, the StudentID of the row being processed is checked and compared to the StudentID of the previous row. If the current StudentID is not the same as the previous StudentID, then the join of grade, admission, and event data is performed. The joined data comprises an object with student numbers as keys and referencing sub-objects that include properties for grade and each benchmark.
+Because the ranking of students for course grade and each benchmarking method is required, several ordered lists are kept in memory for the duration of a single course code is being processed (in this case CSC1015F). In other words, for each course code, and then for every result retrieved from the index, the student number of the row being processed is checked and compared to the student number of the previous row. If the current student number is not the same as the previous student number, then the current rows in memory are joined, list of ranks for each course and benchmark are updated. It is necessary to process all a index output for a particular course code before students can be ranked for a course (as well be ranked in terms of their benchmark placing compared to other students who took that course).
 
-Once all rows from all entities for a particular course are processed, the joined data is iterated over the ranking change of each student (course \% - benchmark \%) is worked out. During this iterative step, several running totals of various summations are collected. These summations are used to calculate the correlation between class rank change and Sakai usage.
+As joins are performed, an object is kept in memory for each student that keeps track of their course grade and scores for each benchmark. Once a single courses results have been iterated over, ranking lists are created that comprise tuples of [StudentId, \%] and are ordered by the second index ($i = 1$). The object of students is updated to add a delta value for (course \% - benchmark \%) (there is a delta value for each benchmark).
 
-The list function is configured to output a table of correlation coefficients for each benchmarking method as shown in Table \ref{tbl-correlation-events} (but in HTML format). List function logic is represented as an activity diagram in Figure \ref{fig-listfn-correlation-events}.
+Then, by iterating over the student object it is possible to perform the summations stipulated in Equation \ref{eq:correlation}, and the correlation between $\Delta$ class rank and events count is found (a separate correlation corresponding to each benchmark is obtained).
+
+List function logic is represented as an activity diagram in Figure \ref{fig-listfn-correlation-events}, and is configured to output a table of correlation coefficients for each benchmarking method as shown in Table \ref{tbl-correlation-events}.
 
 \input{5-analysis/figures/fig-listfn-correlation-events}
 \input{5-analysis/tables/tbl-correlation-events}
