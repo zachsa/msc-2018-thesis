@@ -9,10 +9,10 @@ With special thanks to data owners Jane Hendry (UCT's CIO) and Stephen Marquard 
 All three datasets were received as CSV exports with student IDs anonymized prior to receiving them. Anonymization was consistent across all three datasets, preserving the association of particular students across the admissions, grades and events datasets.
 
 \section{Grades}
-CSV exports received for course grade data for the years 2014, 2015 and 2016 are consistent across all three years in terms of the fields and the ordering of these fields - the only structural difference is that the 2014 CSV is tab-delimited instead of comma delimited. Using Microsoft Excel the three files were combined into a single CSV, which is described in Table \ref{tbl-data-grades}; separate CSV files could just as easily be used, but at no benefit to this analysis (and it is easier to work with a single CSV file of grades than several grades CSV files). A sample of the combined CSV file is shown in Figure \ref{fig-grades-csv-sample}.
+CSV exports received for course grade data for the years 2014, 2015 and 2016 are consistent across all three years in terms of the fields and the ordering of these fields - the only structural difference is that the 2014 CSV is tab-delimited instead of comma delimited. Using Microsoft Excel the three files were combined into a single CSV, which is described in Table \ref{tbl-data-grades}; separate CSV files could just as easily be used, but at no benefit to this analysis (and it is easier to work with a single CSV file of grades than several grades CSV files). A sample of the combined CSV file is shown in Figure \ref{fig-sample-grades}.
 
-\input{3-data/tables/grades}
-\input{3-data/figures/fig-grades-csv-sample}
+\input{3-data/tables/tbl-data-grades}
+\input{3-data/figures/fig-sample-grades}
 
 \section{Admissions}
 CSV exports received for student admissions data for the the 2014, 2015 and 2016 student cohorts. The fields in these CSVs are not consistent across all three years; certain fields are capitalized differently, fields are ordered differently from year to year. Additionally, the 2014 and 2015 CSV files contain fields that show student's UCT academic performance for years subsequent to each student's initial registration. For example, benchmarks data from 2014 includes academic performance for the years 2015/2016, and the 2015 benchmarks data includes academic performance for the year 2016 - resulting in many repeating fields and variable row lengths.
@@ -28,13 +28,13 @@ For automated CSV exports, it is reasonable to expect that there are no repeated
     \item Compile all the admissions data into a single CSV (for ease of use)
 \end{itemize}
 
-The single, processed admissions CSV file contains an anonymized list of students that enrolled at UCT in 2014, 2015, and 2016 as well as these students matric results and NBT test scores. The CSV file is described in Table \ref{tbl-data-benchmarks} in terms of field names, a description of these fields and each field's data type. A sample of the file is shown in Figure \ref{fig-benchmarks-csv-sample}.
+The single, processed admissions CSV file contains an anonymized list of students that enrolled at UCT in 2014, 2015, and 2016 as well as these students matric results and NBT test scores. The CSV file is described in Table \ref{tbl-data-admissions} in terms of field names, a description of these fields and each field's data type. A sample of the file is shown in Figure \ref{fig-sample-admissions}.
 
-\input{3-data/tables/benchmarks}
-\input{3-data/figures/fig-benchmarks-csv-sample}
+\input{3-data/tables/tbl-data-admissions}
+\input{3-data/figures/fig-sample-admissions}
 
 \section{Events}
-The CSV export received for Events data is for 2016, with a description of the fields shown in Table \ref{tbl-data-events}. The Events CSV export cannot be opened using Microsoft Excel due to its large size (\textgreater 5GB). This CSV contains no header rows, and information on the headers had to be obtained separately. A small sample of the CSV was taken using a BASH terminal - the \mintinline{text}{head -n 100 <file.csv>} will show the first 100 lines of a CSV. A sample of this CSV file is shown in Figure \ref{fig-events-csv-sample}.
+The CSV export received for Events data is for 2016, with a description of the fields shown in Table \ref{tbl-data-events}. The Events CSV export cannot be opened using Microsoft Excel due to its large size (\textgreater 5GB). This CSV contains no header rows, and information on the headers had to be obtained separately. A small sample of the CSV was taken using a BASH terminal - the \mintinline{text}{head -n 100 <file.csv>} will show the first 100 lines of a CSV. A sample of this CSV file is shown in Figure \ref{fig-sample-events}.
 
-\input{3-data/tables/events}
-\input{3-data/figures/fig-events-csv-sample}
+\input{3-data/tables/tbl-data-events}
+\input{3-data/figures/fig-sample-events}

@@ -169,7 +169,6 @@
 }
 \makeatother
 
-
 % Document
 \begin{document}
 \emergencystretch 2em
@@ -191,12 +190,15 @@
 \newpage
 
 %  TOC
+\let\origaddvspace\addvspace
+\renewcommand{\addvspace}[1]{}
 \tableofcontents
 \newpage
 \listoffigures
 \newpage
 \listoftables
 \newpage
+\renewcommand{\addvspace}[1]{\origaddvspace{#1}}
 
 % Content
 \chapter{Introduction}
