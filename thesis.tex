@@ -59,6 +59,16 @@
 \usepackage{amsmath}
 \usepackage{mathtools}
 
+% Make footnotes low on page
+\usepackage[bottom]{footmisc}
+
+% Create join symbols
+\def\ojoin{\setbox0=\hbox{$\bowtie$}%
+  \rule[-.02ex]{.25em}{.4pt}\llap{\rule[\ht0]{.25em}{.4pt}}}
+\def\leftouterjoin{\mathbin{\ojoin\mkern-5.8mu\bowtie}}
+\def\rightouterjoin{\mathbin{\bowtie\mkern-5.8mu\ojoin}}
+\def\fullouterjoin{\mathbin{\ojoin\mkern-5.8mu\bowtie\mkern-5.8mu\ojoin}}
+
 % Remove spacing above \chapter head
 \makeatletter
 \patchcmd{\@makechapterhead}{\vspace*{50\p@}}{}{}{}
@@ -73,8 +83,6 @@
 \setstretch{1.5}
 \setlength{\parindent}{0em}
 
-% Make footnotes low on page
-\usepackage[bottom]{footmisc}
 
 % Set hyperref defaults
 \hypersetup{
