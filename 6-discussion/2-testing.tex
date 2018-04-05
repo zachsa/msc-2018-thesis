@@ -9,7 +9,7 @@ Tests relating to CSV-line extraction assert that all lines from the CSV are ext
 Tests that demonstrate correctness of nETL's CouchDB-loading module consist of a single unit test that inserts 3 documents into CouchDB using the the \_bulk\_docs API via a single API call, ensuring that the database exists, that permissions are correct, that network connectivity is available, etc.
 
 \subsection{Manual Map \& List Function Tests}
-Manually testing each of the processes described in Chapter \ref{chapter-analysis} was done using small dummy datasets with just 5 IDs. Based on this dataset, the MapReduce output as shown in Figure \ref{fig-test-map-output} (i.e. the CouchDB view output) is as expected:
+Manually testing each of the processes described in Chapter \ref{chapter-analysis} was done using small dummy datasets with just 5 IDs. Based on this dataset, the MapReduce output of test data is as expected:
 
 \begin{itemize}
   \item Correlation between Grades and admissions benchmarks
@@ -28,11 +28,7 @@ Manually testing each of the processes described in Chapter \ref{chapter-analysi
         \end{itemize}
 \end{itemize}
 
-List function output of these views is shown in Figure \ref{fig-test-list-output} and shows that rows are joined correctly for both correlation analysis of grades (A) and event/$\Delta classrank$ (B). One particular case worth testing is that when MapReduce output includes benchmarks and event counts, but no grade documents for a student, the List output does not include that student. This case often occurs when a student's took CSC1015F in a year other than 2016, and that students event data includes usage for courses other than CSC1015F in 2016.
-
-\newpage
-\input{6-discussion/figures/fig-test-map-output}
-\input{6-discussion/figures/fig-test-list-output}
+List function output of the test data shows that rows are joined correctly for both correlation analysis of grades (A) and event/$\Delta classrank$ (B). One particular case worth testing is that when MapReduce output includes benchmarks and event counts, but no grade documents for a student, the List output does not include that student. This case often occurs when a student's took CSC1015F in a year other than 2016, and that students event data includes usage for courses other than CSC1015F in 2016.
 
 \subsection{Map \& List Function Unit Tests}
 Unit testing the Map and List function code is a more involved, complicated process than testing the nETL components since the Map and List functions as structured for usage by the python-couchapp tool don't conform to valid JavaScript syntax and additionally invoke other functions provided by the CouchDB runtime environment. Unit testing these functions required loading List/Map function code as strings from their respective files and inserting the strings into the testing runtime environment via runtime evaluation (using the \mintinline{text}{eval(`var mapFn = ${mapFnStr}; var lstFn = ${lstFnStr};`)}). Function stubs for the \mintinline{text}{emit()}, \mintinline{text}{provides()}, \mintinline{text}{getRow()}, and \mintinline{text}{send()} CouchDB execution environment functions were authored - including a complicated generator-subroutine to mimic the contract of the \mintinline{text}{getRow()} function. The same sample CSVs as used for the manual Map/List function tests is used for unit testing - the documents as loaded into CouchDB via nETL are used as the source data.

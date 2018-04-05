@@ -8,9 +8,9 @@ With CouchDB's means of data retrieval seemingly crippled compared to SQL, it is
 Working with relational data in CouchDB therefore requires implementation across the entire software stack. That is, ETL processes, indexing and data retrieval processes should all be geared towards working with relational data if that is the requirement. As such, in terms of retrieving processed datasets useful for analysis, for each analysis the nETL and CouchDB applications are incorporated into an workflow represented by the following steps:
 
 \begin{itemize}
-    \item CSVs are parsed, rows filtered (selection) and data loaded into CouchDB by the nETL application
-    \item An index is created from the CouchDB database via MapReduce
-    \item Data is retrieved directly from the index file using a List function, during which time any required joining and statistical calculations are performed
+  \item CSVs are parsed, rows filtered (selection) and data loaded into CouchDB by the nETL application
+  \item An index is created from the CouchDB database via MapReduce
+  \item Data is retrieved directly from the index file using a List function, during which time any required joining and statistical calculations are performed
 \end{itemize}
 
 In terms of the MapReduce tasks, only built-in reduce functions are used; these functions (\_sum, \_count and \_stats) are implemented within the main Erlang process. This offers a performance boost over custom reduce functions since the IO transfer cost between the Erlang process and the view engine (couchjs.exe by default) is avoided. Working on a Windows machine, the IO cost is apparently exaggerated due to the difference between Unix-based and Windows kernel implementations \cite{slack1Nov}.
@@ -21,9 +21,9 @@ Metrics of the different components of the system are recorded and are shown in 
 
 \section{Joining Data}
 The three datasets used in this project require joining on the StudentID field. This field appears once for every student in the admissions data, several times for each student in the grades data and up to thousands of times per student in the events data. Both the grade and event data contain a field for year - i.e. the year in which a grade was obtained or the year in which an event was registered; these two datasets require joining on both the StudentID and Year fields. Admissions data is only collected once per student enrollment, so is associated with grade and event data only by StudentID. To describe the join in terms of SQL, an inner-join is performed on the grades/events data, and the resultant dataset is outer-joined to admissions data: \begin{spreadlines}{15pt}
-    \begin{gather*}
-        (grades \bowtie events) \leftouterjoin admissions
-    \end{gather*}
+  \begin{gather*}
+    (grades \bowtie events) \leftouterjoin admissions
+  \end{gather*}
 \end{spreadlines}
 
 An initial attempt was to perform a join during index creation via MapReduce; this can be achieved via configuring the map function to output identical keys across the three entities for rows that require joining, and emit a tuple of 11 values for each key; index position in the tuple indicates the value-output of specific entities. During map function execution all 11 values are instantiated as 0 (a falsy value). Each index (or group of indices) of the output tuple is reserved for a specific entity type's output and adjusted appropriately during map function execution depending on the type of document the map function is applied to (the map function executes once for every document in the database):
@@ -61,9 +61,9 @@ Because output is systematically processed one student at a time, with grades, e
 With this approach,MapReduce fills the important role of aggregating entities prior to joining them (as discussed in 3-way join section), and then outputting a sorted index - but the join is possible because the index is sorted, not because MapReduce is performed. In fact, a CouchDB database is also structured as a B+tree and so is also sorted (according to the \_id field). So it is possible to join documents directly on retrieval from the main database rather than creating an index first. However there are three problems with retrieving data directly from the main database file and skipping index creation:
 
 \begin{itemize}
-    \item CouchDB database files are sorted by the ``\_id'' field, which when unspecified on document insert is initialized as a UUID. Using UUIDs as unique document identifiers allow for distributed systems in which cluster nodes can operate independently of each other without the possibility of documents being created in separate nodes with conflicting IDs. Even though not required by this project, such best practices are followed. A B+tree sorted by a UUID is not useful for document retrieval, and as such, views are required of the underlying data store for any kind of index-based querying
-    \item List functions are invoked via an HTTP GET request with the requirement of specifying a view within the URI. List functions are convenient for usage in this project as they facilitate ordered, iterative, range-based access (meaning that datum can be accessed sequentially, in isolation and in reliable order)
-    \item When aggregations of specific entities are required, retrieving data directly from these indexes is vastly easier than having to aggregate during data retrieval. Without a reduce function, additional logic would be required during retrieval to perform such aggregations. As aggregation logic becomes more complicated the difficulty of such direct data retrieval increases and the benefit of using indexes increases as a result. Also, performing aggregation during the indexing phase instead of data retrieval greatly improves performance of data retrieval
+  \item CouchDB database files are sorted by the ``\_id'' field, which when unspecified on document insert is initialized as a UUID. Using UUIDs as unique document identifiers allow for distributed systems in which cluster nodes can operate independently of each other without the possibility of documents being created in separate nodes with conflicting IDs. Even though not required by this project, such best practices are followed. A B+tree sorted by a UUID is not useful for document retrieval, and as such, views are required of the underlying data store for any kind of index-based querying
+  \item List functions are invoked via an HTTP GET request with the requirement of specifying a view within the URI. List functions are convenient for usage in this project as they facilitate ordered, iterative, range-based access (meaning that datum can be accessed sequentially, in isolation and in reliable order)
+  \item When aggregations of specific entities are required, retrieving data directly from these indexes is vastly easier than having to aggregate during data retrieval. Without a reduce function, additional logic would be required during retrieval to perform such aggregations. As aggregation logic becomes more complicated the difficulty of such direct data retrieval increases and the benefit of using indexes increases as a result. Also, performing aggregation during the indexing phase instead of data retrieval greatly improves performance of data retrieval
 \end{itemize}
 
 \section{Selecting Data}
@@ -72,24 +72,22 @@ Performing joins via iterating over ordered indices is quite efficient in terms 
 The limitation of this approach is that the predicates can only be applied to fields of the documents being processed. It is a common use case to apply selection predicates to fields made available via first joining a dataset with another dataset. This is impossible to achieve within the context of map function execution. It is possible to apply selections that require joining data on index retrieval (as a join is performed), but this is quite inefficient in terms of the size of the required index. The events data, for example, has 44.4 million documents most of which are not required. To perform a selection on the events data during MapReduce requires iterating through through all events documents - which is expensive in terms of time. Reducing the number of documents loaded into CouchDB in the first place, makes for working with CouchDB more performant and easier. As such, where a join is required to make available fields used in a selection predicate, a join is (effectively) achieved used nETL during the ETL phase of analysis. Joins can therefore be performed by the nETL application is two ways:
 
 \begin{itemize}
-    \item Selection-based predicates can be applied to fields based on field values. More advanced predicate logic (i.e. where field values contain substrings, or where field values fall in a range, etc. - i.e. joins based on conditions other than equality) is not implemented in the current version of nETL used for this project, although it would be fairly straightforward to implement such a feature in the future. Such predicates are not used in this project, but if they were could easily be implemented in the map function (provided a join isn't first required)
-    \item Selection-based predicates based on information retrieved from a separate CouchDB index (similar in concept to a join). Such an approach is conceptually similar to how joins are performed on distributed datasets, where a list of keys on which data joins are required is acquired prior to performing database operations so as to minimize network transport costs \cite{sonia2018}.
+  \item Selection-based predicates can be applied to fields based on field values. More advanced predicate logic (i.e. where field values contain substrings, or where field values fall in a range, etc. - i.e. joins based on conditions other than equality) is not implemented in the current version of nETL used for this project, although it would be fairly straightforward to implement such a feature in the future. Such predicates are not used in this project, but if they were could easily be implemented in the map function (provided a join isn't first required)
+  \item Selection-based predicates based on information retrieved from a separate CouchDB index (similar in concept to a join). Such an approach is conceptually similar to how joins are performed on distributed datasets, where a list of keys on which data joins are required is acquired prior to performing database operations so as to minimize network transport costs \cite{sonia2018}.
 \end{itemize}
 
 When processing admissions and events CSVs a join is required to grades entities to make a course code field available for the selection predicate of only selecting student numbers associated with the CSC1015F course to be applied to. To allow for this, a database is setup housing all CSC1015F grades documents. Indices are created for this database (a database of grades) to make a list of students available in whatever format required; for admissions data: a predicate is applied based on the \textit{anonIDnew} field, for events data: a predicate is applied based on the \textit{uct\_id} field. Indices created from the grades database provide a list of student numbers for these different field names (the list of student numbers is the same).
-
-\input{5-analysis/figures/fig-dynamic-filter-example}
 
 \section{Statistical calculations}
 Because all numbers in JavaScript are 64-bit floating-point (following the IEEE 754 standard \cite{floatingPoint}), working with rational numbers with decimal points results in peculiarities compared to expectations formed from working with a base-10-framed mindset - for example, the sum: $0.1 + 0.2 = 0.30000000000000004$. Decimals such as $0.1$ and $0.2$ cannot be accurately represented in binary format within 64-bit address space (or any finite amount of memory). As such, rounding errors occur. Quantifying the margin for such errors and handling these cases correctly is difficult \cite{Goldberg1991}, so to side-step this uncertainty an open-source library (\textit{decimal.js} \cite{decimaljs}) is used to handle arithmetic via JavaScript. CouchDB allows usage of 3rd party JavaScript libraries via implementing CommonJS module loading within the context of couchjs.exe \cite{commonJsMapFn}.
 
 Numerical data is treated statistically during index retrieval, worked out using the Decimal.js library and according to well known statistical formulae as shown in Equations \ref{eq:variance} (variance), \ref{eq:stddev} (standard deviation), and \ref{eq:correlation} (correlation).
 \begin{align}
-    (\sigma_{\overline{x}})^{2} = \frac{\sum{(x-\bar{x})^2}}{n-1}\label{eq:variance}
+  (\sigma_{\overline{x}})^{2} = \frac{\sum{(x-\bar{x})^2}}{n-1}\label{eq:variance}
 \end{align}
 \begin{align}
-    \sigma_{\overline{x}} = \sqrt{\frac{\sum{(x-\bar{x})^2}}{n-1}}\label{eq:stddev}
+  \sigma_{\overline{x}} = \sqrt{\frac{\sum{(x-\bar{x})^2}}{n-1}}\label{eq:stddev}
 \end{align}
 \begin{align}
-    r = \frac{N\sum{xy} - (\sum{x})(\sum{y})}{\sqrt{[N\sum{x^2} - (\sum{x})^2][N\sum{y^2} - (\sum{y})^2]}} \label{eq:correlation}
+  r = \frac{N\sum{xy} - (\sum{x})(\sum{y})}{\sqrt{[N\sum{x^2} - (\sum{x})^2][N\sum{y^2} - (\sum{y})^2]}} \label{eq:correlation}
 \end{align}
