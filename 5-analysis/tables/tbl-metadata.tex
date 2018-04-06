@@ -5,21 +5,22 @@
         \label{tbl-metadata}
         \begin{tabularx}{\textwidth}{>{\hsize=1.6\hsize}X>{\hsize=0.8\hsize}Y>{\hsize=0.8\hsize}Y>{\hsize=0.8\hsize}Y}
             \toprule
-            \mC{c}{}                                                & \mC{c}{Variance}                 & \mC{c}{Grades}                    & \mC{c}{Events}                    \\
+            \mC{c}{}                                                & \mC{c}{Adms}                      & \mC{c}{Adms/Grds}                 & \mC{c}{Adms/Grds/Evts}            \\
             \midrule
-            Admissions lines extracted                              & 12 219                           & 12 219                            & 12 219                            \\
-            Admissions lines loaded                                 & 1 381                            & 1 381                             & 595                               \\
-            Admissions task time (sec)                              & 1.588\tnote{\textsuperscript{5}} & 2.712\tnote{\textsuperscript{6}}  & 4.881\tnote{\textsuperscript{8}}  \\
+            Admissions lines extracted                              & 12 219                            & 12 219                            & 12 219                            \\
+            Admissions lines loaded                                 & 1 381                             & 1 381                             & 595                               \\
+            Admissions task time (sec)                              & 1.588\tnote{\textsuperscript{5}}  & 2.712\tnote{\textsuperscript{6}}  & 4.881\tnote{\textsuperscript{8}}  \\
             \midrule
-            Grades lines extracted                                  &                                  & 513 872                           & 513 872                           \\
-            Grades lines loaded                                     &                                  & 1 891                             & 738                               \\
-            Grades task time (sec)\tnote{\textsuperscript{1}}       &                                  & 50.993\tnote{\textsuperscript{7}} & 95.796\tnote{\textsuperscript{9}} \\
+            Grades lines extracted                                  &                                   & 513 872                           & 513 872                           \\
+            Grades lines loaded                                     &                                   & 1 891                             & 738                               \\
+            Grades task time (sec)\tnote{\textsuperscript{1}}       &                                   & 50.993\tnote{\textsuperscript{7}} & 95.796\tnote{\textsuperscript{9}} \\
             \midrule
-            Events lines extracted                                  &                                  &                                   & 44 420 508                        \\
-            Events lines loaded                                     &                                  &                                   & -                                 \\
-            Events task time (sec)\tnote{\textsuperscript{1}}       &                                  &                                   & -                                 \\
+            Events lines extracted                                  &                                   &                                   & 44 420 508                        \\
+            Events lines loaded                                     &                                   &                                   & -                                 \\
+            Events task time (sec)\tnote{\textsuperscript{1}}       &                                   &                                   & -                                 \\
             \midrule
-            Index calculation time (sec)\tnote{\textsuperscript{3}} & -                                & -                                 & -                                 \\
+            Data footprint (MB)                                     & $>$ 1                             & $>$ 2                             & -                                 \\
+            Index calculation time (sec)\tnote{\textsuperscript{3}} & 0.533\tnote{\textsuperscript{11}} & 1.092\tnote{\textsuperscript{10}} & -                                 \\
             \bottomrule
         \end{tabularx}
         \scriptsize
@@ -30,6 +31,8 @@
             \item[\textsuperscript{7}]$(52.899, 51.399, 48.681)$
             \item[\textsuperscript{8}]$(5.313, 3.548, 5.782)$
             \item[\textsuperscript{9}]$(94.353, 92.902, 100.134)$
+            \item[\textsuperscript{10}]$(0.988, 1.347, 0.941)$
+            \item[\textsuperscript{11}]$(0.519, 0.472, 0.607)$
         \end{tablenotes}
     \end{threeparttable}
 \end{table}
