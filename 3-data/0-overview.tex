@@ -1,40 +1,35 @@
-With special thanks to data owners Jane Hendry (UCT's CIO) and Stephen Marquard (the Learning Technologies Coordinator from the Center for Innovation in Learning and Teaching at UCT), student data was made available encompassing UCT admissions data, course grades, and LMS (Learning Management Software) - Sakai \cite{sakai} - interactions. This data was received as three separate datasets that are classified in terms of this project as listed below:
+With special thanks to data owners Jane Hendry (UCT's CIO) and Stephen Marquard (the Learning Technologies Coordinator from the Center for Innovation in Learning and Teaching at UCT), student data has been made available encompassing UCT admissions data, course grades, and Sakai interactions. The three separate datasets are classified in terms of the following:
 
 \begin{itemize}
-    \item \textit{A grades dataset}: UCT course results
-    \item \textit{A admissions dataset}: Student matric results and national benchmark test (NBT) results
-    \item \textit{An events dataset}: Student interactions with the Sakai platform, measured as browser interactions
+    \item \textit{grades}: UCT course results
+    \item \textit{admissions}: Student matric results and national benchmark test (NBT) results
+    \item \textit{events}: Student interactions with the Sakai platform, measured as browser interactions
 \end{itemize}
 
-All three datasets were received as CSV exports with student IDs anonymized prior to receiving them. Anonymization was consistent across all three datasets, preserving the association of particular students across the admissions, grades and events datasets.
+All three datasets are in CSV format and have the a student number field in common. This field is anonymized consistently across all three datasets to preserve row associations.
 
 \section{Grades}
-CSV exports received for course grade data for the years 2014, 2015 and 2016 are consistent across all three years in terms of the fields and the ordering of these fields - the only structural difference is that the 2014 CSV is tab-delimited instead of comma delimited. Using Microsoft Excel the three files were combined into a single CSV, which is described in Table \ref{tbl-data-grades}; separate CSV files could just as easily be used, but at no benefit to this analysis (and it is easier to work with a single CSV file of grades than several grades CSV files). A sample of the combined CSV file is shown in Figure \ref{fig-sample-grades}.
+Three years of data is available: 2014, 2015 and 2016 received as separate CSV files. A compilation of these three files is used in which the structure (the files are delimited differently) is normalized. The fields of the compiled file is described in Table \ref{tbl-data-grades}, and a sample of this file is shown in Figure \ref{fig-sample-grades}. Essentially this data comprises a list of grades achieved for specific courses in specific years along with student numbers. The separate files could just as easily be used as received, but for the purposes of this investigation it is easier to work with a single file than multiple files.
 
 \input{3-data/tables/tbl-data-grades}
 \input{3-data/figures/fig-sample-grades}
 
 \section{Admissions}
-CSV exports received for student admissions data for the the 2014, 2015 and 2016 student cohorts. The fields in these CSVs are not consistent across all three years; certain fields are capitalized differently, fields are ordered differently from year to year. Additionally, the 2014 and 2015 CSV files contain fields that show student's UCT academic performance for years subsequent to each student's initial registration. For example, benchmarks data from 2014 includes academic performance for the years 2015/2016, and the 2015 benchmarks data includes academic performance for the year 2016 - resulting in many repeating fields and variable row lengths.
-
-Although CouchDB is lenient in terms of data structure when modeling data (JSON documents are semi-structured), repeated fields in CSV data that is serialized to JSON strings results in unpredictably losing information (CouchDB discards all but one duplicated JSON key at random).
-
-For automated CSV exports, it is reasonable to expect that there are no repeated field named. It is reasonable to re-request CSVs that are malformed, have duplicated field names, etc. However since these CSVs are only received once, it is a reasonable procedure to perform corrections in Microsoft Excel or similar tools if possible - such as done in this project. Microsoft Excel is used to normalize the Benchmark data across all three years as a result. Since Excel processing is required in any case, field names are also normalized where capitalization, spelling or other inconsistencies across the CSVs are present. (Although CouchDB is quite good at handling such inconsistencies - in fact it's on of the big advantages of using CouchDB - this is not something being assessed in this project, and just results in overcomplicated MapReduce functions). CSVs containing admissions data are processed in Excel according to the logic:
+Three years of data is available: 2014, 2015, 2016 received as separate CSV files. As received the files are disorganized; corresponding fields are spelled/capitalized differently across the files, the files have completely different sets of fields, fields ordering is inconsistent, and the files are delimited differently. It is possible to work with these files directly, but doing so would only complicate the analysis procedure and not add any value to the investigation. As such, a single CSV is compiled with the following addressed:
 
 \begin{itemize}
-    \item Adjusting fields to be spelled the same, normalizing whitespace, and making capitalization consistent for fields with the same name
-    \item Removing duplicated fields for years subsequent to student's enrollment date
-    \item Removing data not considered ethical to work with - race, gender, etc.
-    \item Compile all the admissions data into a single CSV (for ease of use)
+    \item Fields are adjusted to be spelled the same with normalized whitespace (where field names contain whitespace)
+    \item Duplicated fields are removed (UCT performance is appended to each student's admissions data for years subsequent to enrollment)
+    \item Contentious data (race, gender, etc.) that this project is not ethically cleared to work with is scrubbed away
 \end{itemize}
 
-The single, processed admissions CSV file contains an anonymized list of students that enrolled at UCT in 2014, 2015, and 2016 as well as these students matric results and NBT test scores. The CSV file is described in Table \ref{tbl-data-admissions} in terms of field names, a description of these fields and each field's data type. A sample of the file is shown in Figure \ref{fig-sample-admissions}.
+The single, processed admissions CSV file contains an anonymized list of students that enrolled at UCT along with these student's matric results and NBT scores. The CSV file is described in Table \ref{tbl-data-admissions} and a sample of the file is shown in Figure \ref{fig-sample-admissions}.
 
 \input{3-data/tables/tbl-data-admissions}
 \input{3-data/figures/fig-sample-admissions}
 
 \section{Events}
-The CSV export received for Events data is for 2016, with a description of the fields shown in Table \ref{tbl-data-events}. The Events CSV export cannot be opened using Microsoft Excel due to its large size (\textgreater 5GB). This CSV contains no header rows, and information on the headers had to be obtained separately. A small sample of the CSV was taken using a BASH terminal - the \mintinline{text}{head -n 100 <file.csv>} will show the first 100 lines of a CSV. A sample of this CSV file is shown in Figure \ref{fig-sample-events}.
+Sakai usage data is available for the 2016 year, recieved as a single CSV file that is 5.2GB in size. Due to it's large size, the file cannot be opened in Microsoft Excel and so no scrubbing/amendment is performed on it. Fields in this file are described in Table \ref{tbl-data-events}. The file as received doesn't contain header information, which had to be obtained separately; these headers are included in the CSV sample as shown in Figure \ref{fig-sample-events} for ease of reference. In this sample, values for the field \textit{ref} are replaced with "txt" - also for display purposes. As a side note, when working with files that cannot be opened due to their large size, it is possible to print out a subset of the file using a BASH terminal via the command \mintinline{text}{head -n <N> <file.ext>} where \mintinline{text}{N} is the number of lines to print.
 
 \input{3-data/tables/tbl-data-events}
 \input{3-data/figures/fig-sample-events}

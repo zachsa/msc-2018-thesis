@@ -1,7 +1,7 @@
 \begin{table}[H]
     \begin{threeparttable}
         \textbf{Table \ref{tbl-data-grades}}\par\medskip\par\medskip
-        \caption[Grades data fields]{Grades data fields}
+        \caption[Grades data fields]{\textbf{Grades data fields}}
         \label{tbl-data-grades}
         \begin{tabularx}{\textwidth}{>{\hsize=0.8\hsize}X>{\hsize=0.6\hsize}X>{\hsize=1.6\hsize}X}
             \toprule
@@ -10,13 +10,13 @@
             DownloadedDate     & date              & Excel date format                                \\
             RegAcadYear        & number            & Year                                             \\
             RegTerm            & number            & Integer ID                                       \\
-            anonIDnew          & number            & Student number\tnote{\textsuperscript{1}}        \\
+            anonIDnew          & number            & Student number                                   \\
             RegProgram         & string            & Program abbreviation                             \\
             RegCareer          & string            & Academic level                                   \\
             Degree             & string            & Degree code                                      \\
             DegreeDescr        & string            & Degree title                                     \\
             Subject            & string            & Three letter abbreviation                        \\
-            Catalog.           & string            & Catalog sub-component\tnote{\textsuperscript{2}} \\
+            Catalog.           & string            & Catalog sub-component\tnote{\textsuperscript{1}} \\
             Course             & string            & Full course code description                     \\
             CourseSuffix       & string            & Course session identifier                        \\
             Session            & string            & Session name                                     \\
@@ -37,8 +37,7 @@
         \end{tabularx}
         \scriptsize
         \begin{tablenotes}
-            \item[\textsuperscript{1}]Anonymization was performed by Associate Professor Sonia Berman
-            \item[\textsuperscript{2}]Course number and session identifier
+            \item[\textsuperscript{1}]Course number and session identifier
         \end{tablenotes}
     \end{threeparttable}
 \end{table}

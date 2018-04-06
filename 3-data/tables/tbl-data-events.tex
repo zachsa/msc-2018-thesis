@@ -1,7 +1,7 @@
 \begin{table}[H]
     \begin{threeparttable}
         \textbf{Table \ref{tbl-data-events}}\par\medskip\par\medskip
-        \caption[Events data fields]{Events data fields}
+        \caption[Events data fields]{\textbf{Events data fields}}
         \label{tbl-data-events}
         \begin{tabularx}{\textwidth}{>{\hsize=0.8\hsize}X>{\hsize=0.6\hsize}X>{\hsize=1.6\hsize}X}
             \toprule
@@ -9,16 +9,15 @@
             \midrule
             event\_date        & date              & yyyy-mm-dd hh:mm:ss                                             \\
             event\_id          & number            & Number\tnote{\textsuperscript{1}}                               \\
-            uct\_id            & number            & Anonymized student number\tnote{\textsuperscript{2}}            \\
-            site\_key          & number            & Foreign key reference to course site\tnote{\textsuperscript{3}} \\
+            uct\_id            & number            & Anonymized student number                                       \\
+            site\_key          & number            & Foreign key reference to course site\tnote{\textsuperscript{2}} \\
             ref                & string            & Detail of event                                                 \\
             \bottomrule
         \end{tabularx}
         \scriptsize
         \begin{tablenotes}
             \item[\textsuperscript{1}]This column represents a foreign key, allowing for a more general classification of events
-            \item[\textsuperscript{2}]Anonymization of the event data was performed by Stephen Marquard
-            \item[\textsuperscript{3}]This column represents a foreign key, allowing each event to be associated with a particular course
+            \item[\textsuperscript{2}]This key references Sakai-specific fields and not grades data recieved reparately
         \end{tablenotes}
     \end{threeparttable}
 \end{table}

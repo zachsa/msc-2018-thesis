@@ -1,32 +1,26 @@
 \begin{table}[H]
     \begin{threeparttable}
         \textbf{Table \ref{tbl-data-admissions}}\par\medskip\par\medskip
-        \caption[Admissions data fields]{Admissions data fields}
+        \caption[Admissions data fields]{\textbf{Admissions data fields}}
         \label{tbl-data-admissions}
-        \begin{tabularx}{\textwidth}{>{\hsize=0.3\hsize}Y>{\hsize=1.3\hsize}X>{\hsize=0.6\hsize}X>{\hsize=1.8\hsize}X}
+        \begin{tabularx}{\textwidth}{>{\hsize=1.3\hsize}X>{\hsize=0.2\hsize}X>{\hsize=1.5\hsize}X}
             \toprule
-            \mC{c}{Include\tnote{\textsuperscript{1}}  } & \mC{c}{Field Name}    & \mC{c}{Data type} & \mC{c}{Description}                       \\
+            \mC{c}{Field Name}    & \mC{c}{Data type} & \mC{c}{Description}       \\
             \midrule
-            \cmark                                       & anonIDnew             & number            & Student number\tnote{\textsuperscript{2}} \\
-            \xmark                                       & Career                & string            & Academic level                            \\
-            \xmark                                       & Citizenship Residency & string            & Student citizenship                       \\
-            \xmark                                       & SA School             & string            & School name (if in RSA)                   \\
-            \cmark                                       & Eng Grd12 Rslt        & string            & Grade 12 English                          \\
-            \cmark                                       & Math Grd12 Rslt       & string            & Grade 12 Math                             \\
-            \cmark                                       & Mth Lit Grd12 Rslt    & string            & Grade 12 Math Literacy                    \\
-            \cmark                                       & Adv Mth Grd12 Rslt    & string            & Grade 12 Advanced Math                    \\
-            \cmark                                       & Phy Sci Grd12 Rslt    & string            & Grade 12 Science                          \\
-            \cmark                                       & NBT AL Score          & string            & NBT\tnote{\textsuperscript{3}}            \\
-            \cmark                                       & NBT QL Score          & string            & NBT                                       \\
-            \cmark                                       & NBT Math Score        & string            & NBT                                       \\
-            \cmark                                       & RegAcadYear           & number            & First registration at UCT                 \\
+            anonIDnew             & number            & Anonymized student number \\
+            Career                & string            & Academic level            \\
+            Citizenship Residency & string            & Student citizenship       \\
+            SA School             & string            & School name (if in RSA)   \\
+            Eng Grd12 Rslt        & string            & Grade 12 English          \\
+            Math Grd12 Rslt       & string            & Grade 12 Math             \\
+            Mth Lit Grd12 Rslt    & string            & Grade 12 Math Literacy    \\
+            Adv Mth Grd12 Rslt    & string            & Grade 12 Advanced Math    \\
+            Phy Sci Grd12 Rslt    & string            & Grade 12 Science          \\
+            NBT AL Score          & string            & NBT                       \\
+            NBT QL Score          & string            & NBT                       \\
+            NBT Math Score        & string            & NBT                       \\
+            RegAcadYear           & number            & First registration at UCT \\
             \bottomrule
         \end{tabularx}
-        \scriptsize
-        \begin{tablenotes}
-            \item[\textsuperscript{1}]Attributes were included via a white-listing process using Microsoft Excel
-            \item[\textsuperscript{2}]Anonymization was performed by Associate Professor Sonia Berman
-            \item[\textsuperscript{3}]National Benchmark Test
-        \end{tablenotes}
     \end{threeparttable}
 \end{table}
