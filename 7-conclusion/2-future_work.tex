@@ -6,3 +6,6 @@ As mentioned previously, CouchDB views are optimized when using built-in reduce 
 Since, for this project, CouchDB was configured to run on a single Windows machine for this project, it would be worth investigating the benefit that clustering CoucDB across many separate nodes provides. Although the database was sharded (CouchDB is configured to use 8 shards by default) and so processed data in parallel, it is likely that deploying shards to separate servers would greatly increase performance and decrease indexing time. CouchDB disperses documents evenly across shards in a random fashion, suggesting that the workload of indexing the documents would be distributed evenly across all the shards of the database (see \cite{slack7Nov}). It is likely that the larger benefits would be seen with increasing data sizes since there is first the cost of network interactions to overcome if shards were distributed across separate nodes.
 
 There is also scope to develop a user interface for the \textit{nETL} application and launch a competitor to Microsoft's SSDT that is browser based and JSON-based.
+
+
+todo: async task time with more tasks. test the async benefits of javascript
