@@ -1,0 +1,126 @@
+\textit{\textbf{Retreiving CouchDB logs}}
+\begin{minted}{sh}
+grep -E '2017-12-13.*Starting\s.*_design/msc|2017-12-13.*Index\supdate\sfinished.*_design/msc' couchdb.log;
+tail -f couchdb.log | grep -E '2017-12-15.*Starting\s.*_design/msc|2017-12-15.*Index\supdate\sfinished.*_design/msc';
+tail -f couchdb.log --lines 100 | grep -E 'Starting\sindex\supdate.*_design/msc|.*Index\supdate\sfinished.*_design/msc'
+\end{minted}
+
+
+\section{Correlation-grades}
+\begin{minted}{sh}
+tail -f couch.log | grep -E 'Starting\s.*_design/correlation-grades|Index\supdate\sfinished.*_design/correlation-grades';
+\end{minted}
+
+\subsection{1}
+[info] 2018-04-06T22:25:20.890000Z couchdb@localhost <0.10756.69> -------- Starting index update for db: shards/20000000-3fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:20.921000Z couchdb@localhost <0.10854.69> -------- Starting index update for db: shards/a0000000-bfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:20.922000Z couchdb@localhost <0.10745.69> -------- Starting index update for db: shards/80000000-9fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:20.925000Z couchdb@localhost <0.10802.69> -------- Starting index update for db: shards/e0000000-ffffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:20.925000Z couchdb@localhost <0.10824.69> -------- Starting index update for db: shards/c0000000-dfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:20.925000Z couchdb@localhost <0.10812.69> -------- Starting index update for db: shards/00000000-1fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:20.926000Z couchdb@localhost <0.10770.69> -------- Starting index update for db: shards/40000000-5fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:20.928000Z couchdb@localhost <0.10816.69> -------- Starting index update for db: shards/60000000-7fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:21.824000Z couchdb@localhost <0.10854.69> -------- Index update finished for db: shards/a0000000-bfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:21.828000Z couchdb@localhost <0.10812.69> -------- Index update finished for db: shards/00000000-1fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:21.834000Z couchdb@localhost <0.10816.69> -------- Index update finished for db: shards/60000000-7fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:21.844000Z couchdb@localhost <0.10824.69> -------- Index update finished for db: shards/c0000000-dfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:21.851000Z couchdb@localhost <0.10745.69> -------- Index update finished for db: shards/80000000-9fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:21.851000Z couchdb@localhost <0.10756.69> -------- Index update finished for db: shards/20000000-3fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:21.865000Z couchdb@localhost <0.10770.69> -------- Index update finished for db: shards/40000000-5fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:25:21.878000Z couchdb@localhost <0.10802.69> -------- Index update finished for db: shards/e0000000-ffffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+
+\subsection{2}
+[info] 2018-04-06T22:27:02.215000Z couchdb@localhost <0.13004.69> -------- Starting index update for db: shards/a0000000-bfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:02.215000Z couchdb@localhost <0.13002.69> -------- Starting index update for db: shards/40000000-5fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:02.216000Z couchdb@localhost <0.12982.69> -------- Starting index update for db: shards/80000000-9fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:02.216000Z couchdb@localhost <0.13008.69> -------- Starting index update for db: shards/e0000000-ffffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:02.216000Z couchdb@localhost <0.12978.69> -------- Starting index update for db: shards/c0000000-dfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:02.216000Z couchdb@localhost <0.13038.69> -------- Starting index update for db: shards/20000000-3fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:02.244000Z couchdb@localhost <0.13046.69> -------- Starting index update for db: shards/00000000-1fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:02.247000Z couchdb@localhost <0.13055.69> -------- Starting index update for db: shards/60000000-7fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:03.248000Z couchdb@localhost <0.12978.69> -------- Index update finished for db: shards/c0000000-dfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:03.266000Z couchdb@localhost <0.12982.69> -------- Index update finished for db: shards/80000000-9fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:03.269000Z couchdb@localhost <0.13004.69> -------- Index update finished for db: shards/a0000000-bfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:03.281000Z couchdb@localhost <0.13055.69> -------- Index update finished for db: shards/60000000-7fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:03.285000Z couchdb@localhost <0.13002.69> -------- Index update finished for db: shards/40000000-5fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:03.286000Z couchdb@localhost <0.13008.69> -------- Index update finished for db: shards/e0000000-ffffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:03.296000Z couchdb@localhost <0.13038.69> -------- Index update finished for db: shards/20000000-3fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:27:03.562000Z couchdb@localhost <0.13046.69> -------- Index update finished for db: shards/00000000-1fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+
+\subsection{3}
+[info] 2018-04-06T22:28:16.793000Z couchdb@localhost <0.14650.69> -------- Starting index update for db: shards/60000000-7fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:16.794000Z couchdb@localhost <0.14675.69> -------- Starting index update for db: shards/20000000-3fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:16.794000Z couchdb@localhost <0.14705.69> -------- Starting index update for db: shards/a0000000-bfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:16.794000Z couchdb@localhost <0.14668.69> -------- Starting index update for db: shards/80000000-9fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:16.796000Z couchdb@localhost <0.14691.69> -------- Starting index update for db: shards/00000000-1fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:16.798000Z couchdb@localhost <0.14685.69> -------- Starting index update for db: shards/c0000000-dfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:16.799000Z couchdb@localhost <0.14754.69> -------- Starting index update for db: shards/e0000000-ffffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:16.799000Z couchdb@localhost <0.14655.69> -------- Starting index update for db: shards/40000000-5fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:17.688000Z couchdb@localhost <0.14691.69> -------- Index update finished for db: shards/00000000-1fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:17.702000Z couchdb@localhost <0.14650.69> -------- Index update finished for db: shards/60000000-7fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:17.706000Z couchdb@localhost <0.14754.69> -------- Index update finished for db: shards/e0000000-ffffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:17.710000Z couchdb@localhost <0.14668.69> -------- Index update finished for db: shards/80000000-9fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:17.712000Z couchdb@localhost <0.14655.69> -------- Index update finished for db: shards/40000000-5fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:17.718000Z couchdb@localhost <0.14705.69> -------- Index update finished for db: shards/a0000000-bfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:17.722000Z couchdb@localhost <0.14685.69> -------- Index update finished for db: shards/c0000000-dfffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+[info] 2018-04-06T22:28:17.734000Z couchdb@localhost <0.14675.69> -------- Index update finished for db: shards/20000000-3fffffff/correlation-grades.1523047182 idx: _design/correlation-grades
+
+
+\section{Variance-benchmarks}
+\begin{minted}{sh}
+tail -f couch.log | grep -E 'Starting\s.*_design/variance|Index\supdate\sfinished.*_design/variance';
+\end{minted}
+
+\subsection{1}
+[info] 2018-04-06T22:02:14.341000Z couchdb@localhost <0.16486.68> -------- Starting index update for db: shards/00000000-1fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.384000Z couchdb@localhost <0.16608.68> -------- Starting index update for db: shards/20000000-3fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.395000Z couchdb@localhost <0.15701.68> -------- Starting index update for db: shards/60000000-7fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.396000Z couchdb@localhost <0.15703.68> -------- Starting index update for db: shards/80000000-9fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.397000Z couchdb@localhost <0.16617.68> -------- Starting index update for db: shards/c0000000-dfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.397000Z couchdb@localhost <0.16624.68> -------- Starting index update for db: shards/a0000000-bfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.412000Z couchdb@localhost <0.16808.68> -------- Starting index update for db: shards/e0000000-ffffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.441000Z couchdb@localhost <0.17677.68> -------- Starting index update for db: shards/40000000-5fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.808000Z couchdb@localhost <0.16486.68> -------- Index update finished for db: shards/00000000-1fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.815000Z couchdb@localhost <0.16608.68> -------- Index update finished for db: shards/20000000-3fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.834000Z couchdb@localhost <0.15701.68> -------- Index update finished for db: shards/60000000-7fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.834000Z couchdb@localhost <0.15703.68> -------- Index update finished for db: shards/80000000-9fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.843000Z couchdb@localhost <0.16617.68> -------- Index update finished for db: shards/c0000000-dfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.844000Z couchdb@localhost <0.16624.68> -------- Index update finished for db: shards/a0000000-bfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.846000Z couchdb@localhost <0.17677.68> -------- Index update finished for db: shards/40000000-5fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:02:14.860000Z couchdb@localhost <0.16808.68> -------- Index update finished for db: shards/e0000000-ffffffff/variance-benchmarks.1523046335 idx: _design/variance
+
+\subsection{2}
+[info] 2018-04-06T22:07:29.438000Z couchdb@localhost <0.22620.68> -------- Starting index update for db: shards/20000000-3fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.439000Z couchdb@localhost <0.23587.68> -------- Starting index update for db: shards/00000000-1fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.440000Z couchdb@localhost <0.22591.68> -------- Starting index update for db: shards/a0000000-bfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.440000Z couchdb@localhost <0.23668.68> -------- Starting index update for db: shards/40000000-5fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.440000Z couchdb@localhost <0.22671.68> -------- Starting index update for db: shards/60000000-7fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.440000Z couchdb@localhost <0.22675.68> -------- Starting index update for db: shards/e0000000-ffffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.441000Z couchdb@localhost <0.21684.68> -------- Starting index update for db: shards/c0000000-dfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.441000Z couchdb@localhost <0.22656.68> -------- Starting index update for db: shards/80000000-9fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.885000Z couchdb@localhost <0.22620.68> -------- Index update finished for db: shards/20000000-3fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.891000Z couchdb@localhost <0.22671.68> -------- Index update finished for db: shards/60000000-7fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.896000Z couchdb@localhost <0.22656.68> -------- Index update finished for db: shards/80000000-9fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.898000Z couchdb@localhost <0.23668.68> -------- Index update finished for db: shards/40000000-5fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.899000Z couchdb@localhost <0.22675.68> -------- Index update finished for db: shards/e0000000-ffffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.901000Z couchdb@localhost <0.21684.68> -------- Index update finished for db: shards/c0000000-dfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.901000Z couchdb@localhost <0.22591.68> -------- Index update finished for db: shards/a0000000-bfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:07:29.910000Z couchdb@localhost <0.23587.68> -------- Index update finished for db: shards/00000000-1fffffff/variance-benchmarks.1523046335 idx: _design/variance
+
+\subsection{3}
+[info] 2018-04-06T22:08:51.112000Z couchdb@localhost <0.24594.68> -------- Starting index update for db: shards/c0000000-dfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.112000Z couchdb@localhost <0.24616.68> -------- Starting index update for db: shards/00000000-1fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.112000Z couchdb@localhost <0.22464.68> -------- Starting index update for db: shards/a0000000-bfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.123000Z couchdb@localhost <0.24632.68> -------- Starting index update for db: shards/40000000-5fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.123000Z couchdb@localhost <0.24618.68> -------- Starting index update for db: shards/60000000-7fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.123000Z couchdb@localhost <0.24590.68> -------- Starting index update for db: shards/20000000-3fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.135000Z couchdb@localhost <0.23696.68> -------- Starting index update for db: shards/e0000000-ffffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.161000Z couchdb@localhost <0.22609.68> -------- Starting index update for db: shards/80000000-9fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.545000Z couchdb@localhost <0.24618.68> -------- Index update finished for db: shards/60000000-7fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.551000Z couchdb@localhost <0.24632.68> -------- Index update finished for db: shards/40000000-5fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.562000Z couchdb@localhost <0.23696.68> -------- Index update finished for db: shards/e0000000-ffffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.564000Z couchdb@localhost <0.24594.68> -------- Index update finished for db: shards/c0000000-dfffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.567000Z couchdb@localhost <0.24590.68> -------- Index update finished for db: shards/20000000-3fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.568000Z couchdb@localhost <0.24616.68> -------- Index update finished for db: shards/00000000-1fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.583000Z couchdb@localhost <0.22609.68> -------- Index update finished for db: shards/80000000-9fffffff/variance-benchmarks.1523046335 idx: _design/variance
+[info] 2018-04-06T22:08:51.719000Z couchdb@localhost <0.22464.68> -------- Index update finished for db: shards/a0000000-bfffffff/variance-benchmarks.1523046335 idx: _design/variance
