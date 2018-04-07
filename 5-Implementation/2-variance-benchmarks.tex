@@ -32,14 +32,14 @@ Variance $(\sigma_{\overline{x}})^{2}$ and standard deviation $\sigma_{\overline
 \subsection{ETL}
 Rows are extracted from the admissions data (\mintinline{text}{Admissions (2014 - 2016).csv}) in batches of 5 000. Each row is converted to an object, and rows are selected for undergraduate students that have citizenship or permanent residency in South Africa, and that have a grade for the CSC1015F course. A \textit{type\_} attribute with the value 'admission' is added to each row (now an object). Batches of objects (there are at most 5 000 objects per batch, but usually far fewer due to the filtering) are loaded into a CouchDB database. An example of a row from the admissions data serialized to a JSON string and as loaded into CouchDB is shown in Figure \ref{fig-json-admission}.
 
-\input{5-analysis/figures/fig-json-admission}
+\input{5-implementation/figures/fig-json-admission}
 
 \subsection{Index Calculation}
 All the admissions documents are loaded into the CouchDB database are mapped to an index consisting of \textit{anonIDnew:[benchmarks]} key-value pairs via a map function. Derivative benchmarks are calculated during map function execution and output to the index as part of the list of benchmarks.
 
 The built-in \_stats function is used to aggregate values in the view-index by benchmark type, which when used without grouping by index key results in MapReduced output of a single tuple containing an object for each benchmark used/created. The resultant index can be retrieved as serialized JSON as shown in Figure \ref{fig-variance-reduce-output}\footnote{Values are rounded for better display} (\mintinline{text}{reduce = true \& group = false}). The \_stats function aggregates benchmark by describing each benchmark in terms of the sum of all students scores for that particular admissions benchmark, the count of how many students are included in the sum, the worst (min) and best (max) scores achieved for each test (or average of tests) by a student, and the sum of squares of each students scores. Because grouping is set to false, reduction is performed (i.e. a \_stats objected is calculated) across the entire dataset instead of for each key output by the map function.
 
-\input{5-analysis/figures/fig-variance-reduce-output}
+\input{5-implementation/figures/fig-variance-reduce-output}
 
 \subsection{Index Retrieval}
 With reference to the reduced (aggregated benchmark) output shown in Figure \ref{fig-variance-reduce-output} variance and standard deviation are worked out according to Equations \ref{eq:variance-with-fields} and \ref{eq:stddev-with-fields} respectively. The computational variation of the sample variance formula is used.
@@ -51,4 +51,4 @@ With reference to the reduced (aggregated benchmark) output shown in Figure \ref
 \end{align}
 Variance and standard deviation are calculated directly from the reduced index output during data retrieval using a CouchDB list function, with results output in tabular form as shown in Table \ref{tbl-variance-benchmarks}.
 
-\input{5-analysis/tables/tbl-variance-benchmarks}
+\input{5-implementation/tables/tbl-variance-benchmarks}

@@ -17,7 +17,7 @@ In terms of the MapReduce tasks, only built-in reduce functions are used; these 
 
 Metrics of the different components of the system are recorded and are shown in Table \ref{tbl-metadata}. The metrics include running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints.
 
-\input{5-analysis/tables/tbl-metadata}
+\input{5-implementation/tables/tbl-metadata}
 
 \section{Joining Data}
 The three datasets used in this project require joining on the StudentID field. This field appears once for every student in the admissions data, several times for each student in the grades data and up to thousands of times per student in the events data. Both the grade and event data contain a field for year - i.e. the year in which a grade was obtained or the year in which an event was registered; these two datasets require joining on both the StudentID and Year fields. Admissions data is only collected once per student enrollment, so is associated with grade and event data only by StudentID. To describe the join in terms of SQL, an inner-join is performed on the grades/events data, and the resultant dataset is outer-joined to admissions data: \begin{spreadlines}{15pt}
@@ -54,7 +54,7 @@ Instead, it is necessary to utilize CouchDB's data-structures (b+trees) as a mea
 
 Although many events documents are outputted by the map function per student, using reduction results in grouping all these documents by common key. In other words, only a single document that is an aggregation of all events documents will be stored as reduced output in the view. So, for any student number, scanning the index iteratively produces first an admissions document, then a single (aggregated) events document, then a single grade document for each course that student enrolled in - this is shown in \ref{fig-sorted-index} (B). Retrieving reduced index output requires querying the index and specifying that reduce is true. In addition, it is necessary to specify that grouping is true. This results in reduction being performed on grouped keys instead of retrieving an aggregation of the entire index (which useful, for example, when calculating variance).
 
-\input{5-analysis/figures/fig-sorted-index}
+\input{5-implementation/figures/fig-sorted-index}
 
 Because output is systematically processed one student at a time, with grades, events and admissions data iteratively process in a predictable order per student, joins can be achieved by holding documents for a particular StudentID in memory and processing grades, events, admissions rows for that StudentID. When a new StudentID is encountered, a joined row is output, memory is flushed and a new joined row for the new studentID is started. This results in a much more efficient way of aggregating/joining different types of documents for a given set of keys.
 

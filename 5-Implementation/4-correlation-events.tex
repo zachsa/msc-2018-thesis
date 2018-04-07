@@ -8,7 +8,7 @@ Via nETL configuration, rows from the admissions data are selected for students 
 
 The events data contains a field \textit{ref}, which is a long string and is not required in the analysis. As such, this string is dropped via a whitelisting process prior to serialization and loading strings into CouchDB (in batches via the \textit{\_bulk\_docs} endpoint). An example of a row from the event data serialized to a JSON string is shown in Figure \ref{fig-json-event}.
 
-\input{5-analysis/figures/fig-json-event}
+\input{5-implementation/figures/fig-json-event}
 
 \subsection{Index Calculation}
 Since a single student may be associated with many rows in the Event data (sometimes even thousands of rows), a reduce function is used within the MapReduce job to aggregate the Events rows into a single document that is a count of Sakai presence events for first and second semester, with the output of this aggregation included in the index along with grade and benchmark data when reduce = true. The index consists of key:value pairs of student numbers associated a tuple that contains values for grades, benchmarks, and event information.
@@ -17,7 +17,7 @@ During map function execution, logical handling of the Grade and Benchmark entit
 
 Using the \_sum reduce function, an aggregation is done across all documents with the same key; this means that per a student, an aggregation is performed on a single Grade document, a single Benchmark document, and many Events documents in which the S1 and S2 variables are summed to form the tuple [sum of S1, sum of S2]. The key emitted for each type of entity is designed so that the view-index is ordered by StudentID. For each student number, documents are ordered by the second key (course), which means that Benchmarks and Events entities are sorted to be before grades for a student; and the \nth{3} component of each key results in benchmark data always being before Events documents. As such, during view-index retrieval it can be taken as given that for a single student ID, first documents of type Benchmark will be retrieved, followed by documents of type Event, followed by documents of type Grade.
 
-\input{5-analysis/figures/fig-mapfn-correlation-events}
+\input{5-implementation/figures/fig-mapfn-correlation-events}
 
 \subsection{Index Retrieval}
 A list function implemented to retrieve the index with \mintinline{text}{reduce = true \& group = true} so that only reduced index output is retrieved, grouped by key.
@@ -30,5 +30,5 @@ Then, by iterating over the student object it is possible to perform the summati
 
 List function logic is represented as an activity diagram in Figure \ref{fig-listfn-correlation-events}, and is configured to output a table of correlation coefficients for each benchmarking method as shown in Table \ref{tbl-correlation-events}.
 
-\input{5-analysis/figures/fig-listfn-correlation-events}
-\input{5-analysis/tables/tbl-correlation-events}
+\input{5-implementation/figures/fig-listfn-correlation-events}
+\input{5-implementation/tables/tbl-correlation-events}
