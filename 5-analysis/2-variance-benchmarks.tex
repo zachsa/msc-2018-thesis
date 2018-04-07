@@ -42,12 +42,12 @@ The built-in \_stats function is used to aggregate values in the view-index by b
 \input{5-analysis/figures/fig-variance-reduce-output}
 
 \subsection{Index Retrieval}
-With reference to the reduced (aggregated benchmark) output shown in Figure \ref{fig-variance-reduce-output} variance and standard deviation are worked out according to Equations \ref{eq:variance-with-fields} and \ref{eq:stddev-with-fields} respectively.
+With reference to the reduced (aggregated benchmark) output shown in Figure \ref{fig-variance-reduce-output} variance and standard deviation are worked out according to Equations \ref{eq:variance-with-fields} and \ref{eq:stddev-with-fields} respectively. The computational variation of the sample variance formula is used.
 \begin{align}
-  (\sigma_{\overline{x}})^{2} = \frac{sumsqr}{count-1} - (\frac{sum}{count})^{2}\label{eq:variance-with-fields}
+  (\sigma_{\overline{x}})^{2} =  \frac{sumsqr - \frac{sum^2}{count}}{count - 1}\label{eq:variance-with-fields}
 \end{align}
 \begin{align}
-  \sigma_{\overline{x}} = \sqrt{\frac{sumsqr}{count-1} - (\frac{sum}{count})^{2}}\label{eq:stddev-with-fields}
+  \sigma_{\overline{x}} = \sqrt{(\sigma_{\overline{x}})^{2}}\label{eq:stddev-with-fields}
 \end{align}
 Variance and standard deviation are calculated directly from the reduced index output during data retrieval using a CouchDB list function, with results output in tabular form as shown in Table \ref{tbl-variance-benchmarks}.
 

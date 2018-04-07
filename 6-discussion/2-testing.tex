@@ -34,3 +34,7 @@ List function output of the test data shows that rows are joined correctly for b
 Unit testing the Map and List function code is a more involved, complicated process than testing the nETL components since the Map and List functions as structured for usage by the python-couchapp tool don't conform to valid JavaScript syntax and additionally invoke other functions provided by the CouchDB runtime environment. Unit testing these functions required loading List/Map function code as strings from their respective files and inserting the strings into the testing runtime environment via runtime evaluation (using the \mintinline{text}{eval(`var mapFn = ${mapFnStr}; var lstFn = ${lstFnStr};`)}). Function stubs for the \mintinline{text}{emit()}, \mintinline{text}{provides()}, \mintinline{text}{getRow()}, and \mintinline{text}{send()} CouchDB execution environment functions were authored - including a complicated generator-subroutine to mimic the contract of the \mintinline{text}{getRow()} function. The same sample CSVs as used for the manual Map/List function tests is used for unit testing - the documents as loaded into CouchDB via nETL are used as the source data.
 
 Statistical calculation output is compared to output using Excel, and is found to be accurate. (todo: haven't actually done this yet)
+
+
+\subsection{Benchmarks variance}
+The CSV data was opened in Excel, and filters applied to the fields manually as applied in nETL.
