@@ -17,6 +17,8 @@ MapReduce processes consist of a user-defined map function and specifying one of
 The three datasets used in this project require joining on the StudentID field. This field appears once for every student in the admissions data, several times for each student in the grades data and up to thousands of times per student in the events data. Both the grade and event data contain a field for year - i.e. the year in which a grade was obtained or the year in which an event was registered; these two datasets require joining on both the StudentID and Year fields. Admissions data is only collected once per student enrollment, so is associated with grade and event data only by StudentID. Two joins are performed: a 2-way join of grades and admissions data (Equation \ref{eq:2-way-join}), and a 3-way join of of grades, events and admissions (Equation \ref{eq:3-way-join}).
 \begin{align}
   grades \bowtie events\label{eq:2-way-join}
+\end{align}
+\begin{align}
   (grades \bowtie events) \leftouterjoin admissions\label{eq:3-way-join}
 \end{align}
 
