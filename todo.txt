@@ -7,6 +7,8 @@
 I will fill in the blank table (netl times, couchdb footprint, etc) tomorrow by taking an everage of 3 instances of each operations
 
 
+joins across documents
+
 
 Did you compare the correlations, variances and std deviations with a relational database result, or with Excel, or on a small dataset with manual calculations?
 
