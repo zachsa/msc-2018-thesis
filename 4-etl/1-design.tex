@@ -3,7 +3,7 @@ Conceptualizing a single ETL process as an entity of type \textit{Task}, that is
 
 Starting the long-running nETL process comprises instantiating the \mintinline{text}{taskManager} singleton. This object provides a CLI (command line interface) to facilitate user interactions. Via the CLI, users can interact with \mintinline{text}{taskManager} to register different ETL components, start/stop tasks, configure application options such as log output path, etc.
 
-The relationship between the \mintinline{text}{taskManager} singleton, \mintinline{text}{task} instances, and components is shown in Figure \ref{fig-nETL}. ETL components comprise modules that adhere to the Module interface and that accept a TaskConfig object as a paramater on instantiation. As such modules are paired with configuration objects as shown in the coloured blocks. An ETL task comprises the following steps:
+The relationship between the \mintinline{text}{taskManager} singleton, \mintinline{text}{task} instances, and components is shown in Figure \ref{fig-nETL}. ETL components comprise modules that adhere to the Module interface and that accept a TaskConfig object as a paramater on instantiation. As such, modules are paired with configuration objects as shown in the coloured blocks. An ETL task comprises the following steps:
 
 \begin{itemize}
     \item Loading all component modules required for a specific task into the nETL runtime

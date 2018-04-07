@@ -7,17 +7,16 @@
             \toprule
             \mC{c}{Field Name} & \mC{c}{Data type} & \mC{c}{Description}                                             \\
             \midrule
-            event\_date        & date              & yyyy-mm-dd hh:mm:ss                                             \\
-            event\_id          & number            & Number\tnote{\textsuperscript{1}}                               \\
+            event\_date        & datetime          & When event occurred                                             \\
+            event\_id          & number            & Type of event (eg. login)                                       \\
             uct\_id            & number            & Anonymized student number                                       \\
-            site\_key          & number            & Foreign key reference to course site\tnote{\textsuperscript{2}} \\
+            site\_key          & number            & Foreign key reference to course site\tnote{\textsuperscript{1}} \\
             ref                & string            & Detail of event                                                 \\
             \bottomrule
         \end{tabularx}
         \scriptsize
         \begin{tablenotes}
-            \item[\textsuperscript{1}]This column represents a foreign key, allowing for a more general classification of events
-            \item[\textsuperscript{2}]This key references Sakai-specific fields and not grades data recieved reparately
+            \item[\textsuperscript{1}]This key references Sakai-specific fields and not grades data recieved reparately
         \end{tablenotes}
     \end{threeparttable}
 \end{table}

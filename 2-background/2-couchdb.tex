@@ -1,5 +1,5 @@
 \section{CouchDB}
-In CouchDB, data is modeled conceptually as \textit{documents}, which users interact with as serialized JSON strings. There are no limitations/specifications/etc. on how documents may be structured (other than that they can be represented by valid JSON). The comprise \textit{key:value} pairs, in which the value may be objects themselves.
+In CouchDB, data is modeled conceptually as \textit{documents}, which users interact with as serialized JSON strings \cite{rfc7159}. There are no limitations/specifications/etc. on how documents may be structured (other than that they can be represented by valid JSON). The comprise \textit{key:value} pairs, in which the value may be objects themselves.
 
 The CouchDB data model (like many NoSQL data models) is considered to be \textit{unstructured}, or \textit{semi-structured}, compared to RDBMSs where data models are rigidly formalized in terms of relations. But despite different storage models, conceptual requirements of data-persistence - such as well known ACID properties are applicable to all database systems. ACID properties provide certain guarantees required within a system to reliably persist information:
 
@@ -46,4 +46,4 @@ To think of entities as rows of a relational table, each entity represented via 
 
 Entity modeling in CouchDB is quite flexible. RDBMSs allow for categorizing information in terms of relations, fields, constraints, and other objects, and MongoDB documents are identifiable in terms of \textit{collections}. CouchDB does not provide a built-in means of classifying documents except by scanning an entire database and reading each document.
 
-Entity classification can be enforced by including a field \textit{type}, that allows for entity modeling separately to the data-storage engine. With this approach documents are only classifiable on retrieval and deserialization (which is inefficient). Alternatively, entity classification can be included in the id field of CouchDB documents, which has the benefit of allowing indexed entity retrieval.
+Entity classification can be enforced by including a field \textit{type}, that allows for entity modeling separately to the data-storage engine. With this approach documents are only classifiable on retrieval and deserialization. Alternatively, entity classification can be included in the id field of CouchDB documents, which has the benefit of allowing indexed entity retrieval.

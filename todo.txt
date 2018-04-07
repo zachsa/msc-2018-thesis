@@ -6,6 +6,8 @@
 
 I will fill in the blank table (netl times, couchdb footprint, etc) tomorrow by taking an everage of 3 instances of each operations
 
+search eg. => e.g.
+
 
 joins across documents
 
