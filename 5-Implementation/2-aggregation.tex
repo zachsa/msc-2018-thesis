@@ -33,7 +33,7 @@ Avg Gr12 & NBT (Dbl Gr12 Mth)
 Avg Gr12 & NBT (Dbl Gr12 Mth & Sci)
 \end{minted}
 
-The built-in \_stats function is used to aggregate values in the view-index by benchmark type, which when used with \mintinline{text}{group=false} results in index output of a single list of stats-objects as shown in Figure \ref{fig-variance-reduce-output}\footnote{Values are rounded for better display} (indices of each object in the value output are indicated on the right hand side of the figure). The objects produced by the \_stats function (one object per benchmark dataset) contain fields for:
+The built-in \_stats function is used to aggregate values in the view-index by benchmark type, which when used with \mintinline{text}{group=false} results in index output of a single list of stats-objects as shown in Figure \ref{fig-stats-output}\footnote{Values are rounded for better display} (indices of each object in the value output are indicated on the right hand side of the figure). The objects produced by the \_stats function (one object per benchmark dataset) contain fields for:
 
 \begin{itemize}
   \item The sum of all items in the dataset
@@ -43,10 +43,10 @@ The built-in \_stats function is used to aggregate values in the view-index by b
   \item The sum of each item squared in the dataset
 \end{itemize}
 
-\input{5-implementation/figures/fig-variance-reduce-output}
+\input{5-implementation/figures/fig-stats-output}
 
 \subsection{Index Retrieval}
-With reference to the reduced (aggregated benchmark) output shown in Figure \ref{fig-variance-reduce-output} variance and standard deviation are worked out according to Equation \ref{eq:variance-with-fields}, with standard deviation the square root of variance. The computational variation of the sample variance formula is used.
+With reference to the reduced (aggregated benchmarks) output shown in Figure \ref{fig-stats-output} variance and standard deviation are worked out according to Equation \ref{eq:variance-with-fields}, with standard deviation the square root of variance. The computational variation of the sample variance formula is used.
 \begin{align}
   (\sigma_{\overline{x}})^{2} =  \frac{sumsqr - \frac{sum^2}{count}}{count - 1}\label{eq:variance-with-fields}
 \end{align}
