@@ -8,6 +8,7 @@ I will fill in the blank table (netl times, couchdb footprint, etc) tomorrow by 
 
 search eg. => e.g.
 
+todo: rename analysis two-way join and three-way join
 
 joins across documents
 
