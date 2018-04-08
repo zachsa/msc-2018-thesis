@@ -1,0 +1,15 @@
+\section{Relational Queries in CouchDB}
+CouchDB uses MapReduce as a deterministic means of producing indices using parallel processing; MapReduce is implemented in terms of index requirements rather than as a means of performing relational operations on datasets. As such, performing relational operations on datasets using CouchDB's implementation of MapReduce is impossible and instead requires architecture-wide considerations. This is in contrast to RDBMSs where relational operations are isolated to the data retrieval layer and require much less thought into entity modeling, software stack architectures, etc. as a result.
+
+But in the context of this project it is shown that CouchDB data can be modeled relationally, and relational operations can be performed on such data in the context of CouchDB. To do this requires the following considerations:
+
+\begin{enumerate}
+    \item ETL processes incorporate operations that would more generally be used in the data-retrieval layer in RDBMSs - i.e. projections, selections (include selections via joins)
+    \item MapReduce is used as a means of normalizing entity representation, performing aggregations and sorting entity representations according to join-keys
+    \item Joins can be performed quite easily and efficiently on sorted indices
+\end{enumerate}
+
+Although indices may be time-consuming to calculate initially, scanning b+trees is very efficient and so data retrieval from CouchDB is fast once indexed. And since indices are updated incrementally, joins performed via index scans are also very efficient. This in itself is an advantage offered by CouchDB when used in a relational context. However, working with relational data is clearly more difficult in CouchDB than in any RDBMS and most other NoSQL alternatives as well.
+
+% TODO
+discuss why it's beneficial to use this means of entity modelling instead of aggregations in a nosql database

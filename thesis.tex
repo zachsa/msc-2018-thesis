@@ -159,7 +159,7 @@
 \author{Zach Smith}
 \date{\today}
 
-% Chapters without heading
+% Chapters without heading (usin for Appendices)
 \makeatletter
 \newcommand{\unchapter}[1]{%
   \begingroup
@@ -183,6 +183,7 @@
 \end{abstract}
 \newpage
 
+% Acknowledgements
 \renewcommand{\abstractname}{Acknowledgements}
 \begin{abstract}
     \input{0-preamble/acknowledgements}
@@ -227,11 +228,15 @@
 \input{5-implementation/3-join}
 \input{5-implementation/4-aggregation-join}
 
+\chapter{Results}
+\input{6-results/1-software-performance}
+\input{6-results/2-student-profiling}
+\input{6-results/3-tests}
+
 \chapter{Conclusion}
-\input{6-conclusion/0-overview}
-\input{6-conclusion/1-results}
-\input{6-conclusion/2-tests}
-\input{6-conclusion/3-future-work}
+\input{7-conclusion/0-overview}
+\input{7-conclusion/1-relational-summary}
+\input{7-conclusion/2-future-work}
 \newpage
 
 % Bibliogrpahy
