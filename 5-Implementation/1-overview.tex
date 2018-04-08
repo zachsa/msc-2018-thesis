@@ -86,12 +86,15 @@ When processing admissions and events CSVs a join is required to grades entities
 \section{Statistical calculations}
 Because all numbers in JavaScript are 64-bit floating-point (following the IEEE 754 standard \cite{floatingPoint}), working with rational numbers with decimal points results in peculiarities compared to expectations formed from working with a base-10-framed mindset - for example, the sum: $0.1 + 0.2 = 0.30000000000000004$. Decimals such as $0.1$ and $0.2$ cannot be accurately represented in binary format within 64-bit address space (or any finite amount of memory). As such, rounding errors occur. Quantifying the margin for such errors and handling these cases correctly is difficult \cite{Goldberg1991}, so to side-step this uncertainty an open-source library (\textit{decimal.js} \cite{decimaljs}) is used to handle arithmetic via JavaScript. CouchDB allows usage of 3rd party JavaScript libraries via implementing CommonJS module loading within the context of couchjs.exe \cite{commonJsMapFn}.
 
-Numerical data is treated statistically during index retrieval, worked out using the Decimal.js library and according to well known statistical formulae as shown in Equations \ref{eq:variance} (variance), \ref{eq:stddev} (standard deviation), and \ref{eq:correlation} (correlation).
+Numerical data is treated statistically during index retrieval, worked out using the Decimal.js library and according to well known statistical formulae as shown in Equations \ref{eq:variance} (variance), \ref{eq:variance-comp} (computational re-arrangement of the variance formula), \ref{eq:stddev} (standard deviation), and \ref{eq:correlation} (correlation).
 \begin{align}
   (\sigma_{\overline{x}})^{2} = \frac{\sum{(x-\bar{x})^2}}{n-1}\label{eq:variance}
 \end{align}
 \begin{align}
-  \sigma_{\overline{x}} = \sqrt{\frac{\sum{(x-\bar{x})^2}}{n-1}}\label{eq:stddev}
+  (\sigma_{\overline{x}})^{2} =  \frac{\sum{x^2} - \frac{(\sum{x})^2}{n}}{n - 1}\label{eq:variance-comp}
+\end{align}
+\begin{align}
+  \sigma_{\overline{x}} = \sqrt{(\sigma_{\overline{x}})^{2}}\label{eq:stddev}
 \end{align}
 \begin{align}
   r = \frac{N\sum{xy} - (\sum{x})(\sum{y})}{\sqrt{[N\sum{x^2} - (\sum{x})^2][N\sum{y^2} - (\sum{y})^2]}} \label{eq:correlation}
