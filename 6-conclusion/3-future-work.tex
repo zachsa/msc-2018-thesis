@@ -5,4 +5,4 @@ Using custom reduce functions would greatly increase the number of possible meth
 
 It would be worth investigating the benefit that clustering CoucDB across many separate nodes. Although the database was sharded (CouchDB is configured to use 8 shards by default) and so processed data in parallel (across 2 physical cores), it is likely that deploying shards to separate servers would greatly increase performance and decrease indexing time. CouchDB disperses documents evenly across shards in a random fashion, suggesting that the workload of indexing the documents would be distributed evenly across all the shards of the database \cite{slack7Nov}. It is likely sharding would benefit large datasets, but not smaller datasets since the cost of network interactions would also increase if shards were distributed across separate nodes.
 
-There is also scope to develop a user interface for the \textit{nETL} application and launch a competitor to Microsoft's SSDT that is browser based and JSON-based.
+There is also scope to develop a GUI for the \textit{nETL} application and launch a competitor to Microsoft's SSDT that is browser based and JSON-based.
