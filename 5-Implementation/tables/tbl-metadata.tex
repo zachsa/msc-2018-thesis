@@ -5,34 +5,36 @@
         \label{tbl-metadata}
         \begin{tabularx}{\textwidth}{>{\hsize=1.6\hsize}X>{\hsize=0.8\hsize}Y>{\hsize=0.8\hsize}Y>{\hsize=0.8\hsize}Y}
             \toprule
-            \mC{c}{}                                                & \mC{c}{Adms}                      & \mC{c}{Adms/Grds}                 & \mC{c}{Adms/Grds/Evts}            \\
+            \mC{c}{}                                                & \mC{c}{Adms}                      & \mC{c}{Adms/Grds}                  & \mC{c}{Adms/Grds/Evts}              \\
             \midrule
-            Admissions lines extracted                              & 12 219                            & 12 219                            & 12 219                            \\
-            Admissions lines loaded                                 & 1 381                             & 1 381                             & 595                               \\
-            Admissions task time (sec)                              & 1.588\tnote{\textsuperscript{5}}  & 2.712\tnote{\textsuperscript{6}}  & 4.881\tnote{\textsuperscript{8}}  \\
+            Admissions lines extracted                              & 12 219                            & 12 219                             & 12 219                              \\
+            Admissions lines loaded                                 & 1 381                             & 1 381                              & 595                                 \\
+            Admissions task time (sec)                              & 1.588\tnote{\textsuperscript{1a}} & 2.712\tnote{\textsuperscript{1b}}  & 4.935\tnote{\textsuperscript{1c}}   \\
             \midrule
-            Grades lines extracted                                  &                                   & 513 872                           & 513 872                           \\
-            Grades lines loaded                                     &                                   & 1 891                             & 738                               \\
-            Grades task time (sec)\tnote{\textsuperscript{1}}       &                                   & 50.993\tnote{\textsuperscript{7}} & 95.796\tnote{\textsuperscript{9}} \\
+            Grades lines extracted                                  &                                   & 513 872                            & 513 872                             \\
+            Grades lines loaded                                     &                                   & 1 891                              & 738                                 \\
+            Grades task time (sec)                                  &                                   & 50.993\tnote{\textsuperscript{2a}} & 97.532\tnote{\textsuperscript{2b}}  \\
             \midrule
-            Events lines extracted                                  &                                   &                                   & 44 420 508                        \\
-            Events lines loaded                                     &                                   &                                   & -                                 \\
-            Events task time (sec)\tnote{\textsuperscript{1}}       &                                   &                                   & -                                 \\
+            Events lines extracted                                  &                                   &                                    & 44 420 508                          \\
+            Events lines loaded                                     &                                   &                                    & 661 555                             \\
+            Events task time (sec)                                  &                                   &                                    & 3 875.932\tnote{\textsuperscript{3} \\
             \midrule
-            Data footprint (MB)                                     & $>$ 1                             & $>$ 2                             & -                                 \\
-            Index calculation time (sec)\tnote{\textsuperscript{3}} & 0.533\tnote{\textsuperscript{11}} & 1.092\tnote{\textsuperscript{10}} & -                                 \\
+            Data footprint (MB)                                     & $>$ 1                             & $>$ 2                              & 169.5                               \\
+            Index calculation time (sec)\tnote{\textsuperscript{*}} & 0.533\tnote{\textsuperscript{4a}} & 1.092\tnote{\textsuperscript{4b}}  & 140.763\tnote{\textsuperscript{4c}  \\
             \bottomrule
         \end{tabularx}
         \scriptsize
         \begin{tablenotes}
-            \item[\textsuperscript{3}]CouchDB views are calculated per shard. By default a database contains 8 shards (even in single node mode). The log file shows start and end times of view calculations for each shard, the time is taken as time the first shard starts indexing, to the time the last shard stops indexing
-            \item[\textsuperscript{5}]$(1.502, 1.745, 1.518)$
-            \item[\textsuperscript{6}]$(3.045, 2.787, 2.305)$
-            \item[\textsuperscript{7}]$(52.899, 51.399, 48.681)$
-            \item[\textsuperscript{8}]$(5.313, 3.548, 5.782, 5.095)$
-            \item[\textsuperscript{9}]$(94.353, 92.902, 100.134, 102.738)$
-            \item[\textsuperscript{10}]$(0.988, 1.347, 0.941)$
-            \item[\textsuperscript{11}]$(0.519, 0.472, 0.607)$
+            \item[\textsuperscript{*}]CouchDB views are calculated per shard. By default a database contains 8 shards (even in single node mode). The log file shows start and end times of view calculations for each shard, the time is taken as time the first shard starts indexing, to the time the last shard stops indexing
+            \item[\textsuperscript{1a}]$(1.502, 1.745, 1.518)$
+            \item[\textsuperscript{1b}]$(3.045, 2.787, 2.305)$
+            \item[\textsuperscript{1c}]$(5.313, 3.548, 5.782, 5.095)$
+            \item[\textsuperscript{2a}]$(52.899, 51.399, 48.681)$
+            \item[\textsuperscript{2b}]$(94.353, 92.902, 100.134, 102.738)$
+            \item[\textsuperscript{3}]$(3989.82, 3942.93, 3695.046)$
+            \item[\textsuperscript{4a}]$(0.519, 0.472, 0.607)$
+            \item[\textsuperscript{4b}]$(0.988, 1.347, 0.941)$
+            \item[\textsuperscript{4c}]$(141.25, 142.709, 138.331)$
         \end{tablenotes}
     \end{threeparttable}
 \end{table}

@@ -1,7 +1,6 @@
 \section{Aggregation Example}
+\label{aggregation}
 Admissions data can be used to profile students based on their matric results, NBT scores and a combination of these. In other words, several benchmarks datasets are created from the admissions data. Variance and standard deviation of each of these datasets is calculated with the aim of providing an example of aggregation using CouchDB.
-
-Admission data incoming students across admissions data from 2014,2015 and 2016 for students that are residents of South Africa and who attended CSC1015F one or more times during the course of their undergraduate career. Data selection is performed in nETL, aggregation is performed in the MapReduce function, and the variance and standard deviation are calculated in the list function during data retrieval. Grade 12 results and NBT scores, along with combinations of these scores are used as benchmarks, with these scores collected across many students treated as separate datasets.
 
 \subsection{ETL}
 Rows are extracted from the admissions data in batches of 5 000. Each row is converted to an object, and rows are selected for undergraduate students that have citizenship or permanent residency in South Africa, and that have a grade for the CSC1015F course. A \textit{type\_} attribute with the value 'admission' is added to each row (now an object). Batches of objects (there are at most 5 000 objects per batch, but usually far fewer due to the filtering) are loaded into a CouchDB database. An example of a row from the admissions data serialized to a JSON string and as loaded into CouchDB is shown in Figure \ref{fig-json-admission}.
@@ -36,11 +35,11 @@ Avg Gr12 & NBT (Dbl Gr12 Mth & Sci)
 The built-in \_stats function is used to aggregate values in the view-index by benchmark type, which when used with \mintinline{text}{group=false} results in index output of a single list of stats-objects as shown in Figure \ref{fig-stats-output}\footnote{Values are rounded for better display} (indices of each object in the value output are indicated on the right hand side of the figure). The objects produced by the \_stats function (one object per benchmark dataset) contain fields for:
 
 \begin{itemize}
-  \item The sum of all items in the dataset
-  \item The count of all the items in the dataset
-  \item The lowest number in the dataset
-  \item The largest number in the dataset
-  \item The sum of each item squared in the dataset
+    \item The sum of all items in the dataset
+    \item The count of all the items in the dataset
+    \item The lowest number in the dataset
+    \item The largest number in the dataset
+    \item The sum of each item squared in the dataset
 \end{itemize}
 
 \input{5-implementation/figures/fig-stats-output}
@@ -48,7 +47,7 @@ The built-in \_stats function is used to aggregate values in the view-index by b
 \subsection{Index Retrieval}
 With reference to the reduced (aggregated benchmarks) output shown in Figure \ref{fig-stats-output} variance and standard deviation are worked out according to Equation \ref{eq:variance-with-fields}, with standard deviation the square root of variance. The computational variation of the sample variance formula is used.
 \begin{align}
-  (\sigma_{\overline{x}})^{2} =  \frac{sumsqr - \frac{sum^2}{count}}{count - 1}\label{eq:variance-with-fields}
+    (\sigma_{\overline{x}})^{2} =  \frac{sumsqr - \frac{sum^2}{count}}{count - 1}\label{eq:variance-with-fields}
 \end{align}
 Variance and standard deviation are calculated directly from the reduced index output during data retrieval using a CouchDB list function, with results output in tabular form as shown in Table \ref{tbl-variance-benchmarks}.
 

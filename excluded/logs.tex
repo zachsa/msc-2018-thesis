@@ -5,6 +5,64 @@ tail -f couchdb.log | grep -E '2017-12-15.*Starting\s.*_design/msc|2017-12-15.*I
 tail -f couchdb.log --lines 100 | grep -E 'Starting\sindex\supdate.*_design/msc|.*Index\supdate\sfinished.*_design/msc'
 \end{minted}
 
+\section{Correlation-events}
+\begin{minted}{sh}
+tail -f couch.log | grep -E 'Starting\s.*_design/correlation-events|Index\supdate\sfinished.*_design/correlation-events';
+\end{minted}
+
+\subsection{1}
+[info] 2018-04-08T12:17:25.493000Z couchdb@localhost <0.5687.100> -------- Starting index update for db: shards/40000000-5fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:17:25.495000Z couchdb@localhost <0.5729.100> -------- Starting index update for db: shards/c0000000-dfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:17:25.501000Z couchdb@localhost <0.5754.100> -------- Starting index update for db: shards/60000000-7fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:17:25.501000Z couchdb@localhost <0.5806.100> -------- Starting index update for db: shards/00000000-1fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:17:25.501000Z couchdb@localhost <0.5876.100> -------- Starting index update for db: shards/e0000000-ffffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:17:25.502000Z couchdb@localhost <0.4900.100> -------- Starting index update for db: shards/a0000000-bfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:17:25.502000Z couchdb@localhost <0.5760.100> -------- Starting index update for db: shards/80000000-9fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:17:25.512000Z couchdb@localhost <0.5818.100> -------- Starting index update for db: shards/20000000-3fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:19:45.658000Z couchdb@localhost <0.4900.100> -------- Index update finished for db: shards/a0000000-bfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:19:45.777000Z couchdb@localhost <0.5760.100> -------- Index update finished for db: shards/80000000-9fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:19:46.052000Z couchdb@localhost <0.5687.100> -------- Index update finished for db: shards/40000000-5fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:19:46.197000Z couchdb@localhost <0.5806.100> -------- Index update finished for db: shards/00000000-1fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:19:46.388000Z couchdb@localhost <0.5754.100> -------- Index update finished for db: shards/60000000-7fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:19:46.426000Z couchdb@localhost <0.5876.100> -------- Index update finished for db: shards/e0000000-ffffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:19:46.539000Z couchdb@localhost <0.5818.100> -------- Index update finished for db: shards/20000000-3fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:19:46.743000Z couchdb@localhost <0.5729.100> -------- Index update finished for db: shards/c0000000-dfffffff/correlation-events.1523184010 idx: _design/correlation-events
+
+\subsection{2}
+[info] 2018-04-08T12:08:37.702000Z couchdb@localhost <0.26812.99> -------- Starting index update for db: shards/20000000-3fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:08:37.703000Z couchdb@localhost <0.26846.99> -------- Starting index update for db: shards/80000000-9fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:08:37.704000Z couchdb@localhost <0.26935.99> -------- Starting index update for db: shards/00000000-1fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:08:37.705000Z couchdb@localhost <0.26805.99> -------- Starting index update for db: shards/c0000000-dfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:08:37.706000Z couchdb@localhost <0.26822.99> -------- Starting index update for db: shards/e0000000-ffffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:08:37.706000Z couchdb@localhost <0.26803.99> -------- Starting index update for db: shards/60000000-7fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:08:37.708000Z couchdb@localhost <0.26848.99> -------- Starting index update for db: shards/a0000000-bfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:08:37.715000Z couchdb@localhost <0.26924.99> -------- Starting index update for db: shards/40000000-5fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:10:59.937000Z couchdb@localhost <0.26848.99> -------- Index update finished for db: shards/a0000000-bfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:11:00.138000Z couchdb@localhost <0.26846.99> -------- Index update finished for db: shards/80000000-9fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:11:00.168000Z couchdb@localhost <0.26803.99> -------- Index update finished for db: shards/60000000-7fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:11:00.293000Z couchdb@localhost <0.26822.99> -------- Index update finished for db: shards/e0000000-ffffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:11:00.334000Z couchdb@localhost <0.26812.99> -------- Index update finished for db: shards/20000000-3fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:11:00.351000Z couchdb@localhost <0.26935.99> -------- Index update finished for db: shards/00000000-1fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:11:00.364000Z couchdb@localhost <0.26805.99> -------- Index update finished for db: shards/c0000000-dfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:11:00.411000Z couchdb@localhost <0.26924.99> -------- Index update finished for db: shards/40000000-5fffffff/correlation-events.1523184010 idx: _design/correlation-events
+
+\subsection{3}
+[info] 2018-04-08T12:01:03.135000Z couchdb@localhost <0.15442.99> -------- Starting index update for db: shards/40000000-5fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:01:03.157000Z couchdb@localhost <0.15727.99> -------- Starting index update for db: shards/60000000-7fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:01:03.157000Z couchdb@localhost <0.16767.99> -------- Starting index update for db: shards/e0000000-ffffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:01:03.158000Z couchdb@localhost <0.16792.99> -------- Starting index update for db: shards/80000000-9fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:01:03.158000Z couchdb@localhost <0.16815.99> -------- Starting index update for db: shards/a0000000-bfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:01:03.158000Z couchdb@localhost <0.16805.99> -------- Starting index update for db: shards/c0000000-dfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:01:03.159000Z couchdb@localhost <0.16838.99> -------- Starting index update for db: shards/00000000-1fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:01:03.199000Z couchdb@localhost <0.17823.99> -------- Starting index update for db: shards/20000000-3fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:03:20.380000Z couchdb@localhost <0.16815.99> -------- Index update finished for db: shards/a0000000-bfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:03:20.932000Z couchdb@localhost <0.16838.99> -------- Index update finished for db: shards/00000000-1fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:03:21.098000Z couchdb@localhost <0.15727.99> -------- Index update finished for db: shards/60000000-7fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:03:21.203000Z couchdb@localhost <0.15442.99> -------- Index update finished for db: shards/40000000-5fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:03:21.304000Z couchdb@localhost <0.16767.99> -------- Index update finished for db: shards/e0000000-ffffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:03:21.407000Z couchdb@localhost <0.16805.99> -------- Index update finished for db: shards/c0000000-dfffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:03:21.442000Z couchdb@localhost <0.17823.99> -------- Index update finished for db: shards/20000000-3fffffff/correlation-events.1523184010 idx: _design/correlation-events
+[info] 2018-04-08T12:03:21.466000Z couchdb@localhost <0.16792.99> -------- Index update finished for db: shards/80000000-9fffffff/correlation-events.1523184010 idx: _design/correlation-events
 
 \section{Correlation-grades}
 \begin{minted}{sh}
