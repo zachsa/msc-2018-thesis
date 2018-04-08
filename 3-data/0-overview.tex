@@ -1,32 +1,32 @@
-With special thanks to data owners: UCTs Chief Information Officer (CIO) Jane Hendry and Stephen Marquard (the Learning Technologies Coordinator from the Center for Innovation in Learning and Teaching at UCT), student data has been made available. This data encompasses UCT admissions data, course grades, and Sakai interactions. The three separate datasets are classified as:
+UCT’s Chief Information Officer (CIO) Jane Hendry and Stephen Marquard (the Learning Technologies Coordinator from the Center for Innovation in Learning and Teaching at UCT), made anonymized student data available for use in the present study. This encompasses UCT admissions data, course grades, and Sakai interactions. The three separate datasets are classified as:
 
 \begin{itemize}
     \item \textit{grades}: UCT course results
-    \item \textit{admissions}: Student matric results and National Benchmark Test (NBT) results
+    \item \textit{admissions}: Student Grade 12 and National Benchmark Test (NBT) results
     \item \textit{events}: Student interactions with the Sakai platform, measured as browser interactions
 \end{itemize}
 
-All three datasets are in CSV format and have the a student number field in common. This field is anonymized consistently across all three datasets to preserve row associations.
+All three datasets are in CSV format and have the student number field in common, which has been anonymized consistently across all three datasets to preserve row associations.
 
 \section{Grades}
-Three years of data is available: 2014, 2015 and 2016 received as separate CSV files and compiled into a single file with normalized delimiters. The fields of the compiled file is described in Table \ref{tbl-data-grades}, and a sample of this file is shown in Figure \ref{fig-sample-grades}. Essentially this data comprises a list of grades achieved for specific courses in specific years along with student numbers. The separate files could just as easily be used as received, but for the purposes of this investigation it is easier to work with a single file than multiple files.
+Three years of data are available (2014, 2015, and 2016) and were received as separate CSV files, then compiled into a single file with normalized delimiters. The fields in the compiled file are described in Table \ref{tbl-data-grades}, and a sample of this file is shown in Figure \ref{fig-sample-grades}. Essentially this data comprises a list of the grades achieved for specific courses in specific years, along with the anonymized student numbers. The individual files could have remained separate, but for the purposes of this investigation it is easier to work with a single file rather than multiple files.
 
 \input{3-data/tables/tbl-data-grades}
 \input{3-data/figures/fig-sample-grades}
 
 \section{Admissions}
-Three years of data is available: 2014, 2015, 2016 received as separate CSV files. As received, the files are disorganized; corresponding fields are spelled/capitalized differently across the files, the files have completely different sets of fields, fields ordering is inconsistent, and the files are delimited differently. It is possible to work with these files directly, but doing so would only complicate the analysis procedure and not add any value to the investigation. As such, a single CSV is compiled with the following addressed:
+Upon receipt, the files containing data from the three years (2014, 2015, 2016) were formatted inconsistently: corresponding fields were spelled/capitalized differently across the files, the files had completely different sets of fields, the ordering of the fields was inconsistent, and the files were delimited differently. It is possible to work with these files directly but doing so would complicate the analytical procedure and would not add any value to the investigation. As such, a single CSV was compiled addressing the following:
 
 \begin{itemize}
-    \item Field names are adjusted to be spelled the same with normalized whitespace (where field names contain whitespace)
-    \item Duplicated fields are removed (UCT performance is appended to each student's admissions data for years subsequent to enrollment)
-    \item Contentious data (race, gender, etc.) that this project is not ethically cleared to work with is scrubbed away
+    \item Field names were adjusted to feature uniform spelling with normalized whitespace (where field names contain whitespace)
+    \item Duplicated fields were removed (UCT performance is appended to each student's admissions data for subsequent years of enrollment)
+    \item Potentially contentious data (race, gender, etc.) that this project is not ethically cleared to work with was removed
 \end{itemize}
 
-The single, processed admissions CSV file contains an anonymized list of students that enrolled at UCT along with corresponding matric results and NBT scores. The CSV file is described in Table \ref{tbl-data-admissions} and a sample of the file is shown in Figure \ref{fig-sample-admissions}.
+The single, processed admissions CSV file contains an anonymized list of students that enrolled at UCT along with corresponding Grade 12 results and NBT scores. The CSV file is described in Table \ref{tbl-data-admissions} and a sample of the file is shown in Figure \ref{fig-sample-admissions}.
 
 \section{Events}
-Sakai usage data is available for the 2016 year, received as a single CSV file that is 5.2GB in size. Due to it's large size, the file cannot be opened in Microsoft Excel and so no scrubbing/amendment is performed on it. Fields in this file are described in Table \ref{tbl-data-events}. The file as received doesn't contain header information, which had to be obtained separately; these headers are included in the CSV sample as shown in Figure \ref{fig-sample-events} for ease of reference\footnote{Lines from files can be printed to BASH terminal windows via the command: \mintinline{text}{head -n <no. of lines> <file.ext>}}.
+Sakai usage data is available for 2016 only and was received as a single CSV file that is 5.2GB in size. Due to its large size, the file cannot be opened in Microsoft Excel and so no scrubbing/amendment was performed on it. Fields in this file are described in Table \ref{tbl-data-events}. The file as received doesn't contain header information, which had to be obtained separately; for ease of reference, these headers are included in the CSV sample shown in Figure \ref{fig-sample-events} \footnote{Lines from files can be printed to BASH terminal windows via the command: \mintinline{text}{head -n <no. of lines> <file.ext>}}.
 
 \input{3-data/tables/tbl-data-admissions}
 \input{3-data/figures/fig-sample-admissions}
