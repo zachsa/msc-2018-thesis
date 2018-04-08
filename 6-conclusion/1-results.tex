@@ -20,31 +20,22 @@ Performance metrics of the different components of the system are recorded and a
 \input{6-conclusion/tables/tbl-metadata}
 
 \section{Student Profiling}
-An important property of any benchmarking method is the variance of the datasets from which these benchmarks are drawn. Small variance will magnify small discrepancies between students and as such does not provide a useful means of assessing students for university admission. Obviously the higher the degree of correlation between benchmarking methods and course grades the better.
+Exploration of datasets as part of the data mining process includes assessing features such as variance and correlation within the data. These features impact the usefulness of datasets in terms of data mining and so are important to quantify during the data exploration phase.
 
-An ideal benchmark has a high degree of correlation with a large variance. Obviously benchmarking methods should be applicable to as large a group of students as possible (for example, although additional mathematics may be a good means of assessing incoming student's abilities, it is useless since so few students take this subject in matric).
+Table \ref{tbl-variance-benchmarks} lists variance measurements for several datasets derived from the admissions data in an effort to assess different means of benchmarking students. These same datasets are tested for correlation with final CSC1015F grade results as shown in Table \ref{tbl-correlation-grades}. An additional dataset is compiled from each benchmarks dataset comprising students change in rank from CSC1015F course grades compared to their class rank in the benchmark dataset. Correlation between this dataset and the events dataset is shown in Table \ref{tbl-correlation-events}.
 
-Statistical output as calculated during index retrieval is shown in:
+NBT scores scores have a higher correlation with CSC1015F grades compared to Grade 12 results in general, with the highest correlation between admissions data and CSC1015F results found when an average of all grade 12 results (that are incorporated into this study) and NBT scores is used as a means of benchmarking students. However this means of benchmarking has the smallest variance as a feature, so it seems likely that higher correlation with CSC1015F is highlighting this feature rather than substantiating the usefulness of this benchmarking method.
 
-\begin{itemize}
-    \item Table \ref{tbl-variance-benchmarks}: Variance of benchmarks datasets
-    \item Table \ref{tbl-correlation-grades}: Correlation between final CSC1015F results with different benchmark datasets
-    \item Table \ref{tbl-correlation-events}: How change in classrank between final CSC1015F and different benchmark datasets correlates with general Sakai usage
-\end{itemize}
+Two benchmarking methods stand out: using straight \textit{NBT QL} a \textit{NBT Mth} scores as benchmark datasets. These datasets display a relatively high standard deviation in terms of percentages ($> 13\%$) and correlate better with CSC1015F grades than many other benchmarks (with $r = 0.53$ and $r = 0.51$ respectively)
+
+Three scatter plots of grade/benchmark scores are included to ..............: Figure \ref{xxx} shows a plot of \textit{GR12 ENG} benchmark vs CSC1015F scores, \ref{yyy} shows a plot of \textit{Avg Gr12 \& NBT} benchmark vs CSC1015F scores, and \ref{zzz} shows a plot of \textit{NBT QL} vs CSC1015F scores. These highlight ............
+
+No correlation is found between student performance and Sakai usage. This is perhaps because the event data doesn't contain a foreign key to the grade entity, and so it is only possible assess the count of presence events for all sites in relation to the CSC1015F site and not usage of the CSC1015F Sakai site specifically.
 
 \input{6-conclusion/tables/tbl-variance-benchmarks}
 \input{6-conclusion/tables/tbl-correlation-grades}
 \input{6-conclusion/tables/tbl-correlation-events}
 
-\subsection{Variance of Different Student Profiling Methods}
-Only admissions data with values for all Gr12 grades (except math literacy and additional maths) and NBT results were considered resulting with a sample size of \mintinline{text}{n = 908} students over 3 years.
 
-\subsection{Correlating CSC1015F Grades With Admissions Data}
-Correlation between the Grades and various combinations of the Benchmarks data shows that compared to Gr12 results, the NBT scores correlate better with CSC1015F performance. The highest correlation between benchmarking and CSC1015F course results occurs when the NBT scores are averaged, with either the NBT QL or NBT Mth (or both) scores double weighted; such a correlation is 0.50, which is considered a moderate correlation.
 
-\subsection{Correlating Sakai Usage With Academic performance}
-Because the event data doesn't contain a foreign key to the grade entities, it is only possible assess the count of presence events for all sites in relation to the CSC1015F site. This isn't particularly useful, and perhaps is the main reason that no correlation is found. However this analysis is useful in demonstrating how such a correlation can be performed using CouchDB making such an analysis somewhat worthwhile.
-
-Taking the NBT QL benchmark as an example (which has a comparatively high correlation with course grades compared to other benchmarks), the \( \delta \) class rank of benchmark score vs grade score is plotted against presence event count of each student in \ref{fig-delta-rank} for a visual feel of how the correlation analysis plots. The correlation between course grades (for CSC1015F) and LMS usage is relatively insignificant according to these results.
-
-\input{6-conclusion/figures/fig-delta-rank}
+\input{6-conclusion/figures/}

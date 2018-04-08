@@ -11,6 +11,8 @@ search eg. => e.g.
 
 joins across documents
 
+define IO somewhere
+
 
 Did you compare the correlations, variances and std deviations with a relational database result, or with Excel, or on a small dataset with manual calculations?
 

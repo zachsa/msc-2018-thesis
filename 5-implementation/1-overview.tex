@@ -1,0 +1,101 @@
+\label{chapter-analysis}
+CouchDB's MapReduce implementation is limiting in terms of performing \textit{joins} and \textit{selections} across multiple entities since index key:values pairs are derived from single documents. Each document is processed by MapReduce in isolation, the output of which is added to the index and no shared state between documents is available. In other words, map function executions are isolated from each other and from the database. Shared state between documents and other documents/databases during MapReduce calculation would violate this principle as well as pose a significant security risk. The MapReduce engine is pure JavaScript by design. No IO to either a file system or to a network is possible. Although many JavaScript implementation provide APIs that allow this, such features are either disabled or emitted for the couchjs engine \cite{slack28Feb}.
+
+Selection in terms of filtering documents can be performed during map function execution but requires hard-coded filter logic into the map function; selection cannot be dynamic in that documents cannot be filtered based on values in other documents. For the same reason, joins cannot be performed during map function execution. Although from a logical perspective joins can be accomplished during reduce function execution, they should not be used for this (performance will deteriorate extremely as database size increases). Practically speaking, neither joins nor selection can be achieved when indexing CouchDB databases. Since indices are the means by which data is retrieved from CouchDB it is fair to say that neither joins nor selections can be performed in CouchDB.
+
+Working with relational data in CouchDB therefore requires consideration across the entire software stack. That is, considerations with regards to ETL processes, indexing and data retrieval should all be geared towards working with relational data. In this project the following process involving nETL and CouchDB is used:
+
+\begin{itemize}
+  \item CSVs are parsed, rows filtered (selection) and data loaded into CouchDB by the nETL application
+  \item An index is created from the CouchDB database via MapReduce
+  \item Data is retrieved directly from the index file using a list function. This function performs joins and statistical calculations
+\end{itemize}
+
+MapReduce processes consist of a user-defined map function and specifying one of CouchDB's built-in reduce functions; \_sum, \_count and \_stats) are implemented within the main Erlang process and offer a performance benefit compared to custom reduce functions. Unlike built-in reduce function, custom reduce functions are executed externally to the main Erlang process and so an IO overhead. Running CouchDB on a Windows machine (as in this project) instead of Unix-based operating systems results in exaggerated overhead for custom reduce functions due to different IO implementation at kernel level \cite{slack1Nov}.
+
+\section{Joins}
+The three datasets used in this project require joining on the StudentID field. This field appears once for every student in the admissions data, several times for each student in the grades data and up to thousands of times per student in the events data. Both the grade and event data contain a field for year - i.e. the year in which a grade was obtained or the year in which an event was registered; these two datasets require joining on both the StudentID and Year fields. Admissions data is only collected once per student enrollment, so is associated with grade and event data only by StudentID. Two joins are performed: a 2-way join of grades and admissions data (Equation \ref{eq:2-way-join}), and a 3-way join of of grades, events and admissions (Equation \ref{eq:3-way-join}).
+\begin{align}
+  grades \bowtie events\label{eq:2-way-join}
+\end{align}
+\begin{align}
+  (grades \bowtie events) \leftouterjoin admissions\label{eq:3-way-join}
+\end{align}
+
+\subsection{Natural Joins}
+From a logical perspective there are several ways by which a join be achieved using CouchDB's MapReduce implementation specifically. One such method is to configure a map function to output identical keys for the three entities described in Equation \ref{eq:key}:
+\begin{align}
+  [studentNumber,courseCode,year]\label{eq:key}
+\end{align}
+During map function execution it is possible to emit each document several times with different keys, which is useful when mapping documents that don't contain all the required fields of the key.
+
+Grades documents contain fields for all three key values, so each grades document is emitted once. Admissions documents only contain one of the required keys (studentNumber), so the map function emits each admissions document several times - the document needs to be emitted for every possible courseCode and year that a grades document may have so that a natural join can be performed on a mutual [studentNumber,CourseCode,year] combination key. Similarly, events documents contain fields for studentNumber and year. Each events document needs to be emitted several times - once for each possible courseCode on which a natural join with grades documents may be required.
+
+This approach to joining relies on grouping by common key (a natural join), which results in the reduce function receiving a list of all documents per key key. The join can then be performed in the reduce function (with difficulty considering that CouchDB's reduce function contract requires allowance for \mintinline{text}{rereduce=true}).
+
+To use the built-in \_stats function to perform the join, a map function is configured to and emit a tuple of 11 values corresponding to key output. Index position in the tuple indicates the value-output of specific entities. During map function execution all 11 values are instantiated as 0 (a falsy value). Each index (or group of indices) of the output tuple is reserved for a specific entity's mapped output and adjusted appropriately depending on the type of entity being processed. The output tuple is structured so that entity information corresponds to specific locations in the emitted tuple (map value output):
+
+\begin{minted}[linenos=false]{text}
+[
+   0,                          # i = 0: a course % grade or 0
+   0, 0, 0, 0, 0, 0, 0, 0,     # 0 < i < 8: admission grade %s
+   0, 0                        # 8 < i > 11: event count for semester 1/2
+]
+\end{minted}
+
+Depending on the value of the `type\_' attribute of the document being processed by the map function, values at relevant indices of the tuple for that particular document type are altered to represent the info in the document that should be output. If the document being processed by the map function is of \textit{type\_} ‘grade’, then the map function emits a tuple with a value at \mintinline{text}{i = 0} and 0s for all other indices: \[[\%, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]\]
+
+If the document is of \textit{type\_} `admission', the map function emits a tuple with values at \mintinline{text}{0 < i < 8}: \[[0, \%, \%, \%, \%, \%, \%, \%, \%, 0, 0]\]
+
+If the document is of \textit{type\_} ‘event’, the map function emits a tuple with values at \mintinline{text}{8 < i > 11}: \[[0, 0, 0, 0, 0, 0, 0, 0, s1EventCount, s2EventCount]\]
+
+In terms of performance this approach is disastrous. To analyze 40 courses taken over 3 years, each admissions document needs to be emitted for a student $40 x 3 = 120$ times so that the key of the Grade document [StudentID, Course, Year] can always be joined to admissions document. Likewise, Each events document (which has year but not course information) needs to be emitted 40 times - once for each course a join could potentially be performed on. This approach is wasteful of computer resources at best (if a single course is being analyzed) and completely impractical to scale (of several courses are being analyzed).
+
+\subsection{Joins via Sorting}
+A more performant approach to performing joins is to collect adjacent values from and indices sorted by keys. With reference to an index of the form shown in Figure \ref{fig-sorted-index} (A) documents output by a map function that share the same key are guaranteed to be grouped together since b+trees are guaranteed to be sorted. A map function outputting compound keys such as in \ref{eq:key} can fill in missing fields with $0$. All three entities have a studentNumber field, so will be grouped together. Admissions and events documents will be emitted with the value $0$ in place of the courseCode field (so will be ordered before grades document output in the index). Admissions documents will be emitted with the value $0$ in place of year, so will always be ordered before events document output in the index.
+
+Because output is systematically processed one student at a time, with grades, events and admissions data processed in a predictable order per student, joins can be achieved by holding documents for a particular StudentID in memory and processing grades, events, admissions rows for that StudentID. When a new StudentID is encountered, a joined row is output, memory is flushed and a new joined row for the new studentID is started. This approach is performant for 2-Way, 3-Way, and more generally, for \textit{N}-Way joins. Additionally, since entity information is obtainable via key-structure, for e.g. a key of $(studentNumber,0,0)$) is indicative of the admissions entity, map output can be structured according to entity types.
+
+\subsection{Joining and Aggregating}
+CouchDB's reduce functions are primarily geared towards aggregating data. This is particularly useful for the events data where several thousand events documents are associated with a single student. The documents are grouped when passed to the reduce function, and aggregated to a single output in the final index (for example, by specifying the \_stats or \_sum reduce functions).
+
+In other words, only a single document that is an aggregation of all events documents will be stored as reduced output in the view. So when using reduction, for any student number, scanning the index produces first an admissions document, then a single (aggregated) events document, then a single grade document for each course that student enrolled in. An example of this with reference to the \_sum reduce function is shown in \ref{fig-sorted-index} (B). Retrieving reduced index output requires querying the index and specifying \mintinline{text}{reduce=true}. In addition, it is necessary to specify \mintinline{text}{group=true}. This results in reduction being performed on grouped keys instead of retrieving an aggregation of the entire index (which useful, for example, when calculating variance).
+
+\input{5-implementation/figures/fig-sorted-index}
+
+With this approach, MapReduce fills the important role of structuring aggregated data as a sorted b+tree index that then facilitates joining. But it should be noted that joining is possible because indices are structured as b+trees - the same structure as used by the main database files. So these files are also sorted (according to documents \_id field). As such, it is possible to join documents directly on retrieval from the main database rather than creating an index first - especially since the \_id field can be given meaningful values. There are benefits to indexing database files, however, such as listed here:
+
+\begin{itemize}
+  \item CouchDB database files are sorted by the ``\_id'' field, which when unspecified on document insert is initialized as a UUID. Using UUIDs as unique document identifiers allow for distributed systems in which cluster nodes can operate independently of each other without the possibility of documents being created in separate nodes with conflicting IDs. Even though not required by this project, such best practices are followed. A b+tree sorted by a UUID is not useful for document retrieval, and as such, views are required of the underlying data store for any kind of index-based querying
+  \item List functions are invoked via an HTTP GET request with the requirement of specifying a view within the URI. List functions are convenient for usage in this project as they facilitate ordered, iterative, range-based access (meaning that datum can be accessed sequentially, in isolation and in reliable order)
+  \item When aggregations of specific entities are required, retrieving data directly from these indexes is vastly easier than having to aggregate during data retrieval. Without a reduce function, additional logic would be required during retrieval to perform such aggregations. As aggregation logic becomes more complicated the difficulty of such direct data retrieval increases and the benefit of using indexes increases as a result. Also, performing aggregation during the indexing phase instead of data retrieval greatly improves performance of data retrieval
+\end{itemize}
+
+\section{Selections}
+Performing joins via iterating over ordered indices is quite efficient in terms of memory usage. No matter the size of datasets being processed, memory usage will always be fairly low. An increase in size of datasets will simply result in more processing time. It is therefor feasible (and possible) to perform selections during index calculation via a map function. To do this, predicates are hard coded into the map function and applied to every document that is processed. Each processed document is then either emitted and incorporated into an index or discarded.
+
+The limitation of this approach is that the predicates can only be applied to fields of the documents being processed. It is a common use case to apply selection predicates to fields made available via first joining a dataset with another dataset. This is impossible to achieve within the context of map function execution. It is possible to apply selections that require joining data on index retrieval (as a join is performed), but this is quite inefficient in terms of the size of the required index. The events data, for example, has 44.4 million documents most of which are not required. To perform a selection on the events data during MapReduce requires iterating through through all events documents - which is expensive in terms of time. Reducing the number of documents loaded into CouchDB in the first place, makes for working with CouchDB more performant and easier. As such, where a join is required to make available fields used in a selection predicate, a join is (effectively) achieved used nETL during the ETL phase of analysis. Joins can therefore be performed by the nETL application is two ways:
+
+\begin{itemize}
+  \item Selection-based predicates can be applied to fields based on field values. More advanced predicate logic (i.e. where field values contain substrings, or where field values fall in a range, etc. - i.e. joins based on conditions other than equality) is not implemented in the current version of nETL used for this project, although it would be fairly straightforward to implement such a feature in the future. Such predicates are not used in this project, but if they were could easily be implemented in the map function (provided a join isn't first required)
+  \item Selection-based predicates based on information retrieved from a separate CouchDB index (similar in concept to a join). Such an approach is conceptually similar to how joins are performed on distributed datasets, where a list of keys on which data joins are required is acquired prior to performing database operations so as to minimize network transport costs \cite{sonia2018}.
+\end{itemize}
+
+When processing admissions and events CSVs a join is required to grades entities to make a course code field available for the selection predicate of only selecting student numbers associated with the CSC1015F course to be applied to. To allow for this, a database is setup housing all CSC1015F grades documents. Indices are created for this database (a database of grades) to make a list of students available in whatever format required; for admissions data: a predicate is applied based on the \textit{anonIDnew} field, for events data: a predicate is applied based on the \textit{uct\_id} field. Indices created from the grades database provide a list of student numbers for these different field names (the list of student numbers is the same).
+
+\section{Statistical calculations}
+Because all numbers in JavaScript are 64-bit floating-point (following the IEEE 754 standard \cite{floatingPoint}), working with rational numbers with decimal points results in peculiarities compared to expectations formed from working with a base-10-framed mindset - for example, the sum: $0.1 + 0.2 = 0.30000000000000004$. Decimals such as $0.1$ and $0.2$ cannot be accurately represented in binary format within 64-bit address space (or any finite amount of memory). As such, rounding errors occur. Quantifying the margin for such errors and handling these cases correctly is difficult \cite{Goldberg1991}, so to side-step this uncertainty an open-source library (\textit{decimal.js} \cite{decimaljs}) is used to handle arithmetic via JavaScript. CouchDB allows usage of 3rd party JavaScript libraries via implementing CommonJS module loading within the context of couchjs.exe \cite{commonJsMapFn}.
+
+Numerical data is treated statistically during index retrieval, worked out using the Decimal.js library and according to well known statistical formulae as shown in Equations \ref{eq:variance} (variance), \ref{eq:variance-comp} (computational re-arrangement of the variance formula), \ref{eq:stddev} (standard deviation), and \ref{eq:correlation} (correlation).
+\begin{align}
+  (\sigma_{\overline{x}})^{2} = \frac{\sum{(x-\bar{x})^2}}{n-1}\label{eq:variance}
+\end{align}
+\begin{align}
+  (\sigma_{\overline{x}})^{2} =  \frac{\sum{x^2} - \frac{(\sum{x})^2}{n}}{n - 1}\label{eq:variance-comp}
+\end{align}
+\begin{align}
+  \sigma_{\overline{x}} = \sqrt{(\sigma_{\overline{x}})^{2}}\label{eq:stddev}
+\end{align}
+\begin{align}
+  r = \frac{N\sum{xy} - (\sum{x})(\sum{y})}{\sqrt{[N\sum{x^2} - (\sum{x})^2][N\sum{y^2} - (\sum{y})^2]}} \label{eq:correlation}
+\end{align}
