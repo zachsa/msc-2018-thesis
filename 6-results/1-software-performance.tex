@@ -1,3 +1,6 @@
-Performance metrics of the different components of the system are recorded and are shown in Table \ref{tbl-metadata} showing running time of nETL tasks, a summary of the data processed by nETL, CouchDB indexing times, and database/index storage footprints. The signature of nETL's asynchronous task management is clear; tasks take longer to run when run concurrently with other tasks. But the processing is asynchronous, since log lines from separate tasks are interleaved.
+\section{Systems Summary}
+Measurable aspects of the processes used during the course of this project such as: runtimes of nETL processes, indexing time in context of the data size, and database storage size are included in Table \ref{tbl-metadata}. Indexing time for a CouchDB database of 3.9 million documents is about 140 seconds.
+
+Task runtime is quicker executed in isolation than concurrently with other tasks, which is expected; task runtime increases when interleaved with other tasks since nETL tasks are executed concurrently but not in parallel. Multiple task executions taking similar amounts of time to complete, and performance seems tolerable, taking around and hour to process a CSV of 44.4 million lines.
 
 \input{6-results/tables/tbl-metadata}
