@@ -1,14 +1,6 @@
---------- NEW ---------
+Data mining typically requires implementing operations that involve cross-cutting entity boundaries and are awkward to implement in document-oriented databases. CouchDB, for example, models entities as documents, with highly isolated entity boundaries, and on which joins cannot be directly performed.
 
-Data mining typically requires implementing operations that are strongly coupled to relational data models such as slicing, dicing, drilldown, rollup, etc. Such operations require cross-cutting entity boundaries and are awkward to implement in aggregate-oriented databases. CouchDB, for example, models entities as \textit{documents}, with highly isolated entity boundaries, and on which joins cannot be performed at all.
+This project shows how join and aggregation can be achieved across entity boundaries in such systems, as encountered for example in the pre-processing and exploration stages of educational data mining. A software stack is presented as a means by which this can be achieved; first, datasets are processed via ETL operations, then MapReduce is used to create indices of ordered and aggregated data. Finally, a Couchdb list function is used to iterate through these indices and perform joins, and
+to compute aggregated values on joined datasets such as variance and corelations.
 
-This project shows an example of implementing an aggregate-oriented database (CouchDB) in the preparation of mineable, educational datasets that are highly relational. A software stack is presented as a means by which this can be achieved; first, datasets are processed via ETL operations, then MapReduce is used to create indices of ordered and aggregated data. Finally, a Couchdb list function is used to iterate through these indices and perform joins, and present statistical features of joined datasets such as variance and correlation.
-
-In terms of this case study, it is shown that NBT scores correlate better with final grades for the CSC1015F course than Grade 12 results for English, Science and Mathematics.
-
-
---------- OLD ---------
-
-CouchDB is a NoSQL database that is optimized for use with large semistructured or unstructured datasets. In data mining ETL processing is performed, then multiple datasets are joined and explored before being processed via machine learning. This project examines the application of CouchDB in the preparation of mineable datasets.
-
-MapReduce is used to create indices of ordered and aggregated data. This allows for joins to be effectively performed during data-retrieval. A Couchdb list function is used to iterate through these indices and perform joins, and present statistacal features of joined datasets such as variance and correlation.
+In terms of the case study, it is shown that the proposed approach to implementing cross-document joins and aggregation is effective and scalable. In addition, it was discovered that for the 2014 - 2016 UCT cohorts, NBT scores correlate better with final grades for the CSC1015F course than do Matric results for English, Science and Mathematics.
