@@ -1,14 +1,12 @@
 The focus of this project is the manipulation of data using CouchDB and associated technologies, whilst specifically using data from the business domain of Educational Data Mining (EDM). This field is well developed and many studies have sought to model student performance based on markers such as attendance, assignment and test grades, high school marks, demographic data, etc. Different means of model generation have been discussed by the EDM community, such as predictive analysis via decision tree generation \cite{Qasem20016,Balestra2017,casper2017,Dimitris,zebun2005,Mierle:2005}, with varying results. Other models have been applied within the field of EDM, as discussed in a review of EDM up to 2009 \cite{bakerEdMiningSummary}.
 
-UCT’s Chief Information Officer (CIO) Jane Hendry and Stephen Marquard (the Learning Technologies Coordinator from the Center for Innovation in Learning and Teaching at UCT), made anonymized student data available for use in the present study. This encompasses UCT admissions data, course grades, and Sakai interactions. The three separate datasets are classified as:
+UCT’s Chief Information Officer (CIO) Jane Hendry and Stephen Marquard (the Learning Technologies Coordinator from the Center for Innovation in Learning and Teaching at UCT), made anonymized student data available for use in the present study. This encompasses UCT admissions data, course grades, and Sakai interactions. The three separate datasets were recieved in CSV format and are classified as:
 
 \begin{itemize}
     \item \textit{grades}: UCT course results
     \item \textit{admissions}: Student Grade 12 and National Benchmark Test (NBT) results
     \item \textit{events}: Student interactions with the Sakai platform, measured as browser interactions
 \end{itemize}
-
-All three datasets are in CSV format and have the student number field in common, which has been anonymized consistently across all three datasets to preserve row associations.
 
 \section{Grades}
 Three years of data are available (2014, 2015, and 2016) and were received as separate CSV files, then compiled into a single file with normalized delimiters. The fields in the compiled file are described in Table \ref{tbl-data-grades}, and a sample of this file is shown in Figure \ref{fig-sample-grades}. Essentially this data comprises a list of the grades achieved for specific courses in specific years, along with the anonymized student numbers. The individual files could have remained separate, but for the purposes of this investigation it is easier to work with a single file rather than multiple files.
