@@ -10,7 +10,7 @@ Rows retrieved from the CSVs contain numerous fields that are not required, and 
 
 \input{5-implementation/figures/fig-json-grade}
 
-\subsection{Index Calculation}
+\subsection{Indexing}
 After loading the data from the CSVs into CouchDB, a Map function is used to produce an index of the CouchDB documents ordered by Student ID, with the guarantee that for everystudent number, documents are ordered by type; an admissions document output precedes grade documents output for any given student. Knowing the order of documents through the view-index allows the join to be performed upon data-retrieval. Only a map function is required (no reduce function). That is, on the map function’s execution the ``type\_'' attribute is checked. If the document is a line of the grades entity, then the key [Student ID, Course, year] is emitted along with a single number for the value - the percent achieved for the course. If the document is a line of the admissions entity, then the key [studentNumber, 0, 0] is emitted along with an ordered list of 19 values corresponding to each of the 19 different methods of benchmarking students (discussed in Chapter \ref{aggregation}). A key of [studentNumber, year] could have been used instead, since the course is always CSC1015F. But explicitly including the year in the key makes debugging easier, whilst also making the code more generically applicable if other courses are to be analyzed.
 
 Normalization of the percentage fields (i.e. ``Percent'' for the grades entity and the test results in the admissions entity) is done using a nested function (a function defined within the map function) according to best-guess logic on how grade symbols correlate with percentage. The logic used for this is shown in Table \ref{ap-tbl-normalize-grades} and Table \ref{ap-tbl-normalize-admissions} in the appendix.
@@ -19,7 +19,7 @@ Because a student should only be represented by a single row in the admissions d
 
 \input{5-implementation/figures/fig-mapfn-correlation-grades}
 
-\subsection{Index Retrieval}
+\subsection{Presentation}
 A list function is used for data retrieval; this function scans the index iteratively (i.e. documents for each student are processed iteratively; first a student's admissions document is processed, then a student's grades documents are processed). The 2-way join is achieved in this way; for every student number the grade and admissions data are joined, and summations of various fields of the grades and each benchmark are updated. For example, for every index key:value processed, the product of \mintinline{text}{CSC1015F \% x each benchmark \%} is calculated and added to running sums kept for each benchmark.
 
 Once the iteration over student numbers is finished, the completed summations are used to calculate correlation coefficients for each combination of benchmarking method and grade  according to Equation \ref{eq:correlation}\footnote{\textit{x}: grade \%, \textit{y}: benchmark (\textit{r} is calculated for multiple \textit{y} values)}.

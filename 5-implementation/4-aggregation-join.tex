@@ -10,7 +10,7 @@ The events data contains a field \textit{ref}, which is a long string and is not
 
 \input{5-implementation/figures/fig-json-event}
 
-\subsection{Index Calculation}
+\subsection{Indexing}
 Since a single student may be associated with many rows in the events data (sometimes even thousands of rows), a reduce function is used within the MapReduce job to aggregate the events rows into a single document, which provides a count of Sakai presence events for both the first and second semesters, with the output of this aggregation included in the index along with grade and benchmark data when reduce = true. The index consists of key:value pairs of student numbers associated with a tuple that contains values for grades, benchmarks, and event information.
 
 During the map function’s execution, the logical handling of grade and admissions entities has already been discussed. If the document produced is a line from the events entity, then the date of the event is categorized as either having occurred in semester 1 (S1) or semester 2 (S2). A key of [Student ID, 0, Year] is emitted along with the tuple [S1, S2]. The S1 and S2 variables are 0 by default, and depending on the date of the presence event, one of these variables is altered to `1'. CSC1015F is a first-semester course, but by including a count of both semesters, it becomes possible to use the same indexing code on courses that run in the second semester as well. The logic of the map function is shown in Figure \ref{fig-mapfn-correlation-events}.
@@ -19,7 +19,7 @@ Using the \_sum reduce function, an aggregation is done across all documents wit
 
 \input{5-implementation/figures/fig-mapfn-correlation-events}
 
-\subsection{Index Retrieval}
+\subsection{Presentation}
 A list function is implemented to retrieve the index with \mintinline{text}{reduce = true \& group = true} so that only reduced index output is retrieved, grouped by key.
 
 Because the ranking of students for course grade and each benchmarking method is required, several ordered lists are kept in memory for the duration of time that a single course code is being processed (in this case CSC1015F). In other words, for each course code, and then for every result retrieved from the index, the student number from the row being processed is checked and compared to the student number from the previous row. If the current student number is not the same as the previous student number, then the current rows in memory are joined, and list of ranks for each course and benchmark are updated. It is necessary to process all index output for a particular course code before students can be ranked for a course (as well as ranked in terms of their benchmarks, when compared to other students who took that course).

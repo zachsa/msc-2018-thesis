@@ -7,7 +7,7 @@ Rows are extracted from the admissions data in batches of 5 000. Each row is con
 
 \input{5-implementation/figures/fig-json-admission}
 
-\subsection{Index Calculation}
+\subsection{Indexing}
 All the admissions documents are loaded into the CouchDB database and mapped to an index consisting of \textit{anonIDnew:[benchmarks]} key-value pairs. Derivative benchmarks are calculated during map function execution before being incorporated into the index – each value added to the index is a tuple of benchmarks categorized according to the following indices:
 
 \begin{minted}[firstnumber=0]{text}
@@ -44,7 +44,7 @@ The built-in \_stats function is used to aggregate values in the view-index by b
 
 \input{5-implementation/figures/fig-stats-output}
 
-\subsection{Index Retrieval}
+\subsection{Presentation}
 With reference to the reduced (aggregated benchmarks) output shown in Figure \ref{fig-stats-output}, variance and standard deviation are worked out according to Equation \ref{eq:variance-with-fields}, with standard deviation being the square root of variance. The computational variation of the sample variance formula is used.
 \begin{align}
     (\sigma_{\overline{x}})^{2} =  \frac{sumsqr - \frac{sum^2}{count}}{count - 1}\label{eq:variance-with-fields}
