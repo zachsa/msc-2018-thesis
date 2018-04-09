@@ -24,11 +24,11 @@ A list function is used for data retrieval; this function scans the index iterat
 
 Once the iteration over student numbers is finished, the completed summations are used to calculate correlation coefficients for each combination of benchmarking method and grade  according to Equation \ref{eq:correlation}\footnote{\textit{x}: grade \%, \textit{y}: benchmark (\textit{r} is calculated for multiple \textit{y} values)}.
 
-Although the \_stats reduce function calculates \textit{sum of squares} per dataset, this is not useful in cases where individual rows from separate entities should be joined (such as in this 2-way join). For example, when working out the numerator as provided in the correlation formula:
+Although the \_stats reduce function calculates \textit{sum of squares} per dataset, this is not useful in cases where individual rows from separate entities should be joined (such as in this 2-way join). For example, the numerator (Equation \ref{eq:numerator}) from the correlation formula (Equation \ref{eq:correlation}) cannot be calculated during MapReduce. Only the $\sum{x}$ and $\sum{y}$ values are accessible when joining the two entities during list function executions, and not $x$ and $y$ values since these values come from entity instances.
 \begin{align}
-    N\sum{xy} - (\sum{x})(\sum{y})
+    N\sum{xy} - (\sum{x})(\sum{y})\label{eq:numerator}
 \end{align}
-Using CouchDB's \_stats function only the $\sum{x}$ and $\sum{y}$ values are accessible when joining the two entities during list function executions, and not $x$ and $y$ values since these values come from entity instances. Only aggregations of the entity instances are available upon index retrieval (when retrieving reduced output) and not the individual instances. Similarly, the denominator of the formula also could not be calculated from the \_stats function output.
+Only aggregations of entity instances are available upon index retrieval (when retrieving reduced output) and not the individual instances. Similarly, the denominator of the formula also could not be calculated from the \_stats function output.
 
 List function logic is represented as an activity diagram in Figure \ref{fig-listfn-correlation-grades} and is configured to output a table of correlation coefficients for each benchmarking method as shown in Table \ref{tbl-correlation-grades}.
 

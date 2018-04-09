@@ -1,5 +1,5 @@
 \section{Design}
-Conceptualizing a single ETL process as an entity of type \textit{Task}, that is, the ``extraction, transformation and loading of data from a source to destination'', provides a focal point on which the nETL software can be architected. \textit{Task} instances are created by a constructor that takes a configuration object (loaded from a JSON file) as an object. Each task-instance is referenced by a singleton object created on app instantiation - the \mintinline{text}{taskManager}.
+Conceptualizing a single ETL process as an entity of type \textit{Task}, that is, the ``extraction, transformation and loading of data from a source to destination'', provides a focal point on which the nETL software can be architected. Task instances are created by a constructor that takes a configuration object (loaded from a JSON file) as an object. Each task-instance is referenced by a singleton object created on app instantiation - the \mintinline{text}{taskManager}.
 
 Starting the long-running nETL process comprises instantiating the \mintinline{text}{taskManager} singleton. This object provides a CLI (command line interface) to facilitate user interactions. Via the CLI, users can interact with \mintinline{text}{taskManager} to register different ETL components, start/stop tasks, configure application options such as log output path, etc.
 

@@ -1,15 +1,17 @@
-\section{Relational Queries in CouchDB}
-CouchDB uses MapReduce as a deterministic means of producing indices using parallel processing; MapReduce is implemented in terms of index requirements rather than as a means of performing relational operations on datasets. As such, performing relational operations on datasets using CouchDB's implementation of MapReduce is impossible and instead requires architecture-wide considerations. This is in contrast to RDBMSs where relational operations are isolated to the data retrieval layer and require much less thought into entity modeling, software stack architectures, etc. as a result.
+\section{Summary}
+CouchDB uses MapReduce as a means of producing indices via parallel processing, and thus requires Map functions that operate on a single document at a time. As such, performing cross-document joins and aggregations on datasets using CouchDB's implementation of MapReduce requires architecture-wide considerations. This is in contrast to relational database systems, where operation implementation is transparent to users and developers.
 
-But in the context of this project it is shown that CouchDB data can be modeled relationally, and relational operations can be performed on such data in the context of CouchDB. To do this requires the following considerations:
+Document-oriented stores such as CouchDB use nesting to ensure that a single document represents a single real-world entity wherever possible. However, particularly in a distributed system, there are frequently situations where, rather than embedding related entities, separate documents are used instead. One advantage of separation over nesting is that it prevents documents from becoming too large, which would make document transfer too costly. Another is that data received from e.g. a data lake is typically in separate, flattened structures rather than hierarchical/embedded format, and much more easily loaded into CouchDB as is. It is when separate documents are used that the need for inter-document joins and aggregations arises.
+
+This thesis has shown that join and aggregation can be performed on such data in the context of CouchDB using the following approach:
 
 \begin{enumerate}
-    \item ETL processes incorporate operations that would more generally be used in the data-retrieval layer in RDBMSs - i.e. projections, selections (include selections via joins)
+    \item a configurable framework is provided for ETL (extract - transform - load) which not only simplifies ETL processes but also runs such tasks concurrently and asynchronously in order to improve performance
     \item MapReduce is used as a means of normalizing entity representation, performing aggregations and sorting entity representations according to join-keys
-    \item Joins can be performed quite easily and efficiently on sorted indices
+    \item joins are then performed using these indices
+    \item where joins are required on projection- and selection-based subsets of data, the ETL framework is used to create such subsets beforehand, so as to improve join performance
 \end{enumerate}
 
-Although indices may be time-consuming to calculate initially, scanning b+trees is very efficient and so data retrieval from CouchDB is fast once indexed. And since indices are updated incrementally, joins performed via index scans are also very efficient. This in itself is an advantage offered by CouchDB when used in a relational context. However, working with relational data is clearly more difficult in CouchDB than in any RDBMS and most other NoSQL alternatives as well.
+Although indices may be time-consuming to calculate initially, scanning B+trees is very efficient, and CouchDB indices are updated incrementally rather than re-created, so both data retrieval and joins performed via index scans are very efficient.
 
-% TODO
-discuss why it's beneficial to use this means of entity modelling instead of aggregations in a nosql database
+The above approach was applied to 3 data sets provided by the University of Cape Town, which varied in size from 12 219 records to over 44 million records. The ETL, join and aggregation operations were correctly computed and executions ran in reasonable time using only 8 shards and a single computer as the server. While this case study was primarily used as a proof of concept, some of the results obtained are of interest to those focussing on educational data mining research. In particular, the emergence of National Benchmark Test scores as more indicative of CSC1015F performance than Grade 12 scores is a result worth investigating further.
