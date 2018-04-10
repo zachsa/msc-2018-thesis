@@ -5,11 +5,11 @@ The framework relies on an astoundingly simple programming model described by \c
 
 \begin{itemize}
     \item A \textit{mapping} stage in which distributed key-value pairs are produced from input data as described by a user-defined map function
-    \item A \textit{grouping} stage where distributed key-value output from the mapping stage is collected to common keys - i.e. \textit{key:[value, value, value]} datasets
+    \item A \textit{grouping} stage where distributed key-value output from the mapping stage is collected to common keys - i.e. \textit{key:[value, ..., value]} datasets
     \item And a \textit{reducing} stage where values per grouped key are processed as described by a user-defined reduce function
 \end{itemize}
 
-Due to the distributed and isolated nature of the map and reduce tasks, MapReduce as an idea is fault tolerant (specifically, fault tolerance is implemented via reexecution), which has in turn resulted in the \textit{New Software Stack} \cite{mining2011}: large-scale computing clusters built on commodity (cheap) hardware and software that computes in parallel. Such an approach to building and maintaining systems represents the potential to process ever-greater amounts of data at ever cheaper rates. This has spurred information explosion across all manner of software applications.
+Due to the distributed and isolated nature of the map and reduce tasks, MapReduce is fault tolerant (specifically, fault tolerance is implemented via reexecution), which has in turn resulted in the \textit{New Software Stack} \cite{mining2011}: large-scale computing clusters built on commodity (cheap) hardware and software that computes in parallel. Such an approach to building and maintaining systems represents the potential to process ever-greater amounts of data at ever cheaper rates. This has spurred information explosion across all manner of software applications.
 
 Starting with the development of the Hadoop framework as an open-source alternative to Google's proprietary file system and MapReduce framework, MapReduce implementations have become mainstream. Companies that make use of this programming model including Yahoo, Facebook, Amazon, and many more \cite{chandar2010}. For example, the Apache Foundation maintains a list of companies that use the Hadoop framework \cite{hadoopPower:2017}.
 

@@ -1,7 +1,7 @@
 \section{CouchDB}
 In CouchDB, data is modeled conceptually as \textit{documents}, which users interact with as serialized JSON strings \cite{rfc7159}. There are no limitations, specifications, etc., on how documents may be structured (other than that they must be represented by valid JSON). These comprise key-value pairs, in which the value may be derived from the objects themselves.
 
-The CouchDB data model (like many NoSQL data models) is considered \textit{unstructured} or \textit{semi-structured} when compared to RDBMSs, where relations within data models are rigidly formalized. But despite using different storage models, the conceptual requirements of data-persistence – such as the well-known ACID properties – are applicable to all database systems. ACID properties provide certain guarantees that are required within a system in order to assure information persistence:
+The CouchDB data model (like many NoSQL data models) is considered \textit{unstructured} or \textit{semi-structured} when compared to RDBMSs, where relations within data models are rigidly formalized. But despite using different storage models, the conceptual requirements of data-persistence – such as ACID properties – need to be addressed. ACID properties provide certain guarantees that are required within a system in order to assure information persistence:
 
 \begin{itemize}
     \item \textit{atomicity}: a series of operations that are part of the same logical transaction should either succeed or fail completely

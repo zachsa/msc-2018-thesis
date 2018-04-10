@@ -1,15 +1,15 @@
 \section{Summary}
-CouchDB uses MapReduce as a means of producing indices via parallel processing, and thus requires Map functions that operate on a single document at a time. As such, performing cross-document joins and aggregations on datasets using CouchDB's implementation of MapReduce requires architecture-wide considerations. This is in contrast to relational database systems, where operation implementation is transparent to users and developers.
+CouchDB uses MapReduce as a means of producing indices via parallel processing, and thus requires map functions that operate on a single document at a time. As such, performing cross-document joins and aggregations on datasets using CouchDB's implementation of MapReduce requires architecture-wide considerations. This is in contrast to relational database systems, where operation implementation is transparent to users and developers.
 
 Document-oriented stores such as CouchDB use nesting to ensure that a single document represents a single real-world entity wherever possible. However, particularly in a distributed system, there are frequently situations where, rather than embedding related entities, separate documents are used instead. One advantage of separation over nesting is that it prevents documents from becoming too large, which would make document transfer too costly. Another is that data received from e.g. a data lake is typically in separate, flattened structures rather than hierarchical/embedded format, and much more easily loaded into CouchDB as is. It is when separate documents are used that the need for inter-document joins and aggregations arises.
 
 This thesis has shown that join and aggregation can be performed on such data in the context of CouchDB using the following approach:
 
 \begin{enumerate}
-    \item a configurable framework is provided for ETL (extract - transform - load) which not only simplifies ETL processes but also runs such tasks concurrently and asynchronously in order to improve performance
-    \item MapReduce is used as a means of normalizing entity representation, performing aggregations and sorting entity representations according to join-keys
-    \item joins are then performed using these indices
-    \item where joins are required on projection- and selection-based subsets of data, the ETL framework is used to create such subsets beforehand, so as to improve join performance
+    \item A configurable framework is provided for ETL (extract - transform - load) which not only simplifies ETL processes but also runs such tasks concurrently and asynchronously in order to improve performance
+    \item MapReduce is used as a means of normalizing entity representation, performing aggregations and indesing entity representations based on join-keys
+    \item Joins are then performed using these indices
+    \item Where joins are required on projection- and selection-based subsets of data, the ETL framework is used to create such subsets beforehand, so as to improve join performance
 \end{enumerate}
 
 Although indices may be time-consuming to calculate initially, scanning B+trees is very efficient, and CouchDB indices are updated incrementally rather than re-created, so both data retrieval and joins performed via index scans are very efficient.
