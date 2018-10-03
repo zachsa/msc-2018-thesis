@@ -1,6 +1,9 @@
 # added by Zach
 _build/
 
+# Ignore the output
+thesis.pdf
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
