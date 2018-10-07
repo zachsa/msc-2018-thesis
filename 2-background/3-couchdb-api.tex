@@ -61,7 +61,7 @@ To adhere to the \_stats function contract, key-value output by the map function
     \item Or, all values must be an array of numbers (each array must be the same length). An example of this format is shown in Figure \ref{fig-stats-reduce-fn} A
 \end{itemize}
 
-This is unlike the contract for the \_sum function, where value output is \textit{normalized} during the reduction of lists of unequal length or the reduction of lists and numerical values. The aggregation of grouped of values (as shown in Figure \ref{fig-stats-reduce-fn} B) is completed by the \_stats function. For values that are groups of numbers (i.e. where the map function outputs key-number) then a single \_stats object is output for each unique key. Map output is received as input to the \_stats reduce function within 3 parameters as shown in Figure \ref{fig-stats-reduce-fn} C:
+This is unlike the contract for the \_sum function, where value output is \textit{normalized} during the reduction of lists of unequal length or the reduction of lists and numerical values. The aggregation of grouped values (as shown in Figure \ref{fig-stats-reduce-fn} B) is completed by the \_stats function. For values that are groups of numbers (i.e. where the map function outputs key-number) then a single \_stats object is output for each unique key. Map output is received as input to the \_stats reduce function within 3 parameters as shown in Figure \ref{fig-stats-reduce-fn} C:
 
 \begin{itemize}
     \item A list of \textit{MapOutputKey}:\textit{Document ID} key-value pairs (all the keys are the same, but the documents that \textit{emitted} them are different)
