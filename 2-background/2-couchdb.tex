@@ -10,7 +10,7 @@ The CouchDB data model (like many NoSQL data models) is considered \textit{unstr
     \item \textit{durability}: data is permanently persisted, irrespective of subsequent system failures
 \end{itemize}
 
-Without such guarantees a database would not be useful since the integrity of any information stored the system would be questionable. In terms of the CouchDB software, ACID properties are applicable at the document level, meaning that the interactions with individual documents are either successful or not; CouchDB does not allow the reading or writing of partial documents.
+Without such guarantees a database would not be useful since the integrity of any information stored by the system would be questionable. In terms of the CouchDB software, ACID properties are applicable at the document level, meaning that the interactions with individual documents are either successful or not; CouchDB does not allow the reading or writing of partial documents.
 
 CouchDB serializes document interactions to guarantee isolation and document writes are guaranteed to be durable and result in a consistent database. In other words, in working with CouchDB, transactions involving single documents are completely reliable and fault tolerant; however, transactions involving retrieving and storing information from multiple documents are not (although bulk document insertions can also be configured atomically).
 
