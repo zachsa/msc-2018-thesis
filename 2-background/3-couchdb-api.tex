@@ -1,6 +1,6 @@
 \subsection{API}
 \subsubsection{HTTP Interface}
-All communication with CouchDB takes place via the HTTP protocol. The interface is resource orientated and strives to be RESTful. This makes such interactions very clear since the HTTP endpoints are logical and easy to remember. For example, the following sample endpoints (among many) are shown here, though the full API is very well documented online \cite{couch-api}.
+All communication with CouchDB takes place via the HTTP protocol. The interface is resource orientated and strives to be RESTful. This makes such interactions very clear since the HTTP endpoints are logical and easy to remember. For example, the following sample endpoints (among many) are shown here, with the full API documentation available online \cite{couch-api}.
 
 \begin{itemize}
     \item \textit{GET} /dbName/:id (retrieves a document with the specified ID)
@@ -21,7 +21,7 @@ CouchDB allows users to specify several different types of functions that can be
     \item \textit{validations}
 \end{itemize}
 
-Views are b+tree indexes created by specifying a mapping function and an optional reduce function to be executed on every document in a database. Map functions iteratively take each document as an argument and output key-value pair(s) - as specified by the map function definition - that are then incorporated into the b+tree. Reduce functions are evaluated by taking Map-function outputs as inputs and returning reduced results from that input, which are stored as internal nodes on the b+tree.
+Views are b+tree indices created by specifying a mapping function and an optional reduce function to be executed on every document in a database. Map functions iteratively take each document as an argument and output key-value pair(s) - as specified by the map function definition - that are then incorporated into the b+tree. Reduce functions are evaluated by taking Map-function outputs as inputs and returning reduced results from that input, which are stored as internal nodes on the b+tree.
 
 Show functions act as a type of middleware, allowing users to specify transformations on a single document that has been requested from the database and then returning that document to the user - for example, transforming a document from JSON representation to HTML representation for better display in a browser. List functions are similar to show functions, but they transform sets of documents that have been iteratively retrieved from an index instead of single documents that have been retrieved from a database.
 
